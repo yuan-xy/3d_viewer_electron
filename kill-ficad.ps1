@@ -1,0 +1,1 @@
+Get-Process | Where-Object { $_.Path -like '*Ficad*' } | Stop-Process -Force -ErrorAction SilentlyContinue

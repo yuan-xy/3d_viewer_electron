@@ -1,0 +1,6 @@
+{
+  "extends": "../ficad_web/tsconfig.json",
+  "compilerOptions": {
+    "types": ["node"]
+  }
+}
