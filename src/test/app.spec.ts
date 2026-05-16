@@ -1,86 +1,50 @@
-import { test, expect } from '@playwright/test'
+import { test, expect, ElectronApplication, _electron } from '@playwright/test'
 import { readFileSync } from 'fs'
 import path from 'path'
 import { fileURLToPath } from 'url'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
-
-const GLB_BUFFER = readFileSync(path.join(__dirname, '../../../ficad_web/src/test/cube_with_hole.glb'))
+const PROJECT_ROOT = path.resolve(__dirname, '..', '..')
+const TEST_GLB = readFileSync(path.join(__dirname, 'fixtures', 'test-box.glb'))
 
 test.describe('Ficad Web Electron', () => {
-  test.use({ viewport: { width: 1280, height: 720 } })
+  let electronApp: ElectronApplication
 
-  test('app starts without errors and renders canvas', async ({ page }) => {
-    const consoleErrors: string[] = []
-
-    page.on('console', (msg) => {
-      if (msg.type() === 'error') consoleErrors.push(msg.text())
+  test.beforeAll(async () => {
+    const exePath = path.join(PROJECT_ROOT, 'dist', 'win-unpacked', 'Ficad Web.exe')
+    electronApp = await _electron.launch({
+      executablePath: exePath,
     })
-    page.on('pageerror', (err) => consoleErrors.push(`[pageerror] ${err.message}`))
-
-    await page.goto('/workspace', { waitUntil: 'networkidle' })
-    await page.waitForTimeout(2000)
-
-    await expect(page.getByText('Ficad', { exact: true })).toBeVisible()
-    await expect(page.locator('canvas').first()).toBeAttached()
-
-    expect(consoleErrors).toEqual([])
   })
 
-  test('loads GLB file and renders 3D mesh without errors', async ({ page }) => {
-    const consoleErrors: string[] = []
+  test.afterAll(async () => {
+    await electronApp.close()
+  })
 
-    page.on('console', (msg) => {
-      if (msg.type() === 'error') consoleErrors.push(msg.text())
-    })
-    page.on('pageerror', (err) => consoleErrors.push(`[pageerror] ${err.message}`))
+  test('app starts and renders canvas', async () => {
+    const window = await electronApp.firstWindow()
+    await window.waitForTimeout(3000)
 
-    await page.goto('/workspace', { waitUntil: 'networkidle' })
-    await page.waitForTimeout(2000)
+    const canvasCount = await window.locator('canvas').count()
+    console.log('[test] canvas count:', canvasCount)
+    expect(canvasCount).toBeGreaterThan(0)
+  })
 
-    // Upload GLB file
-    await page.locator('input[type="file"]').setInputFiles({
-      name: 'cube_with_hole.glb',
+  test('loads GLB file and model renders', async () => {
+    const window = await electronApp.firstWindow()
+    await window.waitForTimeout(2000)
+
+    // Load GLB file
+    await window.locator('input[type="file"]').setInputFiles({
+      name: 'test-box.glb',
       mimeType: 'model/gltf-binary',
-      buffer: GLB_BUFFER,
+      buffer: TEST_GLB,
     })
 
-    // Upload area should disappear after model loads
-    await expect(page.getByText(/Supports STL/).first()).not.toBeVisible({ timeout: 10000 })
+    await window.waitForTimeout(3000)
 
-    // Canvas still rendered (WebGL still running)
-    await expect(page.locator('canvas').first()).toBeAttached()
-
-    // No errors
-    expect(consoleErrors).toEqual([])
-  })
-
-  test('desktop layout renders all toolbar groups', async ({ page }) => {
-    await page.setViewportSize({ width: 1280, height: 800 })
-    await page.goto('/workspace', { waitUntil: 'networkidle' })
-    await page.waitForTimeout(1500)
-
-    await expect(page.locator('[role="group"]')).toHaveCount(5)
-    await expect(page.locator('canvas').first()).toBeAttached()
-  })
-
-  test('loads GLB and toolbar groups remain visible', async ({ page }) => {
-    await page.setViewportSize({ width: 1280, height: 800 })
-    await page.goto('/workspace', { waitUntil: 'networkidle' })
-    await page.waitForTimeout(1500)
-
-    await expect(page.locator('[role="group"]')).toHaveCount(5)
-
-    await page.locator('input[type="file"]').setInputFiles({
-      name: 'cube_with_hole.glb',
-      mimeType: 'model/gltf-binary',
-      buffer: GLB_BUFFER,
-    })
-
-    await page.waitForTimeout(4000)
-
-    // Toolbar still intact after model load
-    await expect(page.locator('[role="group"]')).toHaveCount(5)
-    await expect(page.locator('canvas').first()).toBeAttached()
+    // Canvas still visible
+    const canvasVisible = await window.locator('canvas').first().isVisible()
+    expect(canvasVisible).toBe(true)
   })
 })

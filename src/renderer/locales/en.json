@@ -1,0 +1,51 @@
+{
+  "app.name": "Ficad",
+  "app.welcome": "Welcome to Ficad",
+  "app.welcomeHint": "Upload a model or describe what you need",
+  "app.quickExample1": "Generate an M3 bolt",
+  "app.quickExample2": "Make a 20mm cube",
+  "app.emptySceneTree": "No models yet",
+  "app.noModel": "No model",
+
+  "toolbar.download": "Download Model",
+
+  "sceneTree.title": "Scene",
+  "sceneTree.visible": "Visible",
+  "sceneTree.hidden": "Hidden",
+
+  "status.vertices": "Vertices",
+  "status.faces": "Faces",
+  "status.material": "Material",
+
+  "delete": "Delete",
+  "confirm": "Confirm",
+  "cancel": "Cancel",
+
+  "view.front": "Front",
+  "view.back": "Back",
+  "view.left": "Left",
+  "view.right": "Right",
+  "view.top": "Top",
+  "view.bottom": "Bottom",
+
+  "error.loadFailed": "Load failed: {{message}}",
+  "error.unsupportedFormat": "Unsupported format: {{format}}",
+  "error.retry": "Retry",
+  "error.connectionLost": "Connection lost, reconnecting...",
+  "error.timeout": "Timeout, please retry",
+  "error.webglLost": "3D rendering error, please refresh",
+
+  "display.solid": "Solid",
+  "display.wireframe": "Wireframe",
+  "display.solidWithWireframe": "Solid+Wireframe",
+  "display.mesh": "Mesh",
+  "display.solidMesh": "Solid+Mesh",
+  "display.debug": "Debug",
+
+  "debug.selectFace": "-- Select Face --",
+  "debug.selectEdge": "-- Select Edge --",
+
+  "fileList.title": "Files",
+  "fileList.empty": "Load a file to browse models in the same folder",
+  "fileList.folder": "Folder"
+}

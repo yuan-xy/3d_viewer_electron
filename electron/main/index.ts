@@ -1,5 +1,5 @@
 import { app, shell, BrowserWindow, ipcMain, protocol } from 'electron'
-import { join, extname } from 'path'
+import { join, extname, dirname } from 'path'
 import * as fs from 'fs'
 
 let mainWindow: BrowserWindow | null = null
@@ -78,6 +78,38 @@ function createWindow(): void {
 
 ipcMain.handle('electron:getAppVersion', () => app.getVersion())
 ipcMain.handle('electron:openExternal', (_event, url: string) => shell.openExternal(url))
+
+// File system IPC handlers
+const SUPPORTED_EXTENSIONS = new Set(['.stl', '.glb', '.3mf', '.step', '.stp'])
+
+ipcMain.handle('fs:readDirectory', async (_event, dirPath: string) => {
+  try {
+    const entries = await fs.promises.readdir(dirPath, { withFileTypes: true })
+    const files: { name: string; path: string }[] = []
+    for (const entry of entries) {
+      if (entry.isFile()) {
+        const ext = extname(entry.name).toLowerCase()
+        if (SUPPORTED_EXTENSIONS.has(ext)) {
+          files.push({ name: entry.name, path: join(dirPath, entry.name) })
+        }
+      }
+    }
+    return { success: true, files }
+  } catch (e) {
+    const err = e as Error
+    return { success: false, error: err.message }
+  }
+})
+
+ipcMain.handle('fs:readFileAsBase64', async (_event, filePath: string) => {
+  try {
+    const buffer = await fs.promises.readFile(filePath)
+    return { success: true, data: buffer.toString('base64') }
+  } catch (e) {
+    const err = e as Error
+    return { success: false, error: err.message }
+  }
+})
 
 app.whenReady().then(() => {
   console.log('[Main] app ready')

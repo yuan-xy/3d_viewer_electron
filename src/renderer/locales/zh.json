@@ -1,0 +1,51 @@
+{
+  "app.name": "Ficad",
+  "app.welcome": "欢迎使用 Ficad",
+  "app.welcomeHint": "上传一个模型或直接描述需求开始",
+  "app.quickExample1": "生成一个M3螺栓",
+  "app.quickExample2": "做一个20mm立方体",
+  "app.emptySceneTree": "暂无模型",
+  "app.noModel": "无模型",
+
+  "toolbar.download": "下载模型",
+
+  "sceneTree.title": "场景",
+  "sceneTree.visible": "可见",
+  "sceneTree.hidden": "隐藏",
+
+  "status.vertices": "顶点",
+  "status.faces": "面",
+  "status.material": "耗材",
+
+  "delete": "删除",
+  "confirm": "确认",
+  "cancel": "取消",
+
+  "view.front": "前",
+  "view.back": "后",
+  "view.left": "左",
+  "view.right": "右",
+  "view.top": "上",
+  "view.bottom": "下",
+
+  "error.loadFailed": "加载失败: {{message}}",
+  "error.unsupportedFormat": "不支持的文件格式: {{format}}",
+  "error.retry": "重试",
+  "error.connectionLost": "连接中断，正在重连...",
+  "error.timeout": "处理超时，请重试",
+  "error.webglLost": "3D 渲染异常，请刷新页面",
+
+  "display.solid": "实体",
+  "display.wireframe": "线框",
+  "display.solidWithWireframe": "实体+线框",
+  "display.mesh": "网格",
+  "display.solidMesh": "实体+网格",
+  "display.debug": "调试",
+
+  "debug.selectFace": "-- 选择面 --",
+  "debug.selectEdge": "-- 选择边 --",
+
+  "fileList.title": "文件列表",
+  "fileList.empty": "加载文件后显示同目录模型",
+  "fileList.folder": "文件夹"
+}

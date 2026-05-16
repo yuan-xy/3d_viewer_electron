@@ -5,7 +5,6 @@ import path from 'path'
 import { fileURLToPath } from 'url'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
-const ficadWeb = path.resolve(__dirname, '../ficad_web')
 
 export default defineConfig({
   main: {
@@ -39,17 +38,17 @@ export default defineConfig({
     }
   },
   renderer: {
-    root: ficadWeb,
+    root: path.resolve(__dirname, 'src/renderer'),
     plugins: [react(), tailwindcss()],
     build: {
       outDir: path.resolve(__dirname, 'out/renderer'),
       rollupOptions: {
-        input: path.join(ficadWeb, 'index.html')
+        input: path.resolve(__dirname, 'src/renderer/index.html')
       }
     },
     resolve: {
       alias: {
-        '@': path.join(ficadWeb, 'src')
+        '@': path.resolve(__dirname, 'src/renderer')
       }
     }
   }
