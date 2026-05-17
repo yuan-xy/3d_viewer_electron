@@ -1,6 +1,7 @@
 import { app, shell, BrowserWindow, ipcMain, protocol, net } from 'electron'
 import { join, extname, dirname } from 'path'
 import * as fs from 'fs'
+import { ALL_EXTENSIONS } from '../../src/renderer/config/file-formats'
 
 // Must be called before app.whenReady() to grant the custom protocol access to
 // IndexedDB, fetch, and other standard web APIs.
@@ -97,7 +98,7 @@ ipcMain.handle('electron:getAppVersion', () => app.getVersion())
 ipcMain.handle('electron:openExternal', (_event, url: string) => shell.openExternal(url))
 
 // File system IPC handlers
-const SUPPORTED_EXTENSIONS = new Set(['.stl', '.glb', '.3mf', '.step', '.stp'])
+const SUPPORTED_EXTENSIONS = new Set(ALL_EXTENSIONS)
 
 ipcMain.handle('fs:readDirectory', async (_event, dirPath: string) => {
   try {
