@@ -55,7 +55,7 @@ export async function stepToGlbCached(
   // 3. Worker conversion: ReadStepFile in worker → buildGlb on main thread
   console.log('[stepToGlbCached] miss, starting worker conversion:', key)
   const stepBuffer = stepData instanceof ArrayBuffer ? stepData : stepData.buffer.slice(0)
-  const importResult = await convertInWorker(stepBuffer, OCCT_PARAMS)
+  const importResult = await convertInWorker(key, stepBuffer, OCCT_PARAMS)
   const buffer = buildGlbFromResult(importResult, options)
   const elapsed = ((performance.now() - startTime) / 1000).toFixed(1)
   console.log(`[stepToGlbCached] conversion done in ${elapsed}s, size=${buffer.byteLength}`)

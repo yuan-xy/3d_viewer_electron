@@ -1,14 +1,18 @@
 import type { OcctNode, OcctMesh } from './occtLoader'
 
-const POOL_SIZE = 2
+const POOL_SIZE = 3
+const MAX_PRECACHE_WORKERS = 1
 
-interface PoolWorker {
+type TaskType = 'user' | 'precache'
+
+interface WorkerSlot {
   worker: Worker
   busy: boolean
-  initStarted: boolean
+  taskType: TaskType | null
+  cacheKey: string | null
 }
 
-interface OcctImportResult {
+export interface OcctImportResult {
   root: OcctNode
   meshes: OcctMesh[]
 }
@@ -18,11 +22,14 @@ interface PendingRequest {
   reject: (e: Error) => void
 }
 
-const pool: PoolWorker[] = []
+const slots: WorkerSlot[] = []
 let requestId = 0
 const pending = new Map<number, PendingRequest>()
 
-function createWorker(): PoolWorker {
+// Dedup: one file = one in-flight conversion, regardless of who asked
+const pendingPromises = new Map<string, Promise<OcctImportResult>>()
+
+function createSlot(): WorkerSlot {
   const worker = new Worker('step-worker.js')
 
   worker.onmessage = (e: MessageEvent) => {
@@ -33,9 +40,13 @@ function createWorker(): PoolWorker {
     if (!req) return
     pending.delete(id)
 
-    // Mark worker as free
-    const pw = pool.find(p => p.worker === worker)
-    if (pw) pw.busy = false
+    // Mark slot as free
+    const slot = slots.find(s => s.worker === worker)
+    if (slot) {
+      slot.busy = false
+      slot.taskType = null
+      slot.cacheKey = null
+    }
 
     if (success) {
       req.resolve({ root, meshes })
@@ -46,58 +57,88 @@ function createWorker(): PoolWorker {
 
   worker.onerror = (err: ErrorEvent) => {
     console.error('[WorkerPool] worker error:', err.message || err)
-    // Reject only this worker's pending requests
     for (const [pid, req] of pending) {
-      const pw = pool.find(p => p.worker === worker && p.busy)
-      if (pw) {
+      const slot = slots.find(s => s.worker === worker && s.busy)
+      if (slot) {
         req.reject(new Error('Worker error'))
         pending.delete(pid)
       }
     }
-    // Replace crashed worker
-    const idx = pool.findIndex(p => p.worker === worker)
+    const idx = slots.findIndex(s => s.worker === worker)
     if (idx >= 0) {
       console.warn('[WorkerPool] replacing crashed worker at index', idx)
-      pool[idx] = createWorker()
+      slots[idx] = createSlot()
     }
   }
 
-  // Trigger early WASM init so first conversion is faster
+  // Early WASM init
   worker.postMessage({ type: 'init' })
 
-  return { worker, busy: false, initStarted: true }
+  return { worker, busy: false, taskType: null, cacheKey: null }
 }
 
 // Create pool at module load time
 for (let i = 0; i < POOL_SIZE; i++) {
-  pool.push(createWorker())
+  slots.push(createSlot())
 }
 
-function acquire(): PoolWorker | null {
-  const pw = pool.find(p => !p.busy)
-  if (pw) pw.busy = true
-  return pw ?? null
+function countBusyByType(taskType: TaskType): number {
+  return slots.filter(s => s.busy && s.taskType === taskType).length
+}
+
+function acquire(taskType: TaskType): WorkerSlot | null {
+  // Pre-cache: limit concurrent workers
+  if (taskType === 'precache' && countBusyByType('precache') >= MAX_PRECACHE_WORKERS) {
+    return null
+  }
+  const slot = slots.find(s => !s.busy)
+  if (slot) {
+    slot.busy = true
+    slot.taskType = taskType
+  }
+  return slot ?? null
 }
 
 export function convertInWorker(
+  cacheKey: string,
   stepData: ArrayBuffer,
   params: Record<string, unknown>,
+  priority: TaskType = 'user',
 ): Promise<OcctImportResult> {
-  const id = ++requestId
-  return new Promise((resolve, reject) => {
-    const pw = acquire()
-    if (!pw) {
-      reject(new Error('All workers busy'))
+  // Dedup: if this file is already being converted, wait for that same Promise
+  const existing = pendingPromises.get(cacheKey)
+  if (existing) {
+    console.log('[WorkerPool] dedup hit, waiting for in-flight conversion:', cacheKey)
+    return existing
+  }
+
+  const promise = new Promise<OcctImportResult>((resolve, reject) => {
+    const slot = acquire(priority)
+    if (!slot) {
+      reject(new Error(priority === 'precache'
+        ? 'No free worker for pre-cache'
+        : 'All workers busy'))
       return
     }
+
+    const id = ++requestId
+    slot.cacheKey = cacheKey
     pending.set(id, { resolve, reject })
-    pw.worker.postMessage(
+    slot.worker.postMessage(
       { type: 'convert', id, stepData, params },
       [stepData],
     )
   })
+
+  // Register the promise so other callers can await it
+  pendingPromises.set(cacheKey, promise)
+  promise.finally(() => {
+    pendingPromises.delete(cacheKey)
+  })
+
+  return promise
 }
 
 export function hasFreeWorker(): boolean {
-  return pool.some(p => !p.busy)
+  return slots.some(s => !s.busy)
 }

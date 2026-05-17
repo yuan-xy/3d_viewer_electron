@@ -1,5 +1,5 @@
 import { buildGlbFromResult, type StepToGlbOptions } from './stepToGlb'
-import { convertInWorker, hasFreeWorker } from './stepWorkerPool'
+import { convertInWorker } from './stepWorkerPool'
 import { getCached, putCached } from './stepCache'
 
 const memCache = new Map<string, ArrayBuffer>()
@@ -64,16 +64,6 @@ export async function startPreCache(
       // IndexedDB unavailable, proceed with conversion
     }
 
-    // Wait for a free worker before reading the file
-    const waitStart = performance.now()
-    while (!hasFreeWorker()) {
-      if (preCacheAbort) break
-      await new Promise(r => setTimeout(r, 200))
-    }
-    if (preCacheAbort) break
-    const waited = ((performance.now() - waitStart) / 1000).toFixed(1)
-    if (Number(waited) > 0) console.log('[preCache] waited', waited + 's for free worker')
-
     try {
       const result = await window.electronAPI.readFileAsBase64(file.path)
       if (!result.success || !result.data) {
@@ -81,12 +71,14 @@ export async function startPreCache(
         continue
       }
 
+      if (preCacheAbort) break
+
       const binaryString = atob(result.data)
       const bytes = new Uint8Array(binaryString.length)
       for (let i = 0; i < binaryString.length; i++) bytes[i] = binaryString.charCodeAt(i)
 
       console.log('[preCache] converting:', file.name)
-      const importResult = await convertInWorker(bytes.buffer, OCCT_PARAMS)
+      const importResult = await convertInWorker(key, bytes.buffer, OCCT_PARAMS, 'precache')
 
       const glbBuffer = buildGlbFromResult(importResult, {
         wasmPath,
@@ -97,6 +89,7 @@ export async function startPreCache(
       try { await putCached(key, glbBuffer) } catch { /* best-effort */ }
       console.log('[preCache] cached:', file.name, `(${(glbBuffer.byteLength / 1024).toFixed(0)}KB)`)
     } catch (err) {
+      if (preCacheAbort) break
       console.warn('[preCache] failed for', file.name + ':', err)
     }
   }
