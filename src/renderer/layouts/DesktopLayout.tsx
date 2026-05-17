@@ -145,7 +145,7 @@ export default function DesktopLayout() {
       <div className="flex-1 flex overflow-hidden">
         {/* Left Sidebar */}
         {ui.leftPanelOpen && (
-          <aside className="w-52 lg:w-64 border-r flex flex-col shrink-0">
+          <aside style={{ width: '15%' } as React.CSSProperties} className="border-r flex flex-col shrink-0">
             <div className="p-2 text-xs font-semibold text-muted-foreground">{t('sceneTree.title')}</div>
             <ScrollArea className="flex-1">
               {model.sceneTree.length === 0 ? (
@@ -190,7 +190,7 @@ export default function DesktopLayout() {
 
         {/* Right Panel: File List */}
         {ui.rightPanelOpen && (
-          <aside className="w-72 lg:w-96 border-l flex flex-col shrink-0">
+          <aside style={{ width: '15%' } as React.CSSProperties} className="border-l flex flex-col shrink-0">
             <FileListPanel />
           </aside>
         )}
