@@ -1,27 +1,31 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useModelStore } from '@/stores/model-store'
+import { useModelStore, type FileSortMode } from '@/stores/model-store'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { cn } from '@/lib/utils'
 import { toast } from 'sonner'
 import { stepToGlbCached, startPreCache } from '@/lib/step-converter'
-
-const EXT_COLORS: Record<string, string> = {
-  '.stl': 'text-blue-500',
-  '.glb': 'text-green-500',
-  '.3mf': 'text-orange-500',
-  '.step': 'text-purple-500',
-  '.stp': 'text-purple-500',
-}
+import { EXT_COLORS, detectFormat } from '@/config/file-formats'
+import { Button } from '@/components/ui/button'
+import { ArrowUpDown } from 'lucide-react'
 
 function getExt(name: string): string {
   const i = name.lastIndexOf('.')
-  return i >= 0 ? name.slice(i) : ''
+  return i >= 0 ? name.slice(i).toLowerCase() : ''
 }
 
 export default function FileListPanel() {
   const { t } = useTranslation()
-  const { currentFolderPath, folderFiles, selectedFileIndex, setSelectedFileIndex, setFolderFiles, glbUrl } = useModelStore()
+  const {
+    currentFolderPath,
+    folderFiles,
+    selectedFileIndex,
+    fileSortMode,
+    setSelectedFileIndex,
+    setFolderFiles,
+    setFileSortMode,
+    glbUrl,
+  } = useModelStore()
   const listRef = useRef<HTMLDivElement>(null)
 
   // Scroll selected item into view
@@ -40,6 +44,25 @@ export default function FileListPanel() {
     return () => clearTimeout(timer)
   }, [folderFiles])
 
+  const sortedFiles = useMemo(() => {
+    const files = [...folderFiles]
+    if (fileSortMode === 'type+name') {
+      files.sort((a, b) => {
+        const extA = getExt(a.name)
+        const extB = getExt(b.name)
+        if (extA !== extB) return extA.localeCompare(extB)
+        return a.name.localeCompare(b.name)
+      })
+    }
+    // 'name' — keep original order
+    return files
+  }, [folderFiles, fileSortMode])
+
+  function cycleSortMode() {
+    const next: FileSortMode = fileSortMode === 'name' ? 'type+name' : 'name'
+    setFileSortMode(next)
+  }
+
   if (folderFiles.length === 0) {
     return (
       <div className="flex flex-col h-full">
@@ -55,8 +78,17 @@ export default function FileListPanel() {
 
   return (
     <div className="flex flex-col h-full">
-      <div className="p-2 text-xs font-semibold text-muted-foreground border-b">
-        {t('fileList.title')}
+      <div className="p-2 text-xs font-semibold text-muted-foreground border-b flex items-center justify-between">
+        <span>{t('fileList.title')}</span>
+        <Button
+          variant="ghost"
+          size="icon"
+          className="h-5 w-5"
+          onClick={cycleSortMode}
+          title={fileSortMode === 'name' ? t('fileList.sortByName') : t('fileList.sortByType')}
+        >
+          <ArrowUpDown className={cn('h-3 w-3', fileSortMode === 'type+name' && 'text-primary')} />
+        </Button>
       </div>
       {currentFolderPath && (
         <div className="px-3 py-1.5 text-xs text-muted-foreground border-b truncate" title={currentFolderPath}>
@@ -65,9 +97,10 @@ export default function FileListPanel() {
       )}
       <ScrollArea className="flex-1">
         <div ref={listRef} className="p-2">
-          {folderFiles.map((file, i) => {
+          {sortedFiles.map((file, i) => {
             const isSelected = i === selectedFileIndex
             const isCurrent = file.name === glbUrl
+            const ext = getExt(file.name)
             return (
               <div
                 key={file.path}
@@ -86,8 +119,8 @@ export default function FileListPanel() {
                 {isCurrent && (
                   <span className="h-2 w-2 rounded-full bg-primary shrink-0" />
                 )}
-                <span className={cn('font-medium shrink-0', EXT_COLORS[getExt(file.name)])}>
-                  {getExt(file.name).toUpperCase().slice(1)}
+                <span className={cn('font-medium shrink-0 text-xs', EXT_COLORS[ext] || 'text-muted-foreground')}>
+                  {ext ? ext.toUpperCase().slice(1) : '?'}
                 </span>
                 <span className="truncate text-foreground" title={file.name}>
                   {file.name}
@@ -117,9 +150,10 @@ async function handleFileClick(file: { name: string; path: string; mtimeMs: numb
       bytes[i] = binaryString.charCodeAt(i)
     }
     const buffer = bytes.buffer
-    const ext = file.name.split('.').pop()?.toLowerCase()
-    const isStep = ext === 'step' || ext === 'stp'
-    if (isStep) {
+    const format = detectFormat(file.name)
+
+    // STEP/STP needs special conversion
+    if (format === 'step') {
       useModelStore.getState().setIsConverting(true)
       const { buffer: glbBuffer } = await stepToGlbCached(buffer,
         { filePath: file.path, mtimeMs: file.mtimeMs },
@@ -127,8 +161,11 @@ async function handleFileClick(file: { name: string; path: string; mtimeMs: numb
       )
       useModelStore.getState().setIsConverting(false)
       useModelStore.getState().setModelBuffer(glbBuffer, 'glb')
+    } else if (format) {
+      useModelStore.getState().setModelBuffer(buffer, format)
     } else {
-      useModelStore.getState().setModelBuffer(buffer, ext as 'stl' | 'glb' | '3mf')
+      toast.error('Unsupported file format: ' + file.name)
+      return
     }
     useModelStore.getState().setGLBUrl(file.name)
   } catch (e) {

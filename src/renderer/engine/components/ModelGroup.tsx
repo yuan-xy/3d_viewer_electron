@@ -1,22 +1,20 @@
 import { useEffect, useRef, useState, forwardRef } from 'react'
 import * as THREE from 'three'
-import { STLLoader } from 'three/examples/jsm/loaders/STLLoader.js'
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
-import { ThreeMFLoader } from 'three/examples/jsm/loaders/3MFLoader.js'
 import { mergeGeometries as mergeBufferGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js'
 import { useModelStore, type GlbPartInfo } from '@/stores/model-store'
 import type { SelectorRuntime } from '@/lib/topology/types'
 import { buildGlbFaceIdsForPart } from '@/lib/topology/build-face-ids'
 import type { DisplayMode } from './DisplayModeDropdown'
+import { loadFormat } from '@/engine/formatLoaders'
+import type { FormatId } from '@/config/file-formats'
 
 // ---- types ----
 
 interface ModelGroupProps {
   buffer: ArrayBuffer | null
-  format: 'stl' | 'glb' | '3mf' | 'step' | 'stp' | null
+  format: FormatId | null
   onLoaded?: (box: THREE.Box3) => void
   onError?: (message: string) => void
-  /** If provided, faceIds are built and attached to each GLB mesh's userData for face picking */
   selectorRuntime?: SelectorRuntime | null
   displayMode?: DisplayMode
 }
@@ -34,16 +32,18 @@ function mergeGeometries(meshes: THREE.Mesh[]): THREE.BufferGeometry {
   return mergeBufferGeometries(geoms, false)
 }
 
+// ---- multi-mesh rendering constants ----
+const MULTI_MESH_FORMATS: FormatId[] = ['glb', 'gltf', '3mf', 'fbx', 'dae', '3ds', 'usdz', 'vox', 'kmz', 'amf', 'lwo', 'md2', '3dm']
+
 // ----
 
 const ModelGroup = forwardRef<THREE.Group, ModelGroupProps>(function ModelGroup(
   { buffer, format, onLoaded, onError, selectorRuntime, displayMode = 'solid' },
   ref,
 ) {
-  // GLB: render individual meshes
   const [glbMeshes, setGlbMeshes] = useState<THREE.Mesh[]>([])
-  // Non-GLB: single merged geometry
   const [mergedGeometry, setMergedGeometry] = useState<THREE.BufferGeometry | null>(null)
+  const [objects, setObjects] = useState<THREE.Object3D[]>([])
   const [error, setError] = useState<string | null>(null)
   const setGlbPartInfos = useModelStore((s) => s.setGlbPartInfos)
   const setModelCenteringOffset = useModelStore((s) => s.setModelCenteringOffset)
@@ -59,6 +59,7 @@ const ModelGroup = forwardRef<THREE.Group, ModelGroupProps>(function ModelGroup(
     if (!buffer || !format) {
       setGlbMeshes([])
       setMergedGeometry(null)
+      setObjects([])
       setError(null)
       setGlbPartInfos([])
       setModelCenteringOffset(null)
@@ -70,68 +71,74 @@ const ModelGroup = forwardRef<THREE.Group, ModelGroupProps>(function ModelGroup(
 
     async function load() {
       try {
-        if (format === 'stl') {
-          const geo = new STLLoader().parse(buffer!)
-          if (cancelled) return
-          geo.computeVertexNormals()
-          geo.center()
-          setMergedGeometry(geo)
+        // STEP is special — should have been converted to GLB already
+        if (format === 'step') {
+          console.warn('[ModelGroup] STEP received without prior conversion -- should be GLB by now')
+          return
+        }
+
+        const result = await loadFormat(buffer, format)
+        if (cancelled) return
+
+        // If format produced non-mesh objects (GCode lines, BVH skeleton, PCD points, etc.)
+        if (result.objects.length > 0 && result.meshes.length === 0) {
+          setObjects(result.objects)
           setGlbMeshes([])
+          setMergedGeometry(null)
           setGlbPartInfos([])
-          updateSceneTree([{ id: 'stl-model', name: 'STL Model', visible: true }])
-          geo.computeBoundingBox()
-          if (geo.boundingBox) onLoadedRef.current?.(geo.boundingBox.clone())
-        } else if (format === 'glb') {
-          const loader = new GLTFLoader()
-          const gltf = await loader.parseAsync(buffer!, '')
-          if (cancelled) return
+          updateSceneTree([{ id: `${format}-objects`, name: format.toUpperCase(), visible: true }])
 
-          // GLBs from cad-skill's STEP pipeline carry STEP_topology extension
-          // and store Z-up mesh data directly. Standard GLBs are Y-up per
-          // glTF spec — rotate them into our Z-up scene.
-          const gltfJson = (gltf as unknown as { parser?: { json?: { extensions?: Record<string, unknown> } } }).parser?.json
-          const isCadSkillGlb = !!gltfJson?.extensions?.['STEP_topology']
-          if (!isCadSkillGlb) {
-            console.log('[ModelGroup] standard Y-up GLB detected — converting to Z-up')
+          // Compute bounding box from all objects (Points, Lines, Bones, etc.)
+          const box = new THREE.Box3()
+          for (const obj of result.objects) {
+            obj.updateWorldMatrix(true, false)
+            if (obj.geometry) {
+              if (!obj.geometry.boundingBox) obj.geometry.computeBoundingBox()
+              if (obj.geometry.boundingBox) {
+                box.expandByObject(obj)
+              }
+            }
           }
+          if (!box.isEmpty()) onLoadedRef.current?.(box)
+          return
+        }
 
-          const rawMeshes: THREE.Mesh[] = []
-          gltf.scene.traverse((child) => {
-            if (child instanceof THREE.Mesh) rawMeshes.push(child)
-          })
-          if (rawMeshes.length === 0) {
-            const msg = 'No meshes found in GLB'
-            setError(msg)
-            onErrorRef.current?.(msg)
-            return
-          }
+        const meshes = result.meshes
+        if (meshes.length === 0) {
+          const msg = 'No meshes found in file'
+          setError(msg)
+          onErrorRef.current?.(msg)
+          return
+        }
 
-          // Compute overall bounding box in world space
+        // Determine whether to render as multi-mesh or single merged geometry
+        const useMultiMesh = MULTI_MESH_FORMATS.includes(format)
+
+        if (useMultiMesh) {
+          // Multi-mesh path (GLB-like): keep individual meshes for face picking
           const overallBox = new THREE.Box3()
           const processed: THREE.Mesh[] = []
           const partInfos: GlbPartInfo[] = []
 
-          for (let i = 0; i < rawMeshes.length; i++) {
-            const src = rawMeshes[i]
+          for (let i = 0; i < meshes.length; i++) {
+            const src = meshes[i]
             const geo = src.geometry.clone()
             src.updateWorldMatrix(true, false)
             geo.applyMatrix4(src.matrixWorld)
-            if (!isCadSkillGlb) {
+
+            // Standard GLTF/GLB is Y-up → convert to Z-up (unless cad-skill STEP GLB)
+            if ((format === 'glb' || format === 'gltf') && !isCadSkillGlb(buffer)) {
               geo.rotateX(-Math.PI / 2)
             }
+
             geo.computeVertexNormals()
             geo.computeBoundingBox()
 
             if (geo.boundingBox) {
-              overallBox.expandByObject(
-                new THREE.Mesh(geo),
-              )
+              overallBox.expandByObject(new THREE.Mesh(geo))
             }
 
-            const partId = src.userData?.partId ||
-              src.name ||
-              `part-${i}`
-
+            const partId = src.userData?.partId || src.name || `part-${i}`
             processed.push(new THREE.Mesh(geo))
             partInfos.push({
               partId: String(partId),
@@ -152,10 +159,10 @@ const ModelGroup = forwardRef<THREE.Group, ModelGroupProps>(function ModelGroup(
           setModelCenteringOffset([center.x, center.y, center.z])
 
           setMergedGeometry(null)
+          setObjects([])
           setGlbMeshes(processed)
           setGlbPartInfos(partInfos)
 
-          // Build scene tree from part infos (GLB only)
           const sceneTree = partInfos.map((info) => ({
             id: info.partId,
             name: info.name,
@@ -170,47 +177,18 @@ const ModelGroup = forwardRef<THREE.Group, ModelGroupProps>(function ModelGroup(
             finalBox.expandByObject(new THREE.Mesh(clone))
           }
           onLoadedRef.current?.(finalBox)
-        } else if (format === '3mf') {
-          const group = new ThreeMFLoader().parse(buffer!)
-          if (cancelled) return
-
-          const rawMeshes: THREE.Mesh[] = []
-          group.traverse((child) => {
-            if (child instanceof THREE.Mesh) rawMeshes.push(child)
-          })
-          if (rawMeshes.length === 0) {
-            const msg = 'No meshes found in 3MF'
-            setError(msg)
-            onErrorRef.current?.(msg)
-            return
-          }
-
-          const geo = mergeGeometries(rawMeshes)
+        } else {
+          // Single merged geometry path (STL-like)
+          const geo = mergeGeometries(meshes)
           geo.computeVertexNormals()
           geo.center()
           setMergedGeometry(geo)
           setGlbMeshes([])
+          setObjects([])
           setGlbPartInfos([])
-
-          // Build scene tree from 3MF objects (3MF can have multiple objects)
-          const sceneTree: { id: string; name: string; visible: boolean }[] = []
-          let objIdx = 0
-          group.traverse((child) => {
-            if (child instanceof THREE.Object3D) {
-              const name = child.name || `object-${objIdx}`
-              sceneTree.push({ id: String(objIdx), name, visible: true })
-              objIdx++
-            }
-          })
-          updateSceneTree(sceneTree)
+          updateSceneTree([{ id: `${format}-model`, name: format.toUpperCase(), visible: true }])
           geo.computeBoundingBox()
           if (geo.boundingBox) onLoadedRef.current?.(geo.boundingBox.clone())
-        } else if (format === 'step' || format === 'stp') {
-          console.warn('[ModelGroup] STEP received without prior conversion -- should be GLB by now')
-        } else {
-          const msg = `Unsupported format: ${format}`
-          setError(msg)
-          onErrorRef.current?.(msg)
         }
       } catch (e) {
         if (!cancelled) {
@@ -223,17 +201,25 @@ const ModelGroup = forwardRef<THREE.Group, ModelGroupProps>(function ModelGroup(
     }
 
     load()
-    return () => {
-      cancelled = true
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    return () => { cancelled = true }
   }, [buffer, format, setGlbPartInfos, setModelCenteringOffset])
 
   if (error) {
     return null
   }
 
-  // GLB: render individual meshes
+  // Render non-mesh objects (GCode lines, BVH skeleton helper, etc.)
+  if (objects.length > 0) {
+    return (
+      <group ref={ref as unknown as React.Ref<THREE.Group>}>
+        {objects.map((obj, i) => (
+          <primitive key={i} object={obj} />
+        ))}
+      </group>
+    )
+  }
+
+  // GLB-type: render individual meshes
   if (glbMeshes.length > 0) {
     // Build faceIds for each mesh if runtime is available
     const meshFaceIds: (Uint32Array | null)[] = []
@@ -255,16 +241,13 @@ const ModelGroup = forwardRef<THREE.Group, ModelGroupProps>(function ModelGroup(
         meshFaceIds.push(faceIds)
       }
       console.log('[ModelGroup] faceIds built:', meshFaceIds.map(
-        (f, i) => `mesh${i}:${f ? f.length + 'triangles,' + f.filter((v: number) => v !== 0xffffffff).length + 'mapped' : 'null'}`))
+        (f, i) => `mesh${i}:${f ? f.length + 'triangles,' + f.filter((v: number) => v !== 0xffffffff).length + 'mapped' : 'null'}`
+      ))
     }
 
     const isMeshOnly = displayMode === 'mesh' || displayMode === 'debug'
     const isSolidMesh = displayMode === 'solidWithMesh'
 
-    // wireframe mode: render invisible meshes for face raycasting only.
-    // Wireframe edges are drawn by DebugTopologyOverlay; these meshes
-    // are invisible (colorWrite=false) but still intersectable by the
-    // raycaster so face picking works.
     if (displayMode === 'wireframe') {
       return (
         <group ref={ref as unknown as React.Ref<THREE.Group>}>
@@ -340,7 +323,6 @@ const ModelGroup = forwardRef<THREE.Group, ModelGroupProps>(function ModelGroup(
   const isMeshOnly = displayMode === 'mesh' || displayMode === 'debug'
   const isSolidMesh = displayMode === 'solidWithMesh'
 
-  // wireframe mode: render invisible mesh for face raycasting only
   if (displayMode === 'wireframe') {
     return (
       <group ref={ref as unknown as React.Ref<THREE.Group>}>
@@ -385,3 +367,20 @@ const ModelGroup = forwardRef<THREE.Group, ModelGroupProps>(function ModelGroup(
 })
 
 export default ModelGroup
+
+/** Detect if GLB was produced by cad-skill's STEP pipeline (has STEP_topology extension) */
+function isCadSkillGlb(buffer: ArrayBuffer): boolean {
+  try {
+    // GLB header: magic(4) version(4) length(4), then JSON chunk
+    const header = new Uint32Array(buffer.slice(0, 12))
+    if (header[0] !== 0x46546C67) return false // 'glTF'
+    // Skip to JSON chunk — rough check
+    const view = new Uint8Array(buffer)
+    // Look for STEP_topology string in buffer
+    const decoder = new TextDecoder()
+    const text = decoder.decode(view.slice(0, Math.min(view.length, 2048)))
+    return text.includes('STEP_topology')
+  } catch {
+    return false
+  }
+}

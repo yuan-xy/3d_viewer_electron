@@ -2,9 +2,7 @@ import { useState, useCallback } from 'react'
 import { useModelStore } from '@/stores/model-store'
 import { toast } from 'sonner'
 import { stepToGlbCached, startPreCache } from '@/lib/step-converter'
-
-const ALLOWED_EXTENSIONS = ['stl', 'glb', '3mf', 'step', 'stp'] as const
-type AllowedExtension = (typeof ALLOWED_EXTENSIONS)[number]
+import { detectFormat, ALL_EXTENSIONS_NO_DOT } from '@/config/file-formats'
 
 interface UseFileUploadOptions {
   projectId?: string
@@ -19,20 +17,18 @@ export function useFileUpload({ projectId }: UseFileUploadOptions = {}) {
   const uploadFile = useCallback(
     async (file: File) => {
       const ext = file.name.split('.').pop()?.toLowerCase()
-      if (!ext || !ALLOWED_EXTENSIONS.includes(ext as AllowedExtension)) {
-        toast.error(`不支持的文件格式: .${ext ?? 'unknown'}`)
+      if (!ext || !ALL_EXTENSIONS_NO_DOT.includes(ext)) {
+        toast.error(`Unsupported file format: .${ext ?? 'unknown'}`)
         return
       }
-      const format = ext as AllowedExtension
+      const format = detectFormat(file.name)
 
       setIsUploading(true)
 
       try {
-        // Process file locally only - no server upload
-        const isStep = format === 'step' || format === 'stp'
         const rawBuffer = await file.arrayBuffer()
 
-        if (isStep) {
+        if (format === 'step') {
           useModelStore.getState().setIsConverting(true)
           const filePath = window.electronAPI?.getFilePath(file) ?? file.name
           const { buffer: glbBuffer } = await stepToGlbCached(rawBuffer,
@@ -41,8 +37,12 @@ export function useFileUpload({ projectId }: UseFileUploadOptions = {}) {
           )
           useModelStore.getState().setIsConverting(false)
           setModelBuffer(glbBuffer, 'glb')
+        } else if (format) {
+          setModelBuffer(rawBuffer, format)
         } else {
-          setModelBuffer(rawBuffer, format as 'stl' | 'glb' | '3mf')
+          toast.error(`Unsupported file format: ${file.name}`)
+          setIsUploading(false)
+          return
         }
         setGLBUrl(file.name)
 
@@ -76,7 +76,7 @@ export function useFileUpload({ projectId }: UseFileUploadOptions = {}) {
         useModelStore.getState().setIsConverting(false)
         console.error('[useFileUpload] upload failed:', err)
         const message = err instanceof Error ? err.message : String(err)
-        toast.error(message || '文件读取失败')
+        toast.error(message || 'Load failed')
       } finally {
         setIsUploading(false)
       }

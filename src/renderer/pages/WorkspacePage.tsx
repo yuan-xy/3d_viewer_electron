@@ -1,4 +1,4 @@
-import { useEffect, useCallback } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useModelStore } from '@/stores/model-store'
@@ -6,7 +6,9 @@ import { useFileUpload } from '@/hooks/useFileUpload'
 import { Upload } from 'lucide-react'
 import { toast } from 'sonner'
 import ViewportContainer from '@/components/viewport/ViewportContainer'
+import OpenFileDialog from '@/components/OpenFileDialog'
 import { stepToGlbCached } from '@/lib/step-converter'
+import { ALL_ACCEPT, detectFormat } from '@/config/file-formats'
 
 interface WorkspacePageProps {
   projectId?: string
@@ -19,17 +21,17 @@ export default function WorkspacePage({ projectId }: WorkspacePageProps) {
   const { uploadFile } = useFileUpload({ projectId })
   const [searchParams] = useSearchParams()
   const skipUpload = searchParams.get('skip_upload') === '1' && import.meta.env.DEV
+  const [dialogOpen, setDialogOpen] = useState(false)
 
   const processFileLocally = useCallback(async (file: File) => {
-    const ext = file.name.split('.').pop()?.toLowerCase()
-    if (!ext || !['stl', 'glb', '3mf', 'step', 'stp'].includes(ext)) {
-      console.error('[WorkspacePage] unsupported format:', ext)
+    const format = detectFormat(file.name)
+    if (!format) {
+      console.error('[WorkspacePage] unsupported format:', file.name)
       return
     }
-    const isStep = ext === 'step' || ext === 'stp'
     const rawBuffer = await file.arrayBuffer()
 
-    if (isStep) {
+    if (format === 'step') {
       try {
         useModelStore.getState().setIsConverting(true)
         const filePath = window.electronAPI?.getFilePath(file) ?? file.name
@@ -46,8 +48,7 @@ export default function WorkspacePage({ projectId }: WorkspacePageProps) {
         useModelStore.getState().setIsConverting(false)
       }
     } else {
-      const fmt = ext as 'stl' | 'glb' | '3mf'
-      useModelStore.getState().setModelBuffer(rawBuffer, fmt)
+      useModelStore.getState().setModelBuffer(rawBuffer, format)
     }
     useModelStore.getState().setGLBUrl(file.name)
   }, [])
@@ -106,13 +107,26 @@ export default function WorkspacePage({ projectId }: WorkspacePageProps) {
             <p className="text-sm">{t('chat.uploadHint')}</p>
             <input
               type="file"
-              accept=".stl,.glb,.3mf,.step,.stp"
+              accept={ALL_ACCEPT}
               className="hidden"
               onChange={handleFileChange}
             />
           </label>
         </div>
       )}
+
+      <OpenFileDialog
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+        onFileSelected={(file) => {
+          if (skipUpload) {
+            processFileLocally(file)
+          } else {
+            uploadFile(file)
+          }
+          setDialogOpen(false)
+        }}
+      />
 
       {isConverting && (
         <div

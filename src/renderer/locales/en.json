@@ -54,5 +54,30 @@
 
   "fileList.title": "Files",
   "fileList.empty": "Load a file to browse models in the same folder",
-  "fileList.folder": "Folder"
+  "fileList.folder": "Folder",
+  "fileList.sortByName": "Sort by name",
+  "fileList.sortByType": "Sort by type",
+
+  "openFile.title": "Open File",
+  "openFile.description": "Select a 3D model file to open",
+  "openFile.dropHint": "Click to browse or drag & drop a file",
+  "openFile.allFormats": "All supported formats",
+  "openFile.filterByType": "Filter by type",
+  "openFile.allTypes": "All types",
+
+  "fileGroup.mesh": "Mesh Models",
+  "fileGroup.cad": "CAD Models",
+  "fileGroup.bim": "BIM Models",
+  "fileGroup.point": "Point Clouds",
+  "fileGroup.volume": "Volume Data",
+  "fileGroup.animation": "Animation",
+  "fileGroup.gcode": "GCode",
+  "fileGroup.other": "Other",
+
+  "chat.uploadFormats": "Drag & drop a 3D model file here",
+  "chat.uploadHint": "Supports STL, GLB, 3MF, STEP, OBJ, FBX, and more",
+  "chat.welcome": "Welcome to Ficad",
+  "chat.welcomeMessage": "Load a model or ask me to generate one",
+  "chat.inputPlaceholder": "Describe what you need...",
+  "chat.send": "Send"
 }

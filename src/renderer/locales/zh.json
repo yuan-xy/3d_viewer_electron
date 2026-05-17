@@ -54,5 +54,30 @@
 
   "fileList.title": "文件列表",
   "fileList.empty": "加载文件后显示同目录模型",
-  "fileList.folder": "文件夹"
+  "fileList.folder": "文件夹",
+  "fileList.sortByName": "按名称排序",
+  "fileList.sortByType": "按类型排序",
+
+  "openFile.title": "打开文件",
+  "openFile.description": "选择一个3D模型文件打开",
+  "openFile.dropHint": "点击浏览或拖放文件",
+  "openFile.allFormats": "所有支持的格式",
+  "openFile.filterByType": "按类型筛选",
+  "openFile.allTypes": "全部类型",
+
+  "fileGroup.mesh": "网格模型",
+  "fileGroup.cad": "CAD模型",
+  "fileGroup.bim": "BIM模型",
+  "fileGroup.point": "点云",
+  "fileGroup.volume": "体数据",
+  "fileGroup.animation": "动画",
+  "fileGroup.gcode": "GCode",
+  "fileGroup.other": "其他",
+
+  "chat.uploadFormats": "拖放3D模型文件到此处",
+  "chat.uploadHint": "支持 STL, GLB, 3MF, STEP, OBJ, FBX 等格式",
+  "chat.welcome": "欢迎使用 Ficad",
+  "chat.welcomeMessage": "加载模型或输入需求让我生成",
+  "chat.inputPlaceholder": "描述你需要什么...",
+  "chat.send": "发送"
 }

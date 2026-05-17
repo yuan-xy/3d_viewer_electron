@@ -1,4 +1,5 @@
 import { create } from 'zustand'
+import type { FormatId } from '@/config/file-formats'
 
 export interface SceneTreeNode {
   id: string
@@ -21,6 +22,8 @@ interface ModelStats {
   materialCost: number
 }
 
+export type FileSortMode = 'name' | 'type+name'
+
 interface ModelStore {
   glbUrl: string | null
   sceneTree: SceneTreeNode[]
@@ -29,7 +32,7 @@ interface ModelStore {
 
   // R3F: raw model buffer for declarative rendering via ModelGroup
   modelBuffer: ArrayBuffer | null
-  modelFormat: 'stl' | 'glb' | '3mf' | 'step' | 'stp' | null
+  modelFormat: FormatId | null
 
   // STEP conversion loading state
   isConverting: boolean
@@ -49,15 +52,17 @@ interface ModelStore {
   currentFolderPath: string | null
   folderFiles: { name: string; path: string; mtimeMs: number }[]
   selectedFileIndex: number
+  fileSortMode: FileSortMode
   setFolderFiles: (folderPath: string | null, files: { name: string; path: string; mtimeMs: number }[]) => void
   setSelectedFileIndex: (index: number) => void
+  setFileSortMode: (mode: FileSortMode) => void
 
   setGLBUrl: (url: string) => void
   setModelVersion: (v: number) => void
   updateStats: (vertices: number, faces: number, materialCost: number) => void
   updateSceneTree: (tree: SceneTreeNode[]) => void
   replaceModel: (buffer: ArrayBuffer) => Promise<void>
-  setModelBuffer: (buffer: ArrayBuffer, format: 'stl' | 'glb' | '3mf' | 'step' | 'stp') => void
+  setModelBuffer: (buffer: ArrayBuffer, format: FormatId) => void
   reset: () => void
 }
 
@@ -75,6 +80,7 @@ export const useModelStore = create<ModelStore>()((set, get) => ({
   currentFolderPath: null,
   folderFiles: [],
   selectedFileIndex: -1,
+  fileSortMode: 'name',
 
   setIsConverting: (v) => set({ isConverting: v }),
   setGlbPartInfos: (infos) => set({ glbPartInfos: infos }),
@@ -82,6 +88,7 @@ export const useModelStore = create<ModelStore>()((set, get) => ({
 
   setFolderFiles: (folderPath, files) => set({ currentFolderPath: folderPath, folderFiles: files, selectedFileIndex: -1 }),
   setSelectedFileIndex: (index) => set({ selectedFileIndex: index }),
+  setFileSortMode: (mode) => set({ fileSortMode: mode }),
 
   setGLBUrl: (url) => {
     if (get().glbUrl) URL.revokeObjectURL(get().glbUrl!)
@@ -108,6 +115,6 @@ export const useModelStore = create<ModelStore>()((set, get) => ({
   reset: () => {
     const url = get().glbUrl
     if (url && url !== 'loaded') URL.revokeObjectURL(url)
-    set({ glbUrl: null, sceneTree: [], modelVersion: 0, stats: null, modelBuffer: null, modelFormat: null, glbPartInfos: [], modelCenteringOffset: null, isConverting: false })
+    set({ glbUrl: null, sceneTree: [], modelVersion: 0, stats: null, modelBuffer: null, modelFormat: null, glbPartInfos: [], modelCenteringOffset: null, isConverting: false, fileSortMode: 'name' })
   },
 }))
