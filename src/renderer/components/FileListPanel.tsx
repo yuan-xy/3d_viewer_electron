@@ -1,7 +1,7 @@
 import { useEffect, useRef, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useModelStore, type FileSortMode } from '@/stores/model-store'
-import { ScrollArea } from '@/components/ui/scroll-area'
+import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
 import { cn } from '@/lib/utils'
 import { toast } from 'sonner'
 import { stepToGlbCached, startPreCache } from '@/lib/step-converter'
@@ -96,7 +96,7 @@ export default function FileListPanel() {
         </div>
       )}
       <ScrollArea className="flex-1">
-        <div ref={listRef} className="p-2">
+        <div ref={listRef} className="p-2 min-w-max">
           {sortedFiles.map((file, i) => {
             const isSelected = i === selectedFileIndex
             const isCurrent = file.name === glbUrl
@@ -106,7 +106,7 @@ export default function FileListPanel() {
                 key={file.path}
                 data-index={i}
                 className={cn(
-                  'flex items-center gap-2 px-2 py-1.5 rounded text-sm cursor-pointer mb-0.5',
+                  'flex items-center gap-2 px-2 py-1.5 rounded text-sm cursor-pointer mb-0.5 whitespace-nowrap',
                   'transition-colors duration-100',
                   isSelected ? 'bg-accent ring-1 ring-primary' : 'hover:bg-accent/50',
                   isCurrent && !isSelected && 'bg-primary/10 border border-primary/30',
@@ -122,13 +122,14 @@ export default function FileListPanel() {
                 <span className={cn('font-medium shrink-0 text-xs', EXT_COLORS[ext] || 'text-muted-foreground')}>
                   {ext ? ext.toUpperCase().slice(1) : '?'}
                 </span>
-                <span className="truncate text-foreground" title={file.name}>
+                <span className="text-foreground">
                   {file.name}
                 </span>
               </div>
             )
           })}
         </div>
+        <ScrollBar orientation="horizontal" />
       </ScrollArea>
     </div>
   )
