@@ -15,6 +15,7 @@ interface WorkspacePageProps {
 export default function WorkspacePage({ projectId }: WorkspacePageProps) {
   const { t } = useTranslation()
   const glbUrl = useModelStore((s) => s.glbUrl)
+  const isConverting = useModelStore((s) => s.isConverting)
   const { uploadFile } = useFileUpload({ projectId })
   const [searchParams] = useSearchParams()
   const skipUpload = searchParams.get('skip_upload') === '1' && import.meta.env.DEV
@@ -113,39 +114,40 @@ export default function WorkspacePage({ projectId }: WorkspacePageProps) {
         </div>
       )}
 
-      {/* Always rendered in DOM; toggled synchronously via setIsConverting to appear before WASM blocks main thread */}
-      <div
-        id="step-loading-overlay"
-        data-testid="step-loading-overlay"
-        style={{
-          position: 'absolute',
-          inset: 0,
-          display: 'none',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-          background: 'rgba(0,0,0,0.45)',
-          zIndex: 30,
-          backdropFilter: 'blur(2px)',
-        }}
-      >
-        <div style={{
-          width: 40,
-          height: 40,
-          border: '3px solid rgba(255,255,255,0.2)',
-          borderTopColor: '#fff',
-          borderRadius: '50%',
-          animation: 'step-loading-spin 0.8s linear infinite',
-        }} />
-        <p style={{ color: '#fff', marginTop: 16, fontSize: 14, fontWeight: 500 }}>
-          Loading...
-        </p>
-        <style>{`
-          @keyframes step-loading-spin {
-            to { transform: rotate(360deg); }
-          }
-        `}</style>
-      </div>
+      {isConverting && (
+        <div
+          id="step-loading-overlay"
+          data-testid="step-loading-overlay"
+          style={{
+            position: 'absolute',
+            inset: 0,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            background: 'rgba(0,0,0,0.45)',
+            zIndex: 30,
+            backdropFilter: 'blur(2px)',
+          }}
+        >
+          <div style={{
+            width: 40,
+            height: 40,
+            border: '3px solid rgba(255,255,255,0.2)',
+            borderTopColor: '#fff',
+            borderRadius: '50%',
+            animation: 'step-loading-spin 0.8s linear infinite',
+          }} />
+          <p style={{ color: '#fff', marginTop: 16, fontSize: 14, fontWeight: 500 }}>
+            Loading...
+          </p>
+          <style>{`
+            @keyframes step-loading-spin {
+              to { transform: rotate(360deg); }
+            }
+          `}</style>
+        </div>
+      )}
     </div>
   )
 }

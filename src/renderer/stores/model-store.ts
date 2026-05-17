@@ -76,12 +76,7 @@ export const useModelStore = create<ModelStore>()((set, get) => ({
   folderFiles: [],
   selectedFileIndex: -1,
 
-  setIsConverting: (v) => {
-    set({ isConverting: v })
-    // Force synchronous DOM update so the overlay appears before WASM blocks the main thread
-    const el = document.getElementById('step-loading-overlay')
-    if (el) el.style.display = v ? 'flex' : 'none'
-  },
+  setIsConverting: (v) => set({ isConverting: v }),
   setGlbPartInfos: (infos) => set({ glbPartInfos: infos }),
   setModelCenteringOffset: (offset) => set({ modelCenteringOffset: offset }),
 

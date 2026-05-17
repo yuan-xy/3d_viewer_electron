@@ -1,7 +1,7 @@
 import { useState, useCallback } from 'react'
 import { useModelStore } from '@/stores/model-store'
 import { toast } from 'sonner'
-import { stepToGlbCached } from '@/lib/step-converter'
+import { stepToGlbCached, startPreCache } from '@/lib/step-converter'
 
 const ALLOWED_EXTENSIONS = ['stl', 'glb', '3mf', 'step', 'stp'] as const
 type AllowedExtension = (typeof ALLOWED_EXTENSIONS)[number]
@@ -61,6 +61,10 @@ export function useFileUpload({ projectId }: UseFileUploadOptions = {}) {
                   if (idx !== -1) {
                     useModelStore.getState().setSelectedFileIndex(idx)
                   }
+                  // Schedule background pre-caching for uncached STEP files
+                  setTimeout(() => {
+                    startPreCache(result.files, '/wasm/occt-import-js.wasm')
+                  }, 1000)
                 }
               }
             }

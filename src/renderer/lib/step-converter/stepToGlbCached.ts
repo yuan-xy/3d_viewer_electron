@@ -1,4 +1,5 @@
-import { stepToGlb, type StepToGlbOptions } from './stepToGlb'
+import { buildGlbFromResult, type StepToGlbOptions } from './stepToGlb'
+import { convertInWorker } from './stepWorkerPool'
 import { getCached, putCached } from './stepCache'
 
 const memCache = new Map<string, ArrayBuffer>()
@@ -15,6 +16,13 @@ function cacheKey(filePath: string, mtimeMs: number): string {
     normalizedTime,
   }))
   return key
+}
+
+const OCCT_PARAMS = {
+  linearUnit: 'millimeter',
+  linearDeflectionType: 'absolute_value',
+  linearDeflection: 0.001,
+  angularDeflection: 0.5,
 }
 
 export async function stepToGlbCached(
@@ -44,9 +52,11 @@ export async function stepToGlbCached(
     console.warn('[stepToGlbCached] IndexedDB lookup failed:', err)
   }
 
-  // 3. Full WASM conversion
-  console.log('[stepToGlbCached] miss, starting WASM conversion:', key)
-  const buffer = await stepToGlb(stepData, options)
+  // 3. Worker conversion: ReadStepFile in worker → buildGlb on main thread
+  console.log('[stepToGlbCached] miss, starting worker conversion:', key)
+  const stepBuffer = stepData instanceof ArrayBuffer ? stepData : stepData.buffer.slice(0)
+  const importResult = await convertInWorker(stepBuffer, OCCT_PARAMS)
+  const buffer = buildGlbFromResult(importResult, options)
   const elapsed = ((performance.now() - startTime) / 1000).toFixed(1)
   console.log(`[stepToGlbCached] conversion done in ${elapsed}s, size=${buffer.byteLength}`)
 

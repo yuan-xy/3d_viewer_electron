@@ -193,8 +193,10 @@ test.describe('Ficad Web Electron - STEP Loading', () => {
     await window.waitForTimeout(15000)
 
     const hasCacheMiss = consoleMessages.some(m => m.includes('[stepToGlbCached] miss'))
-    console.log('[test] first load (keycap_v6) cache miss:', hasCacheMiss)
-    expect(hasCacheMiss).toBe(true)
+    const hasIndexedDbHit = consoleMessages.some(m => m.includes('[stepToGlbCached] IndexedDB hit'))
+    const hadCache = hasCacheMiss || hasIndexedDbHit
+    console.log('[test] first load (keycap_v6) cache miss:', hasCacheMiss, 'idb hit:', hasIndexedDbHit)
+    expect(hadCache).toBe(true)
 
     // Verify model rendered
     let sceneOk = await window.evaluate(() => {
@@ -239,22 +241,19 @@ test.describe('Ficad Web Electron - STEP Loading', () => {
     const window = await electronApp.firstWindow()
     await window.waitForTimeout(2000)
 
-    // Verify overlay element is always in DOM (rendered unconditionally since overlay fix)
+    // Overlay is conditionally rendered — not in DOM when isConverting=false
     const overlay = window.locator('[data-testid="step-loading-overlay"]')
-    await expect(overlay).toBeAttached()
+    await expect(overlay).not.toBeAttached()
 
-    // Verify overlay is hidden by default
-    await expect(overlay).toBeHidden()
-
-    // Toggle on via store — this synchronously sets display:flex via DOM API
-    // Testing the real setIsConverting path that all call sites use
+    // Toggle on via store → React re-renders → overlay appears (main thread free, no WASM blocking)
     await window.evaluate(() => window.__modelStore.getState().setIsConverting(true))
+    await expect(overlay).toBeAttached()
     await expect(overlay).toBeVisible()
     console.log('[test] overlay visible after setIsConverting(true)')
 
-    // Toggle off
+    // Toggle off → React unmounts overlay
     await window.evaluate(() => window.__modelStore.getState().setIsConverting(false))
-    await expect(overlay).toBeHidden()
-    console.log('[test] overlay hidden after setIsConverting(false)')
+    await expect(overlay).not.toBeAttached()
+    console.log('[test] overlay unmounted after setIsConverting(false)')
   })
 })

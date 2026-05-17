@@ -4,7 +4,7 @@ import { useModelStore } from '@/stores/model-store'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { cn } from '@/lib/utils'
 import { toast } from 'sonner'
-import { stepToGlbCached } from '@/lib/step-converter'
+import { stepToGlbCached, startPreCache } from '@/lib/step-converter'
 
 const EXT_COLORS: Record<string, string> = {
   '.stl': 'text-blue-500',
@@ -30,6 +30,15 @@ export default function FileListPanel() {
     const item = listRef.current.querySelector(`[data-index="${selectedFileIndex}"]`) as HTMLElement
     item?.scrollIntoView({ block: 'nearest' })
   }, [selectedFileIndex])
+
+  // Auto pre-cache uncached STEP files in background after file list populates
+  useEffect(() => {
+    if (folderFiles.length === 0) return
+    const timer = setTimeout(() => {
+      startPreCache(folderFiles, '/wasm/occt-import-js.wasm')
+    }, 1000)
+    return () => clearTimeout(timer)
+  }, [folderFiles])
 
   if (folderFiles.length === 0) {
     return (

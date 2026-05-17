@@ -42,7 +42,7 @@ export async function stepToGlb(
     throw new Error('STEP import failed');
   }
 
-  return buildGlb(result, options);
+  return buildGlbFromResult(result, options);
 }
 
 export async function sha256(data: ArrayBuffer | Uint8Array): Promise<string> {
@@ -56,7 +56,7 @@ export async function sha256(data: ArrayBuffer | Uint8Array): Promise<string> {
   return createHash('sha256').update(bytes).digest('hex');
 }
 
-function buildGlb(importResult: OcctImportResult, options: StepToGlbOptions): ArrayBuffer {
+export function buildGlbFromResult(importResult: OcctImportResult, options: StepToGlbOptions): ArrayBuffer {
   const builder = new GlbBuilder();
   const { color, entryKind = 'part', stepHash, cadPath } = options;
 
