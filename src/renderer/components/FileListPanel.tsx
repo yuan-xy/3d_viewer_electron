@@ -4,6 +4,7 @@ import { useModelStore } from '@/stores/model-store'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { cn } from '@/lib/utils'
 import { toast } from 'sonner'
+import { stepToGlb } from '@/lib/step-converter'
 
 const EXT_COLORS: Record<string, string> = {
   '.stl': 'text-blue-500',
@@ -107,8 +108,16 @@ async function handleFileClick(file: { name: string; path: string }, index: numb
       bytes[i] = binaryString.charCodeAt(i)
     }
     const buffer = bytes.buffer
-    const ext = file.name.split('.').pop()?.toLowerCase() as 'stl' | 'glb' | '3mf'
-    useModelStore.getState().setModelBuffer(buffer, ext)
+    const ext = file.name.split('.').pop()?.toLowerCase()
+    const isStep = ext === 'step' || ext === 'stp'
+    if (isStep) {
+      const glbBuffer = await stepToGlb(buffer, {
+        wasmPath: '/wasm/occt-import-js.wasm',
+      })
+      useModelStore.getState().setModelBuffer(glbBuffer, 'glb')
+    } else {
+      useModelStore.getState().setModelBuffer(buffer, ext as 'stl' | 'glb' | '3mf')
+    }
     useModelStore.getState().setGLBUrl(file.name)
   } catch (e) {
     toast.error('Load failed: ' + String(e))
