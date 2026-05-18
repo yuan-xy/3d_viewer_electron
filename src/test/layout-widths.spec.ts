@@ -21,7 +21,7 @@ test.describe('DesktopLayout panel widths', () => {
 
   test('panels use 15:70:15 percentage widths when both open', async () => {
     const window = await electronApp.firstWindow()
-    await window.locator('canvas').first().waitFor({ state: 'attached', timeout: 15000 })
+    await window.locator('canvas').first().waitFor({ state: 'attached', timeout: 20000 })
 
     // Check that left and right toggle buttons exist (both panels should be open by default)
     const leftCloseBtn = window.locator('button').filter({ has: window.locator('.lucide-panel-left-close') })

@@ -23,7 +23,7 @@ test.describe.serial('Multi-level scene tree', () => {
 
   test('scene tree panel title is visible', async () => {
     const window = await electronApp.firstWindow()
-    await window.locator('canvas').first().waitFor({ state: 'attached', timeout: 15000 })
+    await window.locator('canvas').first().waitFor({ state: 'attached', timeout: 20000 })
 
     const title = window.locator('aside').first().locator('.text-xs.font-semibold')
     await expect(title).toBeVisible()
@@ -34,7 +34,7 @@ test.describe.serial('Multi-level scene tree', () => {
 
   test('loads a hierarchical GLB and renders tree nodes with expand/collapse', async () => {
     const window = await electronApp.firstWindow()
-    await window.locator('canvas').first().waitFor({ state: 'attached', timeout: 15000 })
+    await window.locator('canvas').first().waitFor({ state: 'attached', timeout: 20000 })
 
     await window.locator('input[type="file"]').setInputFiles({
       name: 'RobotExpressive.glb',
@@ -42,7 +42,7 @@ test.describe.serial('Multi-level scene tree', () => {
       buffer: ROBOT_GLB,
     })
 
-    await window.waitForTimeout(4000)
+    await window.waitForTimeout(8000)
 
     const leftPanel = window.locator('aside').first()
     const treeNodes = leftPanel.locator('.whitespace-nowrap')

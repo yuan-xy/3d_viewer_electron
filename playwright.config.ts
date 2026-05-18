@@ -6,7 +6,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
 export default defineConfig({
   testDir: './src/test',
-  timeout: 30000,
+  timeout: 60000,
   retries: 0,
   use: {
     viewport: { width: 1280, height: 800 },

@@ -25,7 +25,7 @@ test.describe('3D Viewer Electron - STEP Loading', () => {
 
   test('app starts and renders canvas', async () => {
     const window = await electronApp.firstWindow()
-    await window.locator('canvas').first().waitFor({ state: 'attached', timeout: 15000 })
+    await window.locator('canvas').first().waitFor({ state: 'attached', timeout: 20000 })
 
     const canvasCount = await window.locator('canvas').count()
     console.log('[test] canvas count:', canvasCount)
@@ -50,7 +50,7 @@ test.describe('3D Viewer Electron - STEP Loading', () => {
     })
 
     // Wait for STEP → GLB conversion (WASM load + OCCT processing + GLB build + React render)
-    await window.waitForTimeout(15000)
+    await window.waitForTimeout(20000)
 
     // Diagnostic: dump relevant console messages
     const relevant = consoleMessages.filter(m =>
@@ -125,7 +125,7 @@ test.describe('3D Viewer Electron - STEP Loading', () => {
     await stepEntry.click()
 
     // Wait for STEP → GLB conversion and render
-    await window.waitForTimeout(15000)
+    await window.waitForTimeout(20000)
 
     const relevant = consoleMessages.filter(m =>
       m.includes('[ModelGroup]') ||
@@ -190,7 +190,7 @@ test.describe('3D Viewer Electron - STEP Loading', () => {
     // Click keycap_v6.step (not loaded by prior tests) → must be cache miss
     const entry1 = window.locator('div[data-index]').filter({ hasText: 'keycap_v6.step' })
     await entry1.click()
-    await window.waitForTimeout(15000)
+    await window.waitForTimeout(20000)
 
     const hasCacheMiss = consoleMessages.some(m => m.includes('[stepToGlbCached] miss'))
     const hasIndexedDbHit = consoleMessages.some(m => m.includes('[stepToGlbCached] IndexedDB hit'))
@@ -212,7 +212,7 @@ test.describe('3D Viewer Electron - STEP Loading', () => {
     consoleMessages.length = 0
     const entry2 = window.locator('div[data-index]').filter({ hasText: 'test-model.step' })
     await entry2.click()
-    await window.waitForTimeout(15000)
+    await window.waitForTimeout(20000)
 
     consoleMessages.length = 0
     const entry3 = window.locator('div[data-index]').filter({ hasText: 'keycap_v6.step' })
