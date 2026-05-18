@@ -1,4 +1,0 @@
-# package-lock.json changes across platforms (optionalDependencies differ).
-# Don't attempt text-merge — if both sides touched it, regenerate instead:
-#   git checkout --theirs package-lock.json && npm install --package-lock-only
-package-lock.json -merge
