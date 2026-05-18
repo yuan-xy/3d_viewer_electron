@@ -17,7 +17,6 @@
     "build:unpacked": "electron-vite build && electron-builder --win --dir"
   },
   "dependencies": {
-    "@ficad/sdk": "file:./src/renderer/vendor/@ficad/sdk",
     "@radix-ui/react-avatar": "^1.1.11",
     "@radix-ui/react-collapsible": "^1.1.12",
     "@radix-ui/react-context-menu": "^2.2.16",
