@@ -26,9 +26,7 @@ jobs:
           node-version: '22'
           cache: 'npm'
 
-      - run: npm install -g npm@11
-
-      - run: npm ci
+      - run: npm install --ignore-scripts
 
       - name: Type check
         run: npx tsc --noEmit
