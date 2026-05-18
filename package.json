@@ -15,7 +15,8 @@
     "postinstall": "electron-builder install-app-deps",
     "build:win": "electron-vite build && electron-builder --win",
     "build:unpacked": "electron-vite build && electron-builder --win --dir",
-    "build:unpacked:linux": "electron-vite build && electron-builder --linux --dir"
+    "build:unpacked:linux": "electron-vite build && electron-builder --linux --dir",
+    "build:unpacked:mac": "electron-vite build && electron-builder --mac --dir"
   },
   "dependencies": {
     "@radix-ui/react-avatar": "^1.1.11",
@@ -72,6 +73,9 @@
     "vite": "^5.0.0",
     "vitest": "^4.1.6"
   },
+  "overrides": {
+    "magic-string": "0.30.17"
+  },
   "build": {
     "appId": "com.faicad.3d_viewer",
     "productName": "3D Model Viewer",
@@ -106,6 +110,17 @@
           "target": "dir",
           "arch": [
             "x64"
+          ]
+        }
+      ]
+    },
+    "mac": {
+      "target": [
+        {
+          "target": "dir",
+          "arch": [
+            "x64",
+            "arm64"
           ]
         }
       ]
