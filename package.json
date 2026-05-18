@@ -14,7 +14,8 @@
     "ci": "bash scripts/ci.sh",
     "postinstall": "electron-builder install-app-deps",
     "build:win": "electron-vite build && electron-builder --win",
-    "build:unpacked": "electron-vite build && electron-builder --win --dir"
+    "build:unpacked": "electron-vite build && electron-builder --win --dir",
+    "build:unpacked:linux": "electron-vite build && electron-builder --linux --dir"
   },
   "dependencies": {
     "@radix-ui/react-avatar": "^1.1.11",
@@ -91,6 +92,16 @@
             "x64"
           ]
         },
+        {
+          "target": "dir",
+          "arch": [
+            "x64"
+          ]
+        }
+      ]
+    },
+    "linux": {
+      "target": [
         {
           "target": "dir",
           "arch": [

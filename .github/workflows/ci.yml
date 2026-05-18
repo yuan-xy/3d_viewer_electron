@@ -31,7 +31,10 @@ jobs:
         run: npm run lint
 
       - name: Build
-        run: npm run build
+        run: |
+          npm run build:unpacked:linux
+          mkdir -p dist/win-unpacked
+          ln -sf "$PWD/dist/linux-unpacked/3d_viewer_electron" "dist/win-unpacked/3D_Viewer.exe"
 
       - name: Unit tests
         run: npx vitest run
