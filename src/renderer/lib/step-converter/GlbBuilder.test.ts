@@ -13,7 +13,7 @@ function readGlbHeader(buf: ArrayBuffer) {
 function readGlbChunks(buf: ArrayBuffer) {
   const dv = new DataView(buf)
   const jsonLen = dv.getUint32(12, true)
-  const jsonType = dv.getUint32(16, true)
+  dv.getUint32(16, true) // jsonType — verified elsewhere; only need length
   const jsonBytes = new Uint8Array(buf, 20, jsonLen)
   // strip padding spaces
   let end = jsonLen
@@ -81,7 +81,7 @@ describe('GlbBuilder', () => {
     const builder = new GlbBuilder()
     // Add a 1-byte payload, then a 4-byte payload — second should be 4-byte aligned
     builder.addBufferView(new Uint8Array([1]))
-    const view2 = builder.addBufferView(new Uint32Array([42]))
+    builder.addBufferView(new Uint32Array([42]))
     const views = builder.json.bufferViews as Array<{ byteOffset: number }>
     expect(views[1].byteOffset % 4).toBe(0)
   })

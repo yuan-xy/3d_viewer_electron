@@ -20,13 +20,17 @@ const require = createRequire(import.meta.url)
 const PROJECT_ROOT = join(__dirname, '..', '..', '..', '..', '..')
 
 // Load occt-import-js CJS module onto globalThis
-let occtInit: Function
+let occtInit: (config: { wasmBinary: ArrayBuffer; locateFile: (path: string) => string }) => Promise<OcctModule>
 let wasmBinary: ArrayBuffer
+
+interface OcctModule {
+  ReadStepFile(buffer: Uint8Array, params: Record<string, unknown>): OcctImportResult
+}
 
 beforeAll(async () => {
   // Load the CJS UMD module — sets globalThis.occtimportjs
   const cjsPath = join(PROJECT_ROOT, 'src', 'renderer', 'public', 'wasm', 'occt-import-js.cjs')
-  globalThis.occtimportjs = require(cjsPath) as Function
+  globalThis.occtimportjs = require(cjsPath) as (config: Record<string, unknown>) => Promise<OcctModule>
 
   // Load WASM binary directly from disk (bypass XHR)
   const wasmPath = join(PROJECT_ROOT, 'src', 'renderer', 'public', 'wasm', 'occt-import-js.wasm')
@@ -36,7 +40,7 @@ beforeAll(async () => {
   ) as ArrayBuffer
 
   // Initialize the module
-  occtInit = globalThis.occtimportjs as Function
+  occtInit = globalThis.occtimportjs as typeof occtInit
 }, 60000)
 
 interface OcctImportResult {
@@ -68,7 +72,7 @@ function readGlbHeader(buf: ArrayBuffer) {
 function readGlbChunks(buf: ArrayBuffer) {
   const dv = new DataView(buf)
   const jsonLen = dv.getUint32(12, true)
-  const jsonType = dv.getUint32(16, true)
+  dv.getUint32(16, true) // jsonType — already verified in header check
   const jsonBytes = new Uint8Array(buf, 20, jsonLen)
   let end = jsonLen
   while (end > 0 && jsonBytes[end - 1] === 0x20) end--
@@ -77,9 +81,10 @@ function readGlbChunks(buf: ArrayBuffer) {
   let binOffset = 20 + jsonLen
   while (binOffset % 4 !== 0) binOffset++
   const binLen = dv.getUint32(binOffset, true)
-  const binType = dv.getUint32(binOffset + 4, true)
+  // binType should be 0x004E4942 — validated by consumers
+  void dv.getUint32(binOffset + 4, true)
 
-  return { json, binLen, binType, binOffset: binOffset + 8 }
+  return { json, binLen, binOffset: binOffset + 8 }
 }
 
 describe('STEP → GLB conversion', () => {

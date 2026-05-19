@@ -1,6 +1,5 @@
 import { describe, it, expect } from 'vitest'
 import { findClosestPointPure } from './snap'
-import type { SnapCandidate } from './snap'
 
 function makePoints(count: number): {
   positions: Float32Array

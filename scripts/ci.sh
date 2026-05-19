@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
-# Run all CI checks and tests locally
+# CI pipeline — all platforms
+# Fast checks (~30s): typecheck + lint + unit tests + component tests
+# Slow checks (~3min): build + E2E tests
 set -euo pipefail
 
 PLATFORM=$(uname -s)
@@ -31,19 +33,32 @@ echo "Platform: $PLATFORM  |  Build: $BUILD_SCRIPT"
 echo ""
 
 echo "========================================"
-echo "  1/5  Type check (tsc --noEmit)"
+echo "  1/7  Type check (tsc --noEmit)"
 echo "========================================"
 pnpm exec tsc --noEmit
 
 echo ""
 echo "========================================"
-echo "  2/5  Lint (eslint)"
+echo "  2/7  Lint (eslint)"
 echo "========================================"
 pnpm run lint
 
 echo ""
 echo "========================================"
-echo "  3/5  Build ($BUILD_SCRIPT)"
+echo "  3/7  Unit tests (vitest, node env)"
+echo "========================================"
+pnpm exec vitest run
+
+echo ""
+echo "========================================"
+echo "  4/7  Component & integration tests"
+echo "       (vitest, jsdom env)"
+echo "========================================"
+pnpm exec vitest run --config vitest.jsdom.config.ts
+
+echo ""
+echo "========================================"
+echo "  5/7  Build ($BUILD_SCRIPT)"
 echo "========================================"
 pnpm run "$BUILD_SCRIPT"
 
@@ -56,13 +71,7 @@ fi
 
 echo ""
 echo "========================================"
-echo "  4/5  Unit tests (vitest run)"
-echo "========================================"
-pnpm exec vitest run
-
-echo ""
-echo "========================================"
-echo "  5/5  Integration tests (playwright)"
+echo "  6/7  E2E tests (playwright)"
 echo "========================================"
 pnpm exec playwright test
 
