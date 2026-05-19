@@ -106,7 +106,6 @@ export const FILE_FORMATS: FileFormatEntry[] = [
     textBased: false,
     needsDracoWasm: false,
     needsExternalDep: false,
-    disabled: true, // external .bin/texture references can't resolve from ArrayBuffer
     renderHint: 'mesh',
     color: 'text-green-400',
   },

@@ -59,7 +59,7 @@ import { IFCSPACE } from 'web-ifc';
 
 ---
 
-#### 2. GLTF — 外部 .bin/纹理引用无法解析
+#### 2. GLTF — 外部 .bin/纹理引用自动解析 ✅
 
 `.gltf` 是 JSON 文件，几何数据、纹理会以外部文件引用：
 
@@ -70,18 +70,20 @@ import { IFCSPACE } from 'web-ifc';
 }
 ```
 
-当用户通过拖放或文件选择器加载 `.gltf` 时，浏览器只提供了**单个文件的 ArrayBuffer**。`GLTFLoader.parseAsync(buffer, path)` 的第二个参数 `path` 用于解析相对路径引用，但我们传的是空字符串 `''`，loader 没有目录上下文去 fetch 配套文件。
+**解决方案**（已实施）：
 
-**当前行为**：
-- `.glb`（二进制单体，所有数据内嵌）— 正常 ✅
-- `.gltf` 无外部引用的独立文件 — 正常 ✅
-- `.gltf` 有 `.bin`/纹理引用 — 加载失败，缺少几何数据
+1. 通过 `file.path`（Electron `webUtils.getPathForFile()`）获取 .gltf 文件的真实路径
+2. 解析 glTF JSON，找出所有外部 `buffers[].uri` 和 `images[].uri`
+3. 通过 IPC（`fs:readFileAsBase64`）读取每个引用文件
+4. 将 URI 替换为 data URI（`data:application/octet-stream;base64,...`），使 glTF 变为自包含
+5. 将处理后的 JSON 传给 `GLTFLoader.parseAsync()` 正常解析
 
-**解决方向**（未实施）：
-- Electron 环境下，通过 `file.path` 拿到真实路径，调用 `path.dirname()` 传给 loader
-- 或者要求用户通过文件夹打开（而非单文件选择），批量读取配套文件后构造 `FileLoader` 的 resolve 回调
+**错误处理**：
+- 文件路径不可用（非 Electron 环境）→ 抛出 "glTF files with external references require the desktop app"
+- 引用的文件找不到 → 抛出 "Cannot find referenced file: <uri>\nExpected location: <path>"
 
-**影响范围**：仅 `.gltf` 且有外部依赖的文件，`.glb` 不受影响。
+**限制**：
+- glTF 格式不支持内嵌 `STEP_topology`（该扩展仅适用于 GLB 二进制格式）
 
 ---
 

@@ -41,6 +41,65 @@ function bufferToText(buffer: ArrayBuffer): string {
   return decoder.decode(buffer)
 }
 
+/**
+ * Resolve external buffer/image URIs in a glTF JSON file.
+ *
+ * Scans buffers[] and images[] for relative URIs, reads the referenced files
+ * via Electron IPC, and replaces them with data URIs so the glTF becomes
+ * self-contained and can be parsed by GLTFLoader.
+ */
+async function resolveGltfDependencies(gltfText: string, filePath: string): Promise<string> {
+  const gltf = JSON.parse(gltfText)
+
+  const lastSep = Math.max(filePath.lastIndexOf('/'), filePath.lastIndexOf('\\'))
+  const baseDir = lastSep > 0 ? filePath.slice(0, lastSep) : ''
+
+  const api = window.electronAPI
+  if (!api) {
+    throw new Error(
+      'glTF files with external references require the desktop app. Cannot resolve referenced files.',
+    )
+  }
+
+  if (gltf.buffers) {
+    for (const buffer of gltf.buffers) {
+      if (buffer.uri && !buffer.uri.startsWith('data:')) {
+        const resolvedPath = baseDir + '/' + buffer.uri
+        const result = await api.readFileAsBase64(resolvedPath)
+        if (!result.success) {
+          throw new Error(
+            `Cannot find referenced file: "${buffer.uri}"\nExpected location: ${resolvedPath}`,
+          )
+        }
+        buffer.uri = `data:application/octet-stream;base64,${result.data}`
+      }
+    }
+  }
+
+  if (gltf.images) {
+    for (const image of gltf.images) {
+      if (image.uri && !image.uri.startsWith('data:')) {
+        const resolvedPath = baseDir + '/' + image.uri
+        const result = await api.readFileAsBase64(resolvedPath)
+        if (!result.success) {
+          throw new Error(
+            `Cannot find referenced texture: "${image.uri}"\nExpected location: ${resolvedPath}`,
+          )
+        }
+        const ext = image.uri.split('.').pop()?.toLowerCase()
+        const mime =
+          ext === 'png' ? 'image/png'
+          : ext === 'jpg' || ext === 'jpeg' ? 'image/jpeg'
+          : ext === 'webp' ? 'image/webp'
+          : 'application/octet-stream'
+        image.uri = `data:${mime};base64,${result.data}`
+      }
+    }
+  }
+
+  return JSON.stringify(gltf)
+}
+
 function extractMeshes(root: THREE.Object3D): THREE.Mesh[] {
   const meshes: THREE.Mesh[] = []
   root.traverse((child) => {
@@ -61,7 +120,11 @@ function extractAllObjects(root: THREE.Object3D): THREE.Object3D[] {
  * Central dispatcher: parse any supported format's ArrayBuffer into meshes/objects.
  * Returns { meshes, objects } ready for rendering.
  */
-export async function loadFormat(buffer: ArrayBuffer, format: FormatId): Promise<LoaderResult> {
+export async function loadFormat(
+  buffer: ArrayBuffer,
+  format: FormatId,
+  resourcePath?: string | null,
+): Promise<LoaderResult> {
   switch (format) {
     // ---- already supported ----
     case 'stl': {
@@ -70,9 +133,21 @@ export async function loadFormat(buffer: ArrayBuffer, format: FormatId): Promise
       const mesh = new THREE.Mesh(geo)
       return { meshes: [mesh], objects: [] }
     }
-    case 'glb':
-    case 'gltf': {
+    case 'glb': {
       const gltf = await new GLTFLoader().parseAsync(buffer, '')
+      const meshes = extractMeshes(gltf.scene)
+      return { meshes, objects: [], sceneRoot: gltf.scene }
+    }
+    case 'gltf': {
+      const gltfText = bufferToText(buffer)
+      if (resourcePath) {
+        const resolvedJson = await resolveGltfDependencies(gltfText, resourcePath)
+        const gltf = await new GLTFLoader().parseAsync(resolvedJson, '')
+        const meshes = extractMeshes(gltf.scene)
+        return { meshes, objects: [], sceneRoot: gltf.scene }
+      }
+      // No file path — try parsing directly (works if glTF has only data URIs)
+      const gltf = await new GLTFLoader().parseAsync(gltfText, '')
       const meshes = extractMeshes(gltf.scene)
       return { meshes, objects: [], sceneRoot: gltf.scene }
     }

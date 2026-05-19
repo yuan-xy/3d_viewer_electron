@@ -82,10 +82,13 @@ describe('detectFormat', () => {
   })
 
   it('does not detect disabled formats', () => {
-    expect(detectFormat('model.gltf')).toBeNull() // disabled
     expect(detectFormat('model.ifc')).toBeNull() // disabled
     expect(detectFormat('model.mdd')).toBeNull() // disabled
     expect(detectFormat('model.mpd')).toBeNull() // disabled (ldraw)
+  })
+
+  it('detects gltf format since it is now enabled', () => {
+    expect(detectFormat('model.gltf')).toBe('gltf')
   })
 
   it('detects all remaining non-disabled formats', () => {

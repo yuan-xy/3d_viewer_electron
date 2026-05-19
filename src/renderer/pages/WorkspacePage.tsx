@@ -49,6 +49,8 @@ export default function WorkspacePage({ projectId }: WorkspacePageProps) {
       }
     } else {
       useModelStore.getState().setModelBuffer(rawBuffer, format)
+      const filePath = window.electronAPI?.getFilePath(file) ?? null
+      useModelStore.getState().setModelFilePath(filePath)
     }
     useModelStore.getState().setGLBUrl(file.name)
   }, [])

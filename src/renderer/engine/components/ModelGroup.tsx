@@ -90,6 +90,7 @@ const ModelGroup = forwardRef<THREE.Group, ModelGroupProps>(function ModelGroup(
   const glbPartInfos = useModelStore((s) => s.glbPartInfos)
   const sceneTree = useModelStore((s) => s.sceneTree)
   const updateSceneTree = useModelStore((s) => s.updateSceneTree)
+  const modelFilePath = useModelStore((s) => s.modelFilePath)
 
   const visibilityMap = useMemo(
     () => flattenVisibility(sceneTree, true),
@@ -123,7 +124,7 @@ const ModelGroup = forwardRef<THREE.Group, ModelGroupProps>(function ModelGroup(
           return
         }
 
-        const result = await loadFormat(buffer, format)
+        const result = await loadFormat(buffer, format, modelFilePath)
         if (cancelled) return
 
         // If format produced non-mesh objects (GCode lines, BVH skeleton, PCD points, etc.)

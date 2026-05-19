@@ -42,6 +42,7 @@
 |------|--------|------|
 | STL | `.stl` | 三角面片网格，支持 ASCII 和 Binary |
 | GLB | `.glb` | glTF 2.0 二进制格式 |
+| GLTF | `.gltf` | glTF 2.0 JSON 格式，自动解析外部 .bin/纹理引用 |
 | 3MF | `.3mf` | 3D Manufacturing Format |
 | OBJ | `.obj` | Wavefront OBJ，基于文本 |
 | PLY | `.ply` | 支持 ASCII 和 Binary 自动检测 |
@@ -90,7 +91,7 @@
 | VOX | `.vox` | MagicaVoxel 体素格式 |
 | KMZ | `.kmz` | 压缩的 KML，含 3D 模型 |
 
-> **总计：24 种格式**。另有用例受限未启用的格式：glTF (`.gltf`)、IFC (`.ifc`)、LDraw (`.ldraw` `.mpd` `.ldr`)、MDD (`.mdd`)。
+> **总计：25 种格式**。另有用例受限未启用的格式：IFC (`.ifc`)、LDraw (`.ldraw` `.mpd` `.ldr`)、MDD (`.mdd`)。
 
 ## 环境要求
 

@@ -27,6 +27,8 @@ interface ModelStore {
   // R3F: raw model buffer for declarative rendering via ModelGroup
   modelBuffer: ArrayBuffer | null
   modelFormat: FormatId | null
+  /** File path of the loaded model (needed by glTF to resolve external buffer/image URIs) */
+  modelFilePath: string | null
 
   // STEP conversion loading state
   isConverting: boolean
@@ -58,6 +60,7 @@ interface ModelStore {
   toggleNodeVisible: (nodeId: string) => void
   replaceModel: (buffer: ArrayBuffer) => Promise<void>
   setModelBuffer: (buffer: ArrayBuffer, format: FormatId) => void
+  setModelFilePath: (path: string | null) => void
   reset: () => void
 }
 
@@ -83,6 +86,7 @@ export const useModelStore = create<ModelStore>()((set, get) => ({
   modelVersion: 0,
   modelBuffer: null,
   modelFormat: null,
+  modelFilePath: null,
   isConverting: false,
   glbPartInfos: [],
   modelCenteringOffset: null,
@@ -127,9 +131,11 @@ export const useModelStore = create<ModelStore>()((set, get) => ({
     set({ modelBuffer: buffer.slice(0), modelFormat: format })
   },
 
+  setModelFilePath: (path) => set({ modelFilePath: path }),
+
   reset: () => {
     const url = get().glbUrl
     if (url && url !== 'loaded') URL.revokeObjectURL(url)
-    set({ glbUrl: null, sceneTree: [], modelVersion: 0, modelBuffer: null, modelFormat: null, glbPartInfos: [], modelCenteringOffset: null, isConverting: false, fileSortMode: 'name' })
+    set({ glbUrl: null, sceneTree: [], modelVersion: 0, modelBuffer: null, modelFormat: null, modelFilePath: null, glbPartInfos: [], modelCenteringOffset: null, isConverting: false, fileSortMode: 'name' })
   },
 }))

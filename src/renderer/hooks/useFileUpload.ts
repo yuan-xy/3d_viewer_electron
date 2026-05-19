@@ -10,6 +10,7 @@ interface UseFileUploadOptions {
 
 export function useFileUpload({ projectId }: UseFileUploadOptions = {}) {
   const setModelBuffer = useModelStore((s) => s.setModelBuffer)
+  const setModelFilePath = useModelStore((s) => s.setModelFilePath)
   const setGLBUrl = useModelStore((s) => s.setGLBUrl)
   const setFolderFiles = useModelStore((s) => s.setFolderFiles)
   const [isUploading, setIsUploading] = useState(false)
@@ -39,6 +40,8 @@ export function useFileUpload({ projectId }: UseFileUploadOptions = {}) {
           setModelBuffer(glbBuffer, 'glb')
         } else if (format) {
           setModelBuffer(rawBuffer, format)
+          const filePath = window.electronAPI?.getFilePath(file) ?? null
+          setModelFilePath(filePath)
         } else {
           toast.error(`Unsupported file format: ${file.name}`)
           setIsUploading(false)

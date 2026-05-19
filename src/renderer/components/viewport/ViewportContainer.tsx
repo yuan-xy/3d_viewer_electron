@@ -115,7 +115,8 @@ export default function ViewportContainer() {
   const [animActive, setAnimActive] = useState(false)
   const pendingBoxRef = useRef<THREE.Box3 | null>(null)
 
-  // Topology selection state
+  // Topology selection state — only available for GLB (not glTF, which
+  // doesn't support embedded STEP_topology extensions)
   const selectorRuntime = useMemo(() => {
     if (modelFormat !== 'glb' || !modelBuffer) return null
     try {
