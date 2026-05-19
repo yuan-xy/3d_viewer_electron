@@ -2,6 +2,7 @@ export {}
 
 declare global {
   interface Window {
+    __errors: { message: string; stack: string; timestamp: number }[]
     electronAPI: {
       getAppVersion: () => Promise<string>
       getPlatform: () => string

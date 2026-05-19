@@ -1,4 +1,4 @@
-import { test, expect, _electron, ElectronApplication } from '@playwright/test'
+import { test, expect, _electron, ElectronApplication, Page } from '@playwright/test'
 import { readFileSync } from 'fs'
 import path from 'path'
 import { fileURLToPath } from 'url'
@@ -6,6 +6,21 @@ import { fileURLToPath } from 'url'
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const PROJECT_ROOT = path.resolve(__dirname, '..', '..')
 const TEST_STEP = readFileSync(path.join(__dirname, 'fixtures', 'test-model.step'))
+
+/** Collect page errors and return an assertion helper that fails on any error. */
+function trackErrors(page: Page) {
+  const pageErrors: string[] = []
+  page.on('pageerror', (err) => pageErrors.push(String(err)))
+  return {
+    async assertNoErrors() {
+      const appErrors = await page.evaluate(() =>
+        window.__errors.map((e) => `${e.message}\n${e.stack}`),
+      )
+      const all = [...pageErrors, ...appErrors]
+      expect(all, `Unexpected errors detected:\n${all.join('\n')}`).toEqual([])
+    },
+  }
+}
 
 test.describe('3D Viewer Electron - STEP Loading', () => {
   let electronApp: ElectronApplication
@@ -25,15 +40,18 @@ test.describe('3D Viewer Electron - STEP Loading', () => {
 
   test('app starts and renders canvas', async () => {
     const window = await electronApp.firstWindow()
+    const { assertNoErrors } = trackErrors(window)
     await window.locator('canvas').first().waitFor({ state: 'attached', timeout: 20000 })
 
     const canvasCount = await window.locator('canvas').count()
     console.log('[test] canvas count:', canvasCount)
     expect(canvasCount).toBeGreaterThan(0)
+    await assertNoErrors()
   })
 
   test('loads STEP file, converts to GLB, renders mesh with topology', async () => {
     const window = await electronApp.firstWindow()
+    const { assertNoErrors } = trackErrors(window)
     await window.waitForTimeout(2000)
 
     // Capture console messages for debugging
@@ -51,6 +69,7 @@ test.describe('3D Viewer Electron - STEP Loading', () => {
 
     // Wait for STEP → GLB conversion (WASM load + OCCT processing + GLB build + React render)
     await window.waitForTimeout(20000)
+    await assertNoErrors()
 
     // Diagnostic: dump relevant console messages
     const relevant = consoleMessages.filter(m =>
@@ -97,6 +116,7 @@ test.describe('3D Viewer Electron - STEP Loading', () => {
 
   test('clicks STEP file in file list panel and renders model', async () => {
     const window = await electronApp.firstWindow()
+    const { assertNoErrors } = trackErrors(window)
     await window.waitForTimeout(2000)
 
     // Populate file list panel with fixture files
@@ -165,11 +185,13 @@ test.describe('3D Viewer Electron - STEP Loading', () => {
     console.log('[test] topology (file-list click):', topologyInfo)
     expect(topologyInfo).not.toBeNull()
     expect(topologyInfo!.faces).toBeGreaterThan(0)
+    await assertNoErrors()
   })
 
   test('caches converted GLB on first load, hits cache on second load', async () => {
     test.setTimeout(90000)
     const window = await electronApp.firstWindow()
+    const { assertNoErrors } = trackErrors(window)
     await window.waitForTimeout(2000)
 
     // Reset model and populate file list with fixture files
@@ -235,10 +257,12 @@ test.describe('3D Viewer Electron - STEP Loading', () => {
       return meshCount > 0
     })
     expect(sceneOk).toBe(true)
+    await assertNoErrors()
   })
 
   test('shows loading overlay during STEP conversion and hides after', async () => {
     const window = await electronApp.firstWindow()
+    const { assertNoErrors } = trackErrors(window)
     await window.waitForTimeout(2000)
 
     // Overlay is conditionally rendered — not in DOM when isConverting=false
@@ -255,5 +279,6 @@ test.describe('3D Viewer Electron - STEP Loading', () => {
     await window.evaluate(() => window.__modelStore.getState().setIsConverting(false))
     await expect(overlay).not.toBeAttached()
     console.log('[test] overlay unmounted after setIsConverting(false)')
+    await assertNoErrors()
   })
 })

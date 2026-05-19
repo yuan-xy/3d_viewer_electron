@@ -9,20 +9,26 @@ import App from './App'
 import './i18n'
 import './index.css'
 
-// Expose store for E2E test access
+// Expose state for E2E test access
 window.__modelStore = useModelStore
+window.__errors = []
 
-// Global error handlers — ensure all errors are visible in console
+// Global error handlers — surface errors to both console and window.__errors
 window.addEventListener('error', (event) => {
   const err = event.error
   if (err instanceof Error) {
+    const detail = { message: err.message, stack: err.stack ?? '', timestamp: Date.now() }
+    window.__errors.push(detail)
     console.error('[Global Error]', err.message, '\n', err.stack)
   } else {
+    const detail = { message: event.message, stack: `${event.filename}:${event.lineno}:${event.colno}`, timestamp: Date.now() }
+    window.__errors.push(detail)
     console.error('[Global Error]', event.message, '\n', event.filename, ':', event.lineno, ':', event.colno)
   }
 })
 
 window.addEventListener('unhandledrejection', (event) => {
+  window.__errors.push({ message: String(event.reason), stack: '', timestamp: Date.now() })
   console.error('[Unhandled Promise Rejection]', event.reason)
 })
 
