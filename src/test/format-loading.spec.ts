@@ -37,6 +37,14 @@ function trackErrors(page: Page) {
   }
 }
 
+/** Wait for ModelGroup to finish loading (replaces fixed timeouts). */
+async function waitForLoadDone(page: Page, timeout = 30000) {
+  await page.waitForFunction(
+    () => window.__modelStore?.getState().__loadingPhase === 'done',
+    { timeout },
+  )
+}
+
 test.describe('3D Viewer - Key Format E2E', () => {
   let electronApp: ElectronApplication
 
@@ -72,7 +80,7 @@ test.describe('3D Viewer - Key Format E2E', () => {
       buffer: fileBuffer,
     })
 
-    await window.waitForTimeout(3000)
+    await waitForLoadDone(window)
     await assertNoErrors()
 
     const sceneHasContent = await window.evaluate(() => {
@@ -97,7 +105,6 @@ test.describe('3D Viewer - Key Format E2E', () => {
     await window.evaluate(() => {
       window.__modelStore?.getState().reset()
     })
-    await window.waitForTimeout(500)
 
     await window.locator('input[type="file"]').setInputFiles({
       name: fixture.file,
@@ -105,7 +112,7 @@ test.describe('3D Viewer - Key Format E2E', () => {
       buffer: fileBuffer,
     })
 
-    await window.waitForTimeout(8000)
+    await waitForLoadDone(window)
     await assertNoErrors()
 
     const sceneHasContent = await window.evaluate(() => {
@@ -130,7 +137,6 @@ test.describe('3D Viewer - Key Format E2E', () => {
     await window.evaluate(() => {
       window.__modelStore?.getState().reset()
     })
-    await window.waitForTimeout(500)
 
     const consoleMessages: string[] = []
     window.on('console', (msg) => {
@@ -143,8 +149,7 @@ test.describe('3D Viewer - Key Format E2E', () => {
       buffer: fileBuffer,
     })
 
-    // STEP conversion needs WASM load + OCCT processing + GLB build + React render
-    await window.waitForTimeout(25000)
+    await waitForLoadDone(window, 50000)
     await assertNoErrors()
 
     // Verify topology was built (the ModelGroup console log)
@@ -178,7 +183,6 @@ test.describe('3D Viewer - Key Format E2E', () => {
     await window.evaluate(() => {
       window.__modelStore?.getState().reset()
     })
-    await window.waitForTimeout(500)
 
     // Load glTF fixture via IPC (needs real filesystem path for external .bin)
     const gltfPath = path.join(FIXTURES_DIR, 'AnimatedMorphSphere.gltf')
@@ -195,8 +199,7 @@ test.describe('3D Viewer - Key Format E2E', () => {
       window.__modelStore.getState().setGLBUrl('AnimatedMorphSphere.gltf')
     }, gltfPath)
 
-    // Wait for glTF → GLB conversion + React render
-    await window.waitForTimeout(5000)
+    await waitForLoadDone(window)
     await assertNoErrors()
 
     // Verify meshes are in the scene

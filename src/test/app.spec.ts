@@ -22,6 +22,14 @@ function trackErrors(page: Page) {
   }
 }
 
+/** Wait for ModelGroup to finish loading (replaces fixed timeouts). */
+async function waitForLoadDone(page: Page, timeout = 30000) {
+  await page.waitForFunction(
+    () => window.__modelStore?.getState().__loadingPhase === 'done',
+    { timeout },
+  )
+}
+
 test.describe('3D Viewer Electron', () => {
   let electronApp: ElectronApplication
 
@@ -50,7 +58,6 @@ test.describe('3D Viewer Electron', () => {
   test('loads GLB file and model renders', async () => {
     const window = await electronApp.firstWindow()
     const { assertNoErrors } = trackErrors(window)
-    await window.waitForTimeout(2000)
 
     // Load GLB file
     await window.locator('input[type="file"]').setInputFiles({
@@ -59,7 +66,7 @@ test.describe('3D Viewer Electron', () => {
       buffer: TEST_GLB,
     })
 
-    await window.waitForTimeout(3000)
+    await waitForLoadDone(window)
     await assertNoErrors()
 
     // Canvas still visible

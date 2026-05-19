@@ -19,6 +19,8 @@ export interface GlbPartInfo {
 
 export type FileSortMode = 'name' | 'type+name'
 
+export type LoadingPhase = 'idle' | 'loading' | 'done' | 'error'
+
 interface ModelStore {
   glbUrl: string | null
   sceneTree: SceneTreeNode[]
@@ -29,6 +31,10 @@ interface ModelStore {
   modelFormat: FormatId | null
   /** File path of the loaded model (needed by glTF to resolve external buffer/image URIs) */
   modelFilePath: string | null
+
+  /** Loading phase for E2E test conditional waits (replaces fixed timeouts) */
+  __loadingPhase: LoadingPhase
+  setLoadingPhase: (phase: LoadingPhase) => void
 
   // STEP conversion loading state
   isConverting: boolean
@@ -87,6 +93,7 @@ export const useModelStore = create<ModelStore>()((set, get) => ({
   modelBuffer: null,
   modelFormat: null,
   modelFilePath: null,
+  __loadingPhase: 'idle',
   isConverting: false,
   glbPartInfos: [],
   modelCenteringOffset: null,
@@ -97,6 +104,7 @@ export const useModelStore = create<ModelStore>()((set, get) => ({
   fileSortMode: 'name',
 
   setIsConverting: (v) => set({ isConverting: v }),
+  setLoadingPhase: (phase) => set({ __loadingPhase: phase }),
   setGlbPartInfos: (infos) => set({ glbPartInfos: infos }),
   setModelCenteringOffset: (offset) => set({ modelCenteringOffset: offset }),
 
@@ -128,7 +136,7 @@ export const useModelStore = create<ModelStore>()((set, get) => ({
   },
 
   setModelBuffer: (buffer, format) => {
-    set({ modelBuffer: buffer.slice(0), modelFormat: format })
+    set({ modelBuffer: buffer.slice(0), modelFormat: format, __loadingPhase: 'loading' })
   },
 
   setModelFilePath: (path) => set({ modelFilePath: path }),
@@ -136,6 +144,6 @@ export const useModelStore = create<ModelStore>()((set, get) => ({
   reset: () => {
     const url = get().glbUrl
     if (url && url !== 'loaded') URL.revokeObjectURL(url)
-    set({ glbUrl: null, sceneTree: [], modelVersion: 0, modelBuffer: null, modelFormat: null, modelFilePath: null, glbPartInfos: [], modelCenteringOffset: null, isConverting: false, fileSortMode: 'name' })
+    set({ glbUrl: null, sceneTree: [], modelVersion: 0, modelBuffer: null, modelFormat: null, modelFilePath: null, __loadingPhase: 'idle', glbPartInfos: [], modelCenteringOffset: null, isConverting: false, fileSortMode: 'name' })
   },
 }))

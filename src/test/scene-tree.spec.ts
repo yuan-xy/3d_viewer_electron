@@ -1,4 +1,4 @@
-import { test, expect, ElectronApplication, _electron } from '@playwright/test'
+import { test, expect, ElectronApplication, _electron, Page } from '@playwright/test'
 import { readFileSync } from 'fs'
 import path from 'path'
 import { fileURLToPath } from 'url'
@@ -6,6 +6,14 @@ import { fileURLToPath } from 'url'
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const PROJECT_ROOT = path.resolve(__dirname, '..', '..')
 const ROBOT_GLB = readFileSync(path.join(__dirname, 'fixtures', 'RobotExpressive.glb'))
+
+/** Wait for ModelGroup to finish loading (replaces fixed timeouts). */
+async function waitForLoadDone(page: Page, timeout = 30000) {
+  await page.waitForFunction(
+    () => window.__modelStore?.getState().__loadingPhase === 'done',
+    { timeout },
+  )
+}
 
 test.describe.serial('Multi-level scene tree', () => {
   let electronApp: ElectronApplication
@@ -42,7 +50,7 @@ test.describe.serial('Multi-level scene tree', () => {
       buffer: ROBOT_GLB,
     })
 
-    await window.waitForTimeout(8000)
+    await waitForLoadDone(window)
 
     const leftPanel = window.locator('aside').first()
     const treeNodes = leftPanel.locator('.whitespace-nowrap')

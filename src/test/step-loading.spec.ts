@@ -22,6 +22,14 @@ function trackErrors(page: Page) {
   }
 }
 
+/** Wait for ModelGroup to finish loading (replaces fixed timeouts). */
+async function waitForLoadDone(page: Page, timeout = 30000) {
+  await page.waitForFunction(
+    () => window.__modelStore?.getState().__loadingPhase === 'done',
+    { timeout },
+  )
+}
+
 test.describe('3D Viewer Electron - STEP Loading', () => {
   let electronApp: ElectronApplication
 
@@ -52,7 +60,6 @@ test.describe('3D Viewer Electron - STEP Loading', () => {
   test('loads STEP file, converts to GLB, renders mesh with topology', async () => {
     const window = await electronApp.firstWindow()
     const { assertNoErrors } = trackErrors(window)
-    await window.waitForTimeout(2000)
 
     // Capture console messages for debugging
     const consoleMessages: string[] = []
@@ -67,8 +74,7 @@ test.describe('3D Viewer Electron - STEP Loading', () => {
       buffer: TEST_STEP,
     })
 
-    // Wait for STEP → GLB conversion (WASM load + OCCT processing + GLB build + React render)
-    await window.waitForTimeout(20000)
+    await waitForLoadDone(window, 60000)
     await assertNoErrors()
 
     // Diagnostic: dump relevant console messages
@@ -117,7 +123,6 @@ test.describe('3D Viewer Electron - STEP Loading', () => {
   test('clicks STEP file in file list panel and renders model', async () => {
     const window = await electronApp.firstWindow()
     const { assertNoErrors } = trackErrors(window)
-    await window.waitForTimeout(2000)
 
     // Populate file list panel with fixture files
     const hasFiles = await window.evaluate(async (fixturesPath: string) => {
@@ -128,7 +133,8 @@ test.describe('3D Viewer Electron - STEP Loading', () => {
     }, path.resolve(__dirname, 'fixtures'))
     expect(hasFiles).toBe(true)
 
-    await window.waitForTimeout(1000)
+    // Let React render the file list entries
+    await window.waitForTimeout(200)
 
     // Collect console messages
     const consoleMessages: string[] = []
@@ -144,8 +150,7 @@ test.describe('3D Viewer Electron - STEP Loading', () => {
 
     await stepEntry.click()
 
-    // Wait for STEP → GLB conversion and render
-    await window.waitForTimeout(20000)
+    await waitForLoadDone(window, 60000)
 
     const relevant = consoleMessages.filter(m =>
       m.includes('[ModelGroup]') ||
@@ -192,7 +197,6 @@ test.describe('3D Viewer Electron - STEP Loading', () => {
     test.setTimeout(90000)
     const window = await electronApp.firstWindow()
     const { assertNoErrors } = trackErrors(window)
-    await window.waitForTimeout(2000)
 
     // Reset model and populate file list with fixture files
     await window.evaluate(async (fixturesPath: string) => {
@@ -202,7 +206,7 @@ test.describe('3D Viewer Electron - STEP Loading', () => {
         window.__modelStore.getState().setFolderFiles(fixturesPath, result.files)
       }
     }, path.resolve(__dirname, 'fixtures'))
-    await window.waitForTimeout(1000)
+    await window.waitForTimeout(200)
 
     const consoleMessages: string[] = []
     window.on('console', (msg) => {
@@ -212,7 +216,7 @@ test.describe('3D Viewer Electron - STEP Loading', () => {
     // Click keycap_v6.step (not loaded by prior tests) → must be cache miss
     const entry1 = window.locator('div[data-index]').filter({ hasText: 'keycap_v6.step' })
     await entry1.click()
-    await window.waitForTimeout(20000)
+    await waitForLoadDone(window, 60000)
 
     const hasCacheMiss = consoleMessages.some(m => m.includes('[stepToGlbCached] miss'))
     const hasIndexedDbHit = consoleMessages.some(m => m.includes('[stepToGlbCached] IndexedDB hit'))
@@ -234,12 +238,12 @@ test.describe('3D Viewer Electron - STEP Loading', () => {
     consoleMessages.length = 0
     const entry2 = window.locator('div[data-index]').filter({ hasText: 'test-model.step' })
     await entry2.click()
-    await window.waitForTimeout(20000)
+    await waitForLoadDone(window, 60000)
 
     consoleMessages.length = 0
     const entry3 = window.locator('div[data-index]').filter({ hasText: 'keycap_v6.step' })
     await entry3.click()
-    await window.waitForTimeout(8000)
+    await waitForLoadDone(window)
 
     const cacheLogs = consoleMessages.filter(m => m.includes('[stepToGlbCached]'))
     console.log('[test] cache logs on re-click keycap_v6:', cacheLogs)

@@ -1,4 +1,4 @@
-import { test, expect, ElectronApplication, _electron } from '@playwright/test'
+import { test, expect, ElectronApplication, _electron, Page } from '@playwright/test'
 import { readFileSync } from 'fs'
 import path from 'path'
 import { fileURLToPath } from 'url'
@@ -7,6 +7,14 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const PROJECT_ROOT = path.resolve(__dirname, '..', '..')
 const TEST_GLB = readFileSync(path.join(__dirname, 'fixtures', 'test-box.glb'))
 const TEST_FIXTURES = path.join(PROJECT_ROOT, 'src', 'test', 'fixtures')
+
+/** Wait for ModelGroup to finish loading (replaces fixed timeouts). */
+async function waitForLoadDone(page: Page, timeout = 30000) {
+  await page.waitForFunction(
+    () => window.__modelStore?.getState().__loadingPhase === 'done',
+    { timeout },
+  )
+}
 
 test.describe('3D Viewer Electron - File List Panel', () => {
   let electronApp: ElectronApplication
@@ -74,7 +82,6 @@ test.describe('3D Viewer Electron - File List Panel', () => {
 
   test('loads GLB file and model renders', async () => {
     const window = await electronApp.firstWindow()
-    await window.waitForTimeout(2000)
 
     // Load GLB file
     await window.locator('input[type="file"]').setInputFiles({
@@ -83,7 +90,7 @@ test.describe('3D Viewer Electron - File List Panel', () => {
       buffer: TEST_GLB,
     })
 
-    await window.waitForTimeout(3000)
+    await waitForLoadDone(window)
 
     // Canvas still visible (model rendered)
     const canvasVisible = await window.locator('canvas').first().isVisible()

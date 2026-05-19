@@ -110,6 +110,7 @@ const ModelGroup = forwardRef<THREE.Group, ModelGroupProps>(function ModelGroup(
   const [error, setError] = useState<string | null>(null)
   const setGlbPartInfos = useModelStore((s) => s.setGlbPartInfos)
   const setModelCenteringOffset = useModelStore((s) => s.setModelCenteringOffset)
+  const setLoadingPhase = useModelStore((s) => s.setLoadingPhase)
   const glbPartInfos = useModelStore((s) => s.glbPartInfos)
   const sceneTree = useModelStore((s) => s.sceneTree)
   const updateSceneTree = useModelStore((s) => s.updateSceneTree)
@@ -174,6 +175,7 @@ const ModelGroup = forwardRef<THREE.Group, ModelGroupProps>(function ModelGroup(
             }
           }
           if (!box.isEmpty()) onLoadedRef.current?.(box)
+          setLoadingPhase('done')
           return
         }
 
@@ -182,6 +184,7 @@ const ModelGroup = forwardRef<THREE.Group, ModelGroupProps>(function ModelGroup(
           const msg = 'No meshes found in file'
           setError(msg)
           onErrorRef.current?.(msg)
+          setLoadingPhase('error')
           return
         }
 
@@ -255,6 +258,7 @@ const ModelGroup = forwardRef<THREE.Group, ModelGroupProps>(function ModelGroup(
             finalBox.expandByObject(new THREE.Mesh(clone))
           }
           onLoadedRef.current?.(finalBox)
+          setLoadingPhase('done')
         } else {
           // Single merged geometry path (STL-like)
           const geo = mergeGeometries(meshes)
@@ -267,6 +271,7 @@ const ModelGroup = forwardRef<THREE.Group, ModelGroupProps>(function ModelGroup(
           updateSceneTree([{ id: `${format}-model`, name: format.toUpperCase(), visible: true, expanded: true }])
           geo.computeBoundingBox()
           if (geo.boundingBox) onLoadedRef.current?.(geo.boundingBox.clone())
+          setLoadingPhase('done')
         }
       } catch (e) {
         if (!cancelled) {
@@ -274,13 +279,14 @@ const ModelGroup = forwardRef<THREE.Group, ModelGroupProps>(function ModelGroup(
           console.error('[ModelGroup] load error:', msg)
           setError(msg)
           onErrorRef.current?.(msg)
+          setLoadingPhase('error')
         }
       }
     }
 
     load()
     return () => { cancelled = true }
-  }, [buffer, format, modelFilePath, setGlbPartInfos, setModelCenteringOffset])
+  }, [buffer, format, modelFilePath, setGlbPartInfos, setModelCenteringOffset, setLoadingPhase, updateSceneTree])
 
   if (error) {
     return null
