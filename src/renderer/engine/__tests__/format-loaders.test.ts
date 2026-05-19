@@ -33,52 +33,83 @@ interface FixtureEntry {
   file: string
   format: FormatId
   label: string
-  /** For glTF: pre-resolved buffer with embedded data URIs (Node resolves deps) */
+  /** For glTF: pre-built GLB buffer (Node resolves deps). When set, `format` is
+   *  overridden to 'glb' since the buffer is already a GLB binary. */
   resolvedBuffer?: ArrayBuffer
+  /** The format to pass to loadFormat (may differ from detected format if resolvedBuffer is used) */
+  loadFormat?: FormatId
 }
 
 /**
- * Pre-process a glTF fixture: parse JSON, find external buffer/image URIs,
- * read the referenced files from disk, and embed them as data URIs.
+ * Pre-process a glTF fixture: parse JSON, read external buffer files from disk,
+ * and build a self-contained GLB binary. Mirrors the gltfToGlb path used in
+ * the Electron app.
+ *
+ * Returns a GLB ArrayBuffer that can be passed to loadFormat(..., 'glb').
  */
 function resolveGltfFixture(gltfPath: string): ArrayBuffer {
   const gltfText = fs.readFileSync(gltfPath, 'utf-8')
   const gltf = JSON.parse(gltfText)
   const baseDir = path.dirname(gltfPath)
 
+  // Read external buffers into binary chunk
+  const bufferDatas: Uint8Array[] = []
+  let totalLen = 0
+
   if (gltf.buffers) {
-    for (const buffer of gltf.buffers) {
-      if (buffer.uri && !buffer.uri.startsWith('data:')) {
-        const resolvedPath = path.resolve(baseDir, buffer.uri)
-        if (!fs.existsSync(resolvedPath)) {
-          throw new Error(`glTF fixture references missing file: "${buffer.uri}" at ${resolvedPath}`)
+    for (const buf of gltf.buffers) {
+      if (buf.uri && !buf.uri.startsWith('data:')) {
+        const resolved = path.resolve(baseDir, buf.uri)
+        if (!fs.existsSync(resolved)) {
+          throw new Error(`glTF fixture references missing file: "${buf.uri}" at ${resolved}`)
         }
-        const data = fs.readFileSync(resolvedPath).toString('base64')
-        buffer.uri = `data:application/octet-stream;base64,${data}`
+        const data = new Uint8Array(fs.readFileSync(resolved).buffer)
+        bufferDatas.push(data)
+        totalLen += data.byteLength
+        delete buf.uri
       }
     }
   }
 
-  if (gltf.images) {
-    for (const image of gltf.images) {
-      if (image.uri && !image.uri.startsWith('data:')) {
-        const resolvedPath = path.resolve(baseDir, image.uri)
-        if (!fs.existsSync(resolvedPath)) {
-          throw new Error(`glTF fixture references missing texture: "${image.uri}" at ${resolvedPath}`)
-        }
-        const data = fs.readFileSync(resolvedPath).toString('base64')
-        const ext = image.uri.split('.').pop()?.toLowerCase()
-        const mime =
-          ext === 'png' ? 'image/png'
-          : ext === 'jpg' || ext === 'jpeg' ? 'image/jpeg'
-          : ext === 'webp' ? 'image/webp'
-          : 'application/octet-stream'
-        image.uri = `data:${mime};base64,${data}`
-      }
-    }
+  // Concatenate binaries
+  const bin = new Uint8Array(totalLen)
+  let off = 0
+  for (const d of bufferDatas) {
+    bin.set(d, off)
+    off += d.byteLength
   }
 
-  return new TextEncoder().encode(JSON.stringify(gltf)).buffer as ArrayBuffer
+  // Build GLB binary
+  const encoder = new TextEncoder()
+  const jsonBytes = encoder.encode(JSON.stringify(gltf))
+  const jsonPad = (4 - (jsonBytes.length % 4)) % 4
+  const binPad = (4 - (bin.length % 4)) % 4
+  const jsonChunkLen = jsonBytes.length + jsonPad
+  const binChunkLen = bin.length + binPad
+  const total = 12 + 8 + jsonChunkLen + (bin.length > 0 ? 8 + binChunkLen : 0)
+
+  const buffer = new ArrayBuffer(total)
+  const view = new DataView(buffer)
+  const bytes = new Uint8Array(buffer)
+  let pos = 0
+
+  view.setUint32(pos, 0x46546C67, true); pos += 4
+  view.setUint32(pos, 2, true); pos += 4
+  view.setUint32(pos, total, true); pos += 4
+
+  view.setUint32(pos, jsonChunkLen, true); pos += 4
+  view.setUint32(pos, 0x4E4F534A, true); pos += 4
+  bytes.set(jsonBytes, pos)
+  for (let i = jsonBytes.length; i < jsonChunkLen; i++) bytes[pos + i] = 0x20
+  pos += jsonChunkLen
+
+  if (bin.length > 0) {
+    view.setUint32(pos, binChunkLen, true); pos += 4
+    view.setUint32(pos, 0x004E4942, true); pos += 4
+    bytes.set(bin, pos)
+  }
+
+  return buffer
 }
 
 function findFixtures(): FixtureEntry[] {
@@ -100,11 +131,13 @@ function findFixtures(): FixtureEntry[] {
       file,
       format,
       label: fmtEntry?.label ?? format,
+      loadFormat: format,
     }
 
-    // For glTF, pre-resolve external dependencies so loadFormat can handle it
+    // For glTF, pre-build GLB binary so loadFormat can handle it directly
     if (format === 'gltf') {
       entry.resolvedBuffer = resolveGltfFixture(path.join(FIXTURES_DIR, file))
+      entry.loadFormat = 'glb' // buffer is already a self-contained GLB
     }
 
     fixtures.push(entry)
@@ -116,7 +149,7 @@ function findFixtures(): FixtureEntry[] {
 const fixtures = findFixtures()
 
 describe('Format loaders (Vitest integration)', () => {
-  fixtures.forEach(({ file, format, label, resolvedBuffer }) => {
+  fixtures.forEach(({ file, format, label, resolvedBuffer, loadFormat: useFormat }) => {
     it(`loadFormat ${label} (${file})`, async () => {
       const filePath = path.join(FIXTURES_DIR, file)
       const raw = fs.readFileSync(filePath)
@@ -125,7 +158,7 @@ describe('Format loaders (Vitest integration)', () => {
         raw.byteOffset + raw.byteLength,
       ) as ArrayBuffer
 
-      const result = await loadFormat(resolvedBuffer ?? buffer, format)
+      const result = await loadFormat(resolvedBuffer ?? buffer, useFormat ?? format)
 
       const totalObjects = result.meshes.length + result.objects.length
       expect(totalObjects, `${label} should produce at least 1 mesh/object`).toBeGreaterThan(0)
@@ -137,10 +170,10 @@ describe('Format loaders (Vitest integration)', () => {
     console.log(`[format test] Testing ${fixtures.length} formats: ${fixtures.map(f => f.format).join(', ')}`)
   })
 
-  it('loadFormat gltf resolves external buffer and produces meshes', async () => {
+  it('loadFormat gltf (pre-built GLB from fixture) produces meshes', async () => {
     const gltfPath = path.join(FIXTURES_DIR, 'AnimatedMorphSphere.gltf')
-    const resolvedBuffer = resolveGltfFixture(gltfPath)
-    const result = await loadFormat(resolvedBuffer, 'gltf')
+    const glbBuffer = resolveGltfFixture(gltfPath)
+    const result = await loadFormat(glbBuffer, 'glb')
     expect(result.meshes.length).toBeGreaterThan(0)
     expect(result.meshes[0].type).toBe('Mesh')
   })
@@ -153,5 +186,117 @@ describe('Format loaders (Vitest integration)', () => {
     expect(gltf.buffers[0].uri).toBe('AnimatedMorphSphere.bin')
     const binPath = path.resolve(path.dirname(gltfPath), gltf.buffers[0].uri)
     expect(fs.existsSync(binPath)).toBe(true)
+  })
+
+  // ---- glTF Electron-flow simulation: loadFormat resolves external deps via mock IPC ----
+  describe('glTF Electron flow (resolveGltfDependencies)', () => {
+    it('loads AnimatedMorphSphere.gltf by resolving .bin via mock electronAPI', async () => {
+      const gltfPath = path.join(FIXTURES_DIR, 'AnimatedMorphSphere.gltf')
+      const raw = fs.readFileSync(gltfPath)
+      const rawBuffer = raw.buffer.slice(
+        raw.byteOffset,
+        raw.byteOffset + raw.byteLength,
+      ) as ArrayBuffer
+
+      // Simulate Electron's webUtils.getPathForFile by providing the real fs path
+      const testFilePath = path.resolve(gltfPath)
+
+      // Mock window.electronAPI.readFileAsBase64 to read files from disk
+      // (mimics the main process fs:readFileAsBase64 IPC handler)
+      const originalApi = window.electronAPI
+      window.electronAPI = {
+        ...originalApi,
+        readFileAsBase64: async (filePath: string) => {
+          try {
+            const buf = fs.readFileSync(filePath)
+            return { success: true, data: buf.toString('base64') }
+          } catch (e) {
+            return { success: false, error: (e as Error).message }
+          }
+        },
+        getFilePath: (() => testFilePath) as any,
+        getAppVersion: async () => '1.0.0',
+        getPlatform: () => 'win32',
+        openExternal: async () => {},
+        readDirectory: async () => ({ success: true, files: [] }),
+        openFileDialog: async () => ({ success: true, filePaths: [] }),
+        toggleFullscreen: async () => true,
+        onFullscreenChanged: (() => () => {}) as any,
+      } as any
+
+      try {
+        // This is the exact code path taken in Electron:
+        // loadFormat(raw .gltf buffer, 'gltf', absoluteFilePath)
+        // → resolveGltfDependencies is called internally and uses the mock API
+        const result = await loadFormat(rawBuffer, 'gltf', testFilePath)
+
+        expect(result.meshes.length, 'should produce at least 1 mesh').toBeGreaterThan(0)
+        expect(result.meshes[0].type).toBe('Mesh')
+        expect(result.sceneRoot).toBeDefined()
+      } finally {
+        window.electronAPI = originalApi
+      }
+    })
+
+    it('throws when referenced .bin file is missing', async () => {
+      const gltfPath = path.join(FIXTURES_DIR, 'AnimatedMorphSphere.gltf')
+      const raw = fs.readFileSync(gltfPath)
+      const rawBuffer = raw.buffer.slice(
+        raw.byteOffset,
+        raw.byteOffset + raw.byteLength,
+      ) as ArrayBuffer
+
+      // Point to a non-existent directory so .bin resolution fails
+      const fakePath = path.resolve(FIXTURES_DIR, 'nonexistent', 'AnimatedMorphSphere.gltf')
+
+      const originalApi = window.electronAPI
+      window.electronAPI = {
+        ...originalApi,
+        readFileAsBase64: async (_filePath: string) => {
+          return { success: false, error: 'ENOENT: file not found' }
+        },
+        getAppVersion: async () => '1.0.0',
+        getPlatform: () => 'win32',
+        openExternal: async () => {},
+        readDirectory: async () => ({ success: true, files: [] }),
+        openFileDialog: async () => ({ success: true, filePaths: [] }),
+        toggleFullscreen: async () => true,
+        onFullscreenChanged: (() => () => {}) as any,
+      } as any
+
+      try {
+        await loadFormat(rawBuffer, 'gltf', fakePath)
+        // Should have thrown
+        expect.fail('Expected loadFormat to throw for missing referenced file')
+      } catch (err) {
+        const message = err instanceof Error ? err.message : String(err)
+        expect(message).toContain('Cannot find referenced file')
+        expect(message).toContain('AnimatedMorphSphere.bin')
+      } finally {
+        window.electronAPI = originalApi
+      }
+    })
+
+    it('throws when electronAPI is unavailable and glTF has external refs', async () => {
+      const gltfPath = path.join(FIXTURES_DIR, 'AnimatedMorphSphere.gltf')
+      const raw = fs.readFileSync(gltfPath)
+      const rawBuffer = raw.buffer.slice(
+        raw.byteOffset,
+        raw.byteOffset + raw.byteLength,
+      ) as ArrayBuffer
+
+      const originalApi = window.electronAPI
+      delete (window as any).electronAPI
+
+      try {
+        await loadFormat(rawBuffer, 'gltf', '/fake/path/model.gltf')
+        expect.fail('Expected loadFormat to throw without electronAPI')
+      } catch (err) {
+        const message = err instanceof Error ? err.message : String(err)
+        expect(message).toContain('desktop app')
+      } finally {
+        window.electronAPI = originalApi
+      }
+    })
   })
 })

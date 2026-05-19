@@ -42,13 +42,77 @@ function bufferToText(buffer: ArrayBuffer): string {
 }
 
 /**
- * Resolve external buffer/image URIs in a glTF JSON file.
- *
- * Scans buffers[] and images[] for relative URIs, reads the referenced files
- * via Electron IPC, and replaces them with data URIs so the glTF becomes
- * self-contained and can be parsed by GLTFLoader.
+ * Decode a base64 string into a Uint8Array.
  */
-async function resolveGltfDependencies(gltfText: string, filePath: string): Promise<string> {
+function base64ToBytes(base64: string): Uint8Array {
+  const binary = atob(base64)
+  const bytes = new Uint8Array(binary.length)
+  for (let i = 0; i < binary.length; i++) {
+    bytes[i] = binary.charCodeAt(i)
+  }
+  return bytes
+}
+
+/**
+ * Build a GLB binary container from JSON text and binary chunk data.
+ *
+ * GLB format:
+ *   [12-byte header: magic "glTF" + version 2 + total length]
+ *   [JSON chunk: length + type "JSON" + data (4-byte aligned)]
+ *   [BIN  chunk: length + type "BIN\0" + data (4-byte aligned)]
+ */
+function buildGlbBinary(json: string, bin: Uint8Array): ArrayBuffer {
+  const encoder = new TextEncoder()
+  const jsonBytes = encoder.encode(json)
+
+  const jsonPad = (4 - (jsonBytes.length % 4)) % 4
+  const binPad = (4 - (bin.length % 4)) % 4
+
+  const jsonChunkLen = jsonBytes.length + jsonPad
+  const binChunkLen = bin.length + binPad
+
+  const totalLen = 12 + 8 + jsonChunkLen + (bin.length > 0 ? 8 + binChunkLen : 0)
+
+  const buffer = new ArrayBuffer(totalLen)
+  const view = new DataView(buffer)
+  const bytes = new Uint8Array(buffer)
+  let pos = 0
+
+  // Header
+  view.setUint32(pos, 0x46546C67, true); pos += 4 // magic "glTF"
+  view.setUint32(pos, 2, true); pos += 4           // version
+  view.setUint32(pos, totalLen, true); pos += 4     // total length
+
+  // JSON chunk
+  view.setUint32(pos, jsonChunkLen, true); pos += 4
+  view.setUint32(pos, 0x4E4F534A, true); pos += 4  // "JSON"
+  bytes.set(jsonBytes, pos)
+  // JSON padding MUST be spaces (0x20) per glTF spec — JSON.parse rejects \0
+  for (let i = jsonBytes.length; i < jsonChunkLen; i++) bytes[pos + i] = 0x20
+  pos += jsonChunkLen
+
+  // BIN chunk (only if non-empty)
+  if (bin.length > 0) {
+    view.setUint32(pos, binChunkLen, true); pos += 4
+    view.setUint32(pos, 0x004E4942, true); pos += 4 // "BIN\0"
+    bytes.set(bin, pos)
+    // BIN padding can be zeros
+  }
+
+  return buffer
+}
+
+/**
+ * Convert a glTF JSON file with external buffer/image references into a
+ * self-contained GLB binary ArrayBuffer.
+ *
+ * Reads all external buffer files via Electron IPC, concatenates them into
+ * the GLB binary chunk, removes URIs from buffer definitions, and embeds
+ * texture images as data URIs.
+ *
+ * GLTFLoader handles GLB natively — no fetch/data URI issues.
+ */
+async function gltfToGlb(gltfText: string, filePath: string): Promise<ArrayBuffer> {
   const gltf = JSON.parse(gltfText)
 
   const lastSep = Math.max(filePath.lastIndexOf('/'), filePath.lastIndexOf('\\'))
@@ -61,6 +125,10 @@ async function resolveGltfDependencies(gltfText: string, filePath: string): Prom
     )
   }
 
+  // Read all external buffers, concatenate them into the GLB binary chunk
+  const bufferDatas: Uint8Array[] = []
+  let totalBufferLength = 0
+
   if (gltf.buffers) {
     for (const buffer of gltf.buffers) {
       if (buffer.uri && !buffer.uri.startsWith('data:')) {
@@ -71,11 +139,24 @@ async function resolveGltfDependencies(gltfText: string, filePath: string): Prom
             `Cannot find referenced file: "${buffer.uri}"\nExpected location: ${resolvedPath}`,
           )
         }
-        buffer.uri = `data:application/octet-stream;base64,${result.data}`
+        const bytes = base64ToBytes(result.data!)
+        bufferDatas.push(bytes)
+        totalBufferLength += bytes.byteLength
+        // Remove URI so GLTFLoader reads buffer 0 from the GLB binary chunk
+        delete buffer.uri
       }
     }
   }
 
+  // Concatenate all external buffers into the GLB binary chunk
+  const binChunk = new Uint8Array(totalBufferLength)
+  let offset = 0
+  for (const data of bufferDatas) {
+    binChunk.set(data, offset)
+    offset += data.byteLength
+  }
+
+  // Handle external images — embed as data URIs
   if (gltf.images) {
     for (const image of gltf.images) {
       if (image.uri && !image.uri.startsWith('data:')) {
@@ -97,7 +178,7 @@ async function resolveGltfDependencies(gltfText: string, filePath: string): Prom
     }
   }
 
-  return JSON.stringify(gltf)
+  return buildGlbBinary(JSON.stringify(gltf), binChunk)
 }
 
 function extractMeshes(root: THREE.Object3D): THREE.Mesh[] {
@@ -139,14 +220,14 @@ export async function loadFormat(
       return { meshes, objects: [], sceneRoot: gltf.scene }
     }
     case 'gltf': {
-      const gltfText = bufferToText(buffer)
       if (resourcePath) {
-        const resolvedJson = await resolveGltfDependencies(gltfText, resourcePath)
-        const gltf = await new GLTFLoader().parseAsync(resolvedJson, '')
-        const meshes = extractMeshes(gltf.scene)
-        return { meshes, objects: [], sceneRoot: gltf.scene }
+        // Convert glTF + external files into self-contained GLB binary
+        const glbBuffer = await gltfToGlb(bufferToText(buffer), resourcePath)
+        return loadFormat(glbBuffer, 'glb')
       }
-      // No file path — try parsing directly (works if glTF has only data URIs)
+      // No file path — try parsing directly (works if glTF has only data URIs or
+      // if pre-resolved by test helpers)
+      const gltfText = bufferToText(buffer)
       const gltf = await new GLTFLoader().parseAsync(gltfText, '')
       const meshes = extractMeshes(gltf.scene)
       return { meshes, objects: [], sceneRoot: gltf.scene }
