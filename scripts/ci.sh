@@ -9,8 +9,7 @@ PLATFORM=$(uname -s)
 #   uname -s matches MINGW*/MSYS*/CYGWIN* — Git Bash, MSYS2
 #   /mnt/c/Windows exists — WSL bash running on a Windows host
 if echo "${OS:-}${os:-}" | grep -q "Windows_NT" ||
-   echo "$PLATFORM" | grep -qE "^(MINGW|MSYS|CYGWIN)" ||
-   [ -d /mnt/c/Windows ]; then
+   echo "$PLATFORM" | grep -qE "^(MINGW|MSYS|CYGWIN)"; then
   PLATFORM="Windows"
   BUILD_SCRIPT="build:unpacked"
   SRC_DIR="dist/win-unpacked"

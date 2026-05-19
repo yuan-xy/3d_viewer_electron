@@ -39,7 +39,6 @@
     "clsx": "^2.1.1",
     "i18next": "^26.0.8",
     "lucide-react": "^1.14.0",
-    "manifold-3d": "^3.4.1",
     "react": "^19.2.5",
     "react-dom": "^19.2.5",
     "react-i18next": "^17.0.6",
@@ -76,13 +75,6 @@
   },
   "overrides": {
     "magic-string": "0.30.17"
-  },
-  "pnpm": {
-    "onlyBuiltDependencies": [
-      "electron",
-      "esbuild",
-      "sharp"
-    ]
   },
   "build": {
     "appId": "com.faicad.3d_viewer",

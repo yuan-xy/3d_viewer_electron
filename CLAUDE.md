@@ -36,7 +36,6 @@ The app registers `faicad-viewer://` to serve renderer assets without CORS issue
 ### 3D Engine Stack
 
 - **Three.js + React Three Fiber + Drei** — Core 3D rendering
-- **manifold-3d** — CSG (Constructive Solid Geometry) operations via `CSGEngine.ts`
 - **STEP file support** — `occtLoader.ts` + `GlbBuilder.ts` in `src/renderer/lib/step-converter/` handle STEP→GLB conversion via Web Workers
 
 ### IPC / Context Bridge API
@@ -59,8 +58,12 @@ Zustand stores in `src/renderer/stores/`. No Redux or other state library.
 
 - React 19 + TypeScript
 - electron 35 + electron-vite 3
-- Three.js + React Three Fiber + Drei + manifold-3d
+- Three.js + React Three Fiber + Drei
 - Radix UI + TailwindCSS
 - Zustand (state)
 - Vitest (unit tests) + Playwright (integration tests)
 - electron-builder (packaging)
+
+
+强调：任务完成前/代码提交到git前，必须跑npm run ci。
+
