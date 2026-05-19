@@ -1,0 +1,83 @@
+{
+  "app.name": "Faicad",
+  "app.welcome": "Faicad 3Dビューザーへようこそ",
+  "app.welcomeHint": "モデルをアップロードするか、必要ものを説明してください",
+  "app.quickExample1": "M3ボルトを生成",
+  "app.quickExample2": "20mmキューブを作成",
+  "app.emptySceneTree": "モデルがありません",
+  "app.noModel": "モデルなし",
+
+  "toolbar.download": "モデルをダウンロード",
+
+  "sceneTree.title": "シーン",
+  "sceneTree.visible": "表示",
+  "sceneTree.hidden": "非表示",
+
+  "status.vertices": "頂点",
+  "status.faces": "面",
+  "status.material": "マテリアル",
+
+  "delete": "削除",
+  "confirm": "確認",
+  "cancel": "キャンセル",
+
+  "view.front": "前",
+  "view.back": "後",
+  "view.left": "左",
+  "view.right": "右",
+  "view.top": "上",
+  "view.bottom": "下",
+
+  "error.loadFailed": "読み込み失敗: {{message}}",
+  "error.unsupportedFormat": "サポートされていない形式: {{format}}",
+  "error.retry": "再試行",
+  "error.connectionLost": "接続が切断されました。再接続中...",
+  "error.timeout": "タイムアウトしました。もう一度お試しください",
+  "error.webglLost": "3D描画エラーが発生しました。ページを更新してください",
+
+  "display.solid": "ソリッド",
+  "display.wireframe": "ワイヤーフレーム",
+  "display.solidWithWireframe": "ソリッド+ワイヤーフレーム",
+  "display.mesh": "メッシュ",
+  "display.solidMesh": "ソリッド+メッシュ",
+  "display.debug": "デバッグ",
+
+  "debug.selectFace": "-- 面を選択 --",
+  "debug.selectEdge": "-- エッジを選択 --",
+
+  "selection": {
+    "object": "オブジェクト",
+    "face": "面",
+    "edge": "エッジ",
+    "point": "点"
+  },
+
+  "fileList.title": "ファイル",
+  "fileList.empty": "ファイルを読み込むと同一フォルダのモデルが表示されます",
+  "fileList.folder": "フォルダ",
+  "fileList.sortByName": "名前順でソート",
+  "fileList.sortByType": "種類順でソート",
+
+  "openFile.title": "ファイルを開く",
+  "openFile.description": "開く3Dモデルファイルを選択",
+  "openFile.dropHint": "クリックして参照またはドラッグ&ドロップ",
+  "openFile.allFormats": "すべてのサポート形式",
+  "openFile.filterByType": "種類でフィルタ",
+  "openFile.allTypes": "すべての種類",
+
+  "fileGroup.mesh": "メッシュモデル",
+  "fileGroup.cad": "CADモデル",
+  "fileGroup.bim": "BIMモデル",
+  "fileGroup.point": "点群",
+  "fileGroup.volume": "ボリュームデータ",
+  "fileGroup.animation": "アニメーション",
+  "fileGroup.gcode": "GCode",
+  "fileGroup.other": "その他",
+
+  "chat.uploadFormats": "3Dモデルファイルをここにドラッグ&ドロップ",
+  "chat.uploadHint": "STL, GLB, 3MF, STEP, OBJ, FBXなどの形式をサポート",
+  "chat.welcome": "Faicadへようこそ",
+  "chat.welcomeMessage": "モデルを読み込むか生成を依頼してください",
+  "chat.inputPlaceholder": "必要ものを説明...",
+  "chat.send": "送信"
+}

@@ -1,0 +1,83 @@
+{
+  "app.name": "Faicad",
+  "app.welcome": "Faicad 3D Görüntüleyiciye Hoş Geldiniz",
+  "app.welcomeHint": "Bir model yükleyin veya neye ihtiyacınız olduğunu açıklayın",
+  "app.quickExample1": "M3 cıvata oluştur",
+  "app.quickExample2": "20mm küp yap",
+  "app.emptySceneTree": "Henüz model yok",
+  "app.noModel": "Model yok",
+
+  "toolbar.download": "Modeli indir",
+
+  "sceneTree.title": "Sahne",
+  "sceneTree.visible": "Görünür",
+  "sceneTree.hidden": "Gizli",
+
+  "status.vertices": "Köşeler",
+  "status.faces": "Yüzeyler",
+  "status.material": "Malzeme",
+
+  "delete": "Sil",
+  "confirm": "Onayla",
+  "cancel": "İptal",
+
+  "view.front": "Ön",
+  "view.back": "Arka",
+  "view.left": "Sol",
+  "view.right": "Sağ",
+  "view.top": "Üst",
+  "view.bottom": "Alt",
+
+  "error.loadFailed": "Yükleme başarısız: {{message}}",
+  "error.unsupportedFormat": "Desteklenmeyen format: {{format}}",
+  "error.retry": "Tekrar dene",
+  "error.connectionLost": "Bağlantı kayboldu, yeniden bağlanıyor...",
+  "error.timeout": "Zaman aşımı, lütfen tekrar deneyin",
+  "error.webglLost": "3D render hatası, lütfen sayfayı yenileyin",
+
+  "display.solid": "Katı",
+  "display.wireframe": "Tel çerçeve",
+  "display.solidWithWireframe": "Katı+Tel çerçeve",
+  "display.mesh": "Ağ",
+  "display.solidMesh": "Katı+Ağ",
+  "display.debug": "Hata ayıklama",
+
+  "debug.selectFace": "-- Yüzey seçin --",
+  "debug.selectEdge": "-- Kenar seçin --",
+
+  "selection": {
+    "object": "Nesne",
+    "face": "Yüzey",
+    "edge": "Kenar",
+    "point": "Nokta"
+  },
+
+  "fileList.title": "Dosyalar",
+  "fileList.empty": "Aynı klasördeki modelleri görmek için bir dosya yükleyin",
+  "fileList.folder": "Klasör",
+  "fileList.sortByName": "İsme göre sırala",
+  "fileList.sortByType": "Türe göre sırala",
+
+  "openFile.title": "Dosya aç",
+  "openFile.description": "Açılacak 3D model dosyası seçin",
+  "openFile.dropHint": "Gözatmak için tıklayın veya sürükle-bırak yapın",
+  "openFile.allFormats": "Tüm desteklenen formatlar",
+  "openFile.filterByType": "Türe göre filtrele",
+  "openFile.allTypes": "Tüm türler",
+
+  "fileGroup.mesh": "Ağ Modelleri",
+  "fileGroup.cad": "CAD Modelleri",
+  "fileGroup.bim": "BIM Modelleri",
+  "fileGroup.point": "Nokta Bulutları",
+  "fileGroup.volume": "Hacim Verileri",
+  "fileGroup.animation": "Animasyon",
+  "fileGroup.gcode": "GCode",
+  "fileGroup.other": "Diğer",
+
+  "chat.uploadFormats": "3D model dosyasını buraya sürükle-bırak yapın",
+  "chat.uploadHint": "STL, GLB, 3MF, STEP, OBJ, FBX ve daha fazlasını destekler",
+  "chat.welcome": "Faicad'e Hoş Geldiniz",
+  "chat.welcomeMessage": "Bir model yükleyin veya bir tane oluşturmamı isteyin",
+  "chat.inputPlaceholder": "Neye ihtiyacınız olduğunu açıklayın...",
+  "chat.send": "Gönder"
+}

@@ -1,0 +1,83 @@
+{
+  "app.name": "Faicad",
+  "app.welcome": "Faicad 3D व्यूअर में आपका स्वागत है",
+  "app.welcomeHint": "एक मॉडल अपलोड करें या बताएं कि आपको क्या चाहिए",
+  "app.quickExample1": "M3 बोल्ट बनाएं",
+  "app.quickExample2": "20mm क्यूब बनाएं",
+  "app.emptySceneTree": "अभी तक कोई मॉडल नहीं",
+  "app.noModel": "कोई मॉडल नहीं",
+
+  "toolbar.download": "मॉडल डाउनलोड करें",
+
+  "sceneTree.title": "दृश्य",
+  "sceneTree.visible": "दृश्यमान",
+  "sceneTree.hidden": "छिपा",
+
+  "status.vertices": "शीर्ष बिंदु",
+  "status.faces": "फेस",
+  "status.material": "सामग्री",
+
+  "delete": "हटाएं",
+  "confirm": "पुष्टि करें",
+  "cancel": "रद्द करें",
+
+  "view.front": "सामने",
+  "view.back": "पीछे",
+  "view.left": "बाएं",
+  "view.right": "दाएं",
+  "view.top": "ऊपर",
+  "view.bottom": "नीचे",
+
+  "error.loadFailed": "लोड विफल: {{message}}",
+  "error.unsupportedFormat": "असमर्थित प्रारूप: {{format}}",
+  "error.retry": "पुनः प्रयास करें",
+  "error.connectionLost": "कनेक्शन खो गया, पुनः कनेक्ट हो रहा है...",
+  "error.timeout": "टाइमआउट, कृपया पुनः प्रयास करें",
+  "error.webglLost": "3D रेंडरिंग त्रुटि, कृपया पेज रिफ्रेश करें",
+
+  "display.solid": "ठोस",
+  "display.wireframe": "वायरफ्रेम",
+  "display.solidWithWireframe": "ठोस+वायरफ्रेम",
+  "display.mesh": "मेश",
+  "display.solidMesh": "ठोस+मेश",
+  "display.debug": "डिबग",
+
+  "debug.selectFace": "-- फेस चुनें --",
+  "debug.selectEdge": "-- एज चुनें --",
+
+  "selection": {
+    "object": "ऑब्जेक्ट",
+    "face": "फेस",
+    "edge": "एज",
+    "point": "बिंदु"
+  },
+
+  "fileList.title": "फाइलें",
+  "fileList.empty": "उसी फोल्डर में मॉडल देखने के लिए फाइल लोड करें",
+  "fileList.folder": "फोल्डर",
+  "fileList.sortByName": "नाम से क्रमबद्ध करें",
+  "fileList.sortByType": "प्रकार से क्रमबद्ध करें",
+
+  "openFile.title": "फाइल खोलें",
+  "openFile.description": "खोलने के लिए 3D मॉडल फाइल चुनें",
+  "openFile.dropHint": "ब्राउज करने के लिए क्लिक करें या ड्रैग एंड ड्रॉप करें",
+  "openFile.allFormats": "सभी समर्थित प्रारूप",
+  "openFile.filterByType": "प्रकार से फ़िल्टर करें",
+  "openFile.allTypes": "सभी प्रकार",
+
+  "fileGroup.mesh": "मेश मॉडल",
+  "fileGroup.cad": "CAD मॉडल",
+  "fileGroup.bim": "BIM मॉडल",
+  "fileGroup.point": "पॉइंट क्लाउड",
+  "fileGroup.volume": "वॉल्यूम डेटा",
+  "fileGroup.animation": "एनिमेशन",
+  "fileGroup.gcode": "GCode",
+  "fileGroup.other": "अन्य",
+
+  "chat.uploadFormats": "3D मॉडल फाइल यहां ड्रैग एंड ड्रॉप करें",
+  "chat.uploadHint": "STL, GLB, 3MF, STEP, OBJ, FBX और अधिक का समर्थन करता है",
+  "chat.welcome": "Faicad में आपका स्वागत है",
+  "chat.welcomeMessage": "मॉडल लोड करें या मुझे एक बनाने के लिए कहें",
+  "chat.inputPlaceholder": "आपको क्या चाहिए बताएं...",
+  "chat.send": "भेजें"
+}

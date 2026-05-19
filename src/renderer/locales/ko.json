@@ -1,0 +1,83 @@
+{
+  "app.name": "Faicad",
+  "app.welcome": "Faicad 3D 뷰어로 오세요",
+  "app.welcomeHint": "모델을 업로드하거나 필요한 것을 설명하세요",
+  "app.quickExample1": "M3 볼트 생성",
+  "app.quickExample2": "20mm 큐브 만들기",
+  "app.emptySceneTree": "모델 없음",
+  "app.noModel": "모델 없음",
+
+  "toolbar.download": "모델 다운로드",
+
+  "sceneTree.title": "씬",
+  "sceneTree.visible": "표시",
+  "sceneTree.hidden": "숨김",
+
+  "status.vertices": "정점",
+  "status.faces": "면",
+  "status.material": "재질",
+
+  "delete": "삭제",
+  "confirm": "확인",
+  "cancel": "취소",
+
+  "view.front": "앞",
+  "view.back": "뒤",
+  "view.left": "왼쪽",
+  "view.right": "오른쪽",
+  "view.top": "위",
+  "view.bottom": "아래",
+
+  "error.loadFailed": "로드 실패: {{message}}",
+  "error.unsupportedFormat": "지원하지 않는 형식: {{format}}",
+  "error.retry": "재시도",
+  "error.connectionLost": "연결이 끊어졌습니다. 다시 연결 중...",
+  "error.timeout": "시간 초과. 다시 시도해 주세요",
+  "error.webglLost": "3D 렌더링 오류. 페이지를 새로고침해 주세요",
+
+  "display.solid": "솔리드",
+  "display.wireframe": "와이어프레임",
+  "display.solidWithWireframe": "솔리드+와이어프레임",
+  "display.mesh": "메쉬",
+  "display.solidMesh": "솔리드+메쉬",
+  "display.debug": "디버그",
+
+  "debug.selectFace": "-- 면 선택 --",
+  "debug.selectEdge": "-- 모서리 선택 --",
+
+  "selection": {
+    "object": "오브젝트",
+    "face": "면",
+    "edge": "모서리",
+    "point": "점"
+  },
+
+  "fileList.title": "파일",
+  "fileList.empty": "파일을 불러오면 같은 폴더의 모델이 표시됩니다",
+  "fileList.folder": "폴더",
+  "fileList.sortByName": "이름순 정렬",
+  "fileList.sortByType": "종류순 정렬",
+
+  "openFile.title": "파일 열기",
+  "openFile.description": "열 3D 모델 파일 선택",
+  "openFile.dropHint": "클릭하여 찾아보기 또는 드래그&드롭",
+  "openFile.allFormats": "지원하는 모든 형식",
+  "openFile.filterByType": "종류별 필터",
+  "openFile.allTypes": "모든 종류",
+
+  "fileGroup.mesh": "메쉬 모델",
+  "fileGroup.cad": "CAD 모델",
+  "fileGroup.bim": "BIM 모델",
+  "fileGroup.point": "포인트 클라우드",
+  "fileGroup.volume": "볼륨 데이터",
+  "fileGroup.animation": "애니메이션",
+  "fileGroup.gcode": "GCode",
+  "fileGroup.other": "기타",
+
+  "chat.uploadFormats": "3D 모델 파일을 여기에 드래그&드롭",
+  "chat.uploadHint": "STL, GLB, 3MF, STEP, OBJ, FBX 등 지원",
+  "chat.welcome": "Faicad에 오신 것을 환영합니다",
+  "chat.welcomeMessage": "모델을 불러오거나 생성을 요청하세요",
+  "chat.inputPlaceholder": "필요한 것을 설명하세요...",
+  "chat.send": "보내기"
+}

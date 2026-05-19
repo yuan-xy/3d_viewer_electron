@@ -1,0 +1,83 @@
+{
+  "app.name": "Faicad",
+  "app.welcome": "Witaj w Faicad Przeglądarce 3D",
+  "app.welcomeHint": "Prześlij model lub opisz, czego potrzebujesz",
+  "app.quickExample1": "Wygeneruj śrubę M3",
+  "app.quickExample2": "Zrób sześcian 20mm",
+  "app.emptySceneTree": "Brak modeli",
+  "app.noModel": "Brak modelu",
+
+  "toolbar.download": "Pobierz model",
+
+  "sceneTree.title": "Scena",
+  "sceneTree.visible": "Widoczny",
+  "sceneTree.hidden": "Ukryty",
+
+  "status.vertices": "Wierzchołki",
+  "status.faces": "Ściany",
+  "status.material": "Materiał",
+
+  "delete": "Usuń",
+  "confirm": "Potwierdź",
+  "cancel": "Anuluj",
+
+  "view.front": "Przód",
+  "view.back": "Tył",
+  "view.left": "Lewo",
+  "view.right": "Prawo",
+  "view.top": "Góra",
+  "view.bottom": "Dół",
+
+  "error.loadFailed": "Ładowanie nie powiodło się: {{message}}",
+  "error.unsupportedFormat": "Nieobsługiwany format: {{format}}",
+  "error.retry": "Ponów",
+  "error.connectionLost": "Utracono połączenie, ponowne łączenie...",
+  "error.timeout": "Przekroczenie czasu, proszę spróbować ponownie",
+  "error.webglLost": "Błąd renderowania 3D, proszę odświeżyć stronę",
+
+  "display.solid": "Pełny",
+  "display.wireframe": "Szkielet",
+  "display.solidWithWireframe": "Pełny+Szkielet",
+  "display.mesh": "Siatka",
+  "display.solidMesh": "Pełny+Siatka",
+  "display.debug": "Debug",
+
+  "debug.selectFace": "-- Wybierz ścianę --",
+  "debug.selectEdge": "-- Wybierz krawędź --",
+
+  "selection": {
+    "object": "Obiekt",
+    "face": "Ściana",
+    "edge": "Krawędź",
+    "point": "Punkt"
+  },
+
+  "fileList.title": "Pliki",
+  "fileList.empty": "Załaduj plik, aby przeglądać modele w tym samym folderze",
+  "fileList.folder": "Folder",
+  "fileList.sortByName": "Sortuj według nazwy",
+  "fileList.sortByType": "Sortuj według typu",
+
+  "openFile.title": "Otwórz plik",
+  "openFile.description": "Wybierz plik modelu 3D do otwarcia",
+  "openFile.dropHint": "Kliknij, aby przeglądać lub przeciągnij i upuść",
+  "openFile.allFormats": "Wszystkie obsługiwane formaty",
+  "openFile.filterByType": "Filtruj według typu",
+  "openFile.allTypes": "Wszystkie typy",
+
+  "fileGroup.mesh": "Modele siatkowe",
+  "fileGroup.cad": "Modele CAD",
+  "fileGroup.bim": "Modele BIM",
+  "fileGroup.point": "Chmury punktów",
+  "fileGroup.volume": "Dane objętościowe",
+  "fileGroup.animation": "Animacja",
+  "fileGroup.gcode": "GCode",
+  "fileGroup.other": "Inne",
+
+  "chat.uploadFormats": "Przeciągnij i upuść plik modelu 3D tutaj",
+  "chat.uploadHint": "Obsługuje STL, GLB, 3MF, STEP, OBJ, FBX i więcej",
+  "chat.welcome": "Witaj w Faicad",
+  "chat.welcomeMessage": "Załaduj model lub poproś mnie o jego wygenerowanie",
+  "chat.inputPlaceholder": "Opisz, czego potrzebujesz...",
+  "chat.send": "Wyślij"
+}

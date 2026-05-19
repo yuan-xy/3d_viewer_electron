@@ -1,0 +1,83 @@
+{
+  "app.name": "Faicad",
+  "app.welcome": "Ласкаво просимо до Faicad 3D Переглядача",
+  "app.welcomeHint": "Завантажте модель або опишіть, що вам потрібно",
+  "app.quickExample1": "Згенерувати болт М3",
+  "app.quickExample2": "Зробити куб 20мм",
+  "app.emptySceneTree": "Моделей поки що немає",
+  "app.noModel": "Немає моделі",
+
+  "toolbar.download": "Завантажити модель",
+
+  "sceneTree.title": "Сцена",
+  "sceneTree.visible": "Видимий",
+  "sceneTree.hidden": "Прихований",
+
+  "status.vertices": "Вершини",
+  "status.faces": "Грані",
+  "status.material": "Матеріал",
+
+  "delete": "Видалити",
+  "confirm": "Підтвердити",
+  "cancel": "Скасувати",
+
+  "view.front": "Спереду",
+  "view.back": "Ззаду",
+  "view.left": "Зліва",
+  "view.right": "Справа",
+  "view.top": "Зверху",
+  "view.bottom": "Знизу",
+
+  "error.loadFailed": "Помилка завантаження: {{message}}",
+  "error.unsupportedFormat": "Непідтримуваний формат: {{format}}",
+  "error.retry": "Повторити",
+  "error.connectionLost": "З'єднання втрачено, перепідключення...",
+  "error.timeout": "Час очікування вичерпано, будь ласка спробуйте знову",
+  "error.webglLost": "Помилка 3D-рендерингу, будь ласка оновите сторінку",
+
+  "display.solid": "Суцільний",
+  "display.wireframe": "Каркас",
+  "display.solidWithWireframe": "Суцільний+Каркас",
+  "display.mesh": "Сітка",
+  "display.solidMesh": "Суцільний+Сітка",
+  "display.debug": "Зневадження",
+
+  "debug.selectFace": "-- Вибрати грань --",
+  "debug.selectEdge": "-- Вибрати ребро --",
+
+  "selection": {
+    "object": "Об'єкт",
+    "face": "Грань",
+    "edge": "Ребро",
+    "point": "Точка"
+  },
+
+  "fileList.title": "Файли",
+  "fileList.empty": "Завантажте файл, щоб переглянути моделі в тій самій папці",
+  "fileList.folder": "Папка",
+  "fileList.sortByName": "Сортувати за іменем",
+  "fileList.sortByType": "Сортувати за типом",
+
+  "openFile.title": "Відкрити файл",
+  "openFile.description": "Виберіть файл 3D моделі для відкриття",
+  "openFile.dropHint": "Натисніть для вибору або перетягніть файл",
+  "openFile.allFormats": "Всі підтримувані формати",
+  "openFile.filterByType": "Фільтрувати за типом",
+  "openFile.allTypes": "Всі типи",
+
+  "fileGroup.mesh": "Сіткові моделі",
+  "fileGroup.cad": "CAD моделі",
+  "fileGroup.bim": "BIM моделі",
+  "fileGroup.point": "Хмари точок",
+  "fileGroup.volume": "Об'ємні дані",
+  "fileGroup.animation": "Анімація",
+  "fileGroup.gcode": "GCode",
+  "fileGroup.other": "Інші",
+
+  "chat.uploadFormats": "Перетягніть файл 3D моделі сюди",
+  "chat.uploadHint": "Підтримує STL, GLB, 3MF, STEP, OBJ, FBX та інші",
+  "chat.welcome": "Ласкаво просимо до Faicad",
+  "chat.welcomeMessage": "Завантажте модель або попросіть мене створити її",
+  "chat.inputPlaceholder": "Опишіть, що вам потрібно...",
+  "chat.send": "Надіслати"
+}

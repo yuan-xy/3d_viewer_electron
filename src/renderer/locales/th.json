@@ -1,0 +1,83 @@
+{
+  "app.name": "Faicad",
+  "app.welcome": "ยินดีต้อนรับสู่ Faicad 3D Viewer",
+  "app.welcomeHint": "อัปโหลดโมเดลหรืออธิบายสิ่งที่คุณต้องการ",
+  "app.quickExample1": "สร้างสกรู M3",
+  "app.quickExample2": "ทำลูกบาศก์ 20mm",
+  "app.emptySceneTree": "ยังไม่มีโมเดล",
+  "app.noModel": "ไม่มีโมเดล",
+
+  "toolbar.download": "ดาวน์โหลดโมเดล",
+
+  "sceneTree.title": "ฉาก",
+  "sceneTree.visible": "มองเห็น",
+  "sceneTree.hidden": "ซ่อน",
+
+  "status.vertices": "จุดยอด",
+  "status.faces": "ใบหน้า",
+  "status.material": "วัสดุ",
+
+  "delete": "ลบ",
+  "confirm": "ยืนยัน",
+  "cancel": "ยกเลิก",
+
+  "view.front": "หน้า",
+  "view.back": "หลัง",
+  "view.left": "ซ้าย",
+  "view.right": "ขวา",
+  "view.top": "บน",
+  "view.bottom": "ล่าง",
+
+  "error.loadFailed": "โหลดล้มเหลว: {{message}}",
+  "error.unsupportedFormat": "รูปแบบไม่รองรับ: {{format}}",
+  "error.retry": "ลองอีกครั้ง",
+  "error.connectionLost": "การเชื่อมต่อหลุด กำลังเชื่อมต่อใหม่...",
+  "error.timeout": "หมดเวลา กรุณาลองอีกครั้ง",
+  "error.webglLost": "เกิดข้อผิดพลาดในการเรนเดอร์ 3D กรุณารีเฟรชหน้า",
+
+  "display.solid": "ของแข็ง",
+  "display.wireframe": "โครงลวด",
+  "display.solidWithWireframe": "ของแข็ง+โครงลวด",
+  "display.mesh": "เมช",
+  "display.solidMesh": "ของแข็ง+เมช",
+  "display.debug": "ดีบัก",
+
+  "debug.selectFace": "-- เลือกใบหน้า --",
+  "debug.selectEdge": "-- เลือกขอบ --",
+
+  "selection": {
+    "object": "วัตถุ",
+    "face": "ใบหน้า",
+    "edge": "ขอบ",
+    "point": "จุด"
+  },
+
+  "fileList.title": "ไฟล์",
+  "fileList.empty": "โหลดไฟล์เพื่อดูโมเดลในโฟลเดอร์เดียวกัน",
+  "fileList.folder": "โฟลเดอร์",
+  "fileList.sortByName": "เรียงตามชื่อ",
+  "fileList.sortByType": "เรียงตามประเภท",
+
+  "openFile.title": "เปิดไฟล์",
+  "openFile.description": "เลือกไฟล์โมเดล 3D ที่จะเปิด",
+  "openFile.dropHint": "คลิกเพื่อเรียกดูหรือลากและวางไฟล์",
+  "openFile.allFormats": "รูปแบบที่รองรับทั้งหมด",
+  "openFile.filterByType": "กรองตามประเภท",
+  "openFile.allTypes": "ทุกประเภท",
+
+  "fileGroup.mesh": "โมเดลเมช",
+  "fileGroup.cad": "โมเดล CAD",
+  "fileGroup.bim": "โมเดล BIM",
+  "fileGroup.point": "คลาวด์จุด",
+  "fileGroup.volume": "ข้อมูลปริมาตร",
+  "fileGroup.animation": "แอนิเมชัน",
+  "fileGroup.gcode": "GCode",
+  "fileGroup.other": "อื่นๆ",
+
+  "chat.uploadFormats": "ลากและวางไฟล์โมเดล 3D ที่นี่",
+  "chat.uploadHint": "รองรับ STL, GLB, 3MF, STEP, OBJ, FBX และอื่นๆ",
+  "chat.welcome": "ยินดีต้อนรับสู่ Faicad",
+  "chat.welcomeMessage": "โหลดโมเดลหรือขอให้ฉันสร้างโมเดล",
+  "chat.inputPlaceholder": "อธิบายสิ่งที่คุณต้องการ...",
+  "chat.send": "ส่ง"
+}

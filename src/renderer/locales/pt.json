@@ -1,0 +1,83 @@
+{
+  "app.name": "Faicad",
+  "app.welcome": "Bem-vindo ao Faicad Visualizador 3D",
+  "app.welcomeHint": "Carregue um modelo ou descreva o que precisa",
+  "app.quickExample1": "Gerar um parafuso M3",
+  "app.quickExample2": "Fazer um cubo de 20mm",
+  "app.emptySceneTree": "Sem modelos ainda",
+  "app.noModel": "Sem modelo",
+
+  "toolbar.download": "Baixar modelo",
+
+  "sceneTree.title": "Cena",
+  "sceneTree.visible": "Visível",
+  "sceneTree.hidden": "Oculto",
+
+  "status.vertices": "Vértices",
+  "status.faces": "Faces",
+  "status.material": "Material",
+
+  "delete": "Eliminar",
+  "confirm": "Confirmar",
+  "cancel": "Cancelar",
+
+  "view.front": "Frente",
+  "view.back": "Trás",
+  "view.left": "Esquerda",
+  "view.right": "Direita",
+  "view.top": "Cima",
+  "view.bottom": "Baixo",
+
+  "error.loadFailed": "Falha ao carregar: {{message}}",
+  "error.unsupportedFormat": "Formato não suportado: {{format}}",
+  "error.retry": "Tentar novamente",
+  "error.connectionLost": "Conexão perdida, a reconectar...",
+  "error.timeout": "Tempo esgotado, por favor tente novamente",
+  "error.webglLost": "Erro de renderização 3D, por favor atualize a página",
+
+  "display.solid": "Sólido",
+  "display.wireframe": "Aramado",
+  "display.solidWithWireframe": "Sólido+Aramado",
+  "display.mesh": "Malha",
+  "display.solidMesh": "Sólido+Malha",
+  "display.debug": "Depurar",
+
+  "debug.selectFace": "-- Selecionar face --",
+  "debug.selectEdge": "-- Selecionar aresta --",
+
+  "selection": {
+    "object": "Objeto",
+    "face": "Face",
+    "edge": "Aresta",
+    "point": "Ponto"
+  },
+
+  "fileList.title": "Ficheiros",
+  "fileList.empty": "Carregue um ficheiro para ver modelos na mesma pasta",
+  "fileList.folder": "Pasta",
+  "fileList.sortByName": "Ordenar por nome",
+  "fileList.sortByType": "Ordenar por tipo",
+
+  "openFile.title": "Abrir ficheiro",
+  "openFile.description": "Selecione um ficheiro de modelo 3D para abrir",
+  "openFile.dropHint": "Clique para procurar ou arraste e solte",
+  "openFile.allFormats": "Todos os formatos suportados",
+  "openFile.filterByType": "Filtrar por tipo",
+  "openFile.allTypes": "Todos os tipos",
+
+  "fileGroup.mesh": "Modelos de malha",
+  "fileGroup.cad": "Modelos CAD",
+  "fileGroup.bim": "Modelos BIM",
+  "fileGroup.point": "Nuvens de pontos",
+  "fileGroup.volume": "Dados volumétricos",
+  "fileGroup.animation": "Animação",
+  "fileGroup.gcode": "GCode",
+  "fileGroup.other": "Outros",
+
+  "chat.uploadFormats": "Arraste e solte um ficheiro de modelo 3D aqui",
+  "chat.uploadHint": "Suporta STL, GLB, 3MF, STEP, OBJ, FBX e mais",
+  "chat.welcome": "Bem-vindo ao Faicad",
+  "chat.welcomeMessage": "Carregue um modelo ou peça-me para gerar um",
+  "chat.inputPlaceholder": "Descreva o que precisa...",
+  "chat.send": "Enviar"
+}

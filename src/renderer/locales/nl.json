@@ -1,0 +1,83 @@
+{
+  "app.name": "Faicad",
+  "app.welcome": "Welkom bij Faicad 3D Viewer",
+  "app.welcomeHint": "Upload een model of beschrijf wat je nodig hebt",
+  "app.quickExample1": "Genereer een M3 bout",
+  "app.quickExample2": "Maak een 20mm kubus",
+  "app.emptySceneTree": "Nog geen modellen",
+  "app.noModel": "Geen model",
+
+  "toolbar.download": "Model downloaden",
+
+  "sceneTree.title": "Scène",
+  "sceneTree.visible": "Zichtbaar",
+  "sceneTree.hidden": "Verborgen",
+
+  "status.vertices": "Vertices",
+  "status.faces": "Faces",
+  "status.material": "Materiaal",
+
+  "delete": "Verwijder",
+  "confirm": "Bevestig",
+  "cancel": "Annuleer",
+
+  "view.front": "Voor",
+  "view.back": "Achter",
+  "view.left": "Links",
+  "view.right": "Rechts",
+  "view.top": "Boven",
+  "view.bottom": "Onder",
+
+  "error.loadFailed": "Laden mislukt: {{message}}",
+  "error.unsupportedFormat": "Niet ondersteund formaat: {{format}}",
+  "error.retry": "Opnieuw proberen",
+  "error.connectionLost": "Verbinding verloren, opnieuw verbinden...",
+  "error.timeout": "Time-out, probeer het opnieuw",
+  "error.webglLost": "3D rendering fout,刷新 pagina",
+
+  "display.solid": "Solide",
+  "display.wireframe": "Draadmodel",
+  "display.solidWithWireframe": "Solide+Draadmodel",
+  "display.mesh": "Mesh",
+  "display.solidMesh": "Solide+Mesh",
+  "display.debug": "Debug",
+
+  "debug.selectFace": "-- Selecteer face --",
+  "debug.selectEdge": "-- Selecteer edge --",
+
+  "selection": {
+    "object": "Object",
+    "face": "Face",
+    "edge": "Edge",
+    "point": "Punt"
+  },
+
+  "fileList.title": "Bestanden",
+  "fileList.empty": "Laad een bestand om modellen in dezelfde map te bekijken",
+  "fileList.folder": "Map",
+  "fileList.sortByName": "Sorteren op naam",
+  "fileList.sortByType": "Sorteren op type",
+
+  "openFile.title": "Bestand openen",
+  "openFile.description": "Selecteer een 3D model bestand om te openen",
+  "openFile.dropHint": "Klik om te bladeren of sleep en neerzetten",
+  "openFile.allFormats": "Alle ondersteunde formaten",
+  "openFile.filterByType": "Filteren op type",
+  "openFile.allTypes": "Alle types",
+
+  "fileGroup.mesh": "Mesh modellen",
+  "fileGroup.cad": "CAD modellen",
+  "fileGroup.bim": "BIM modellen",
+  "fileGroup.point": "Puntwolken",
+  "fileGroup.volume": "Volume data",
+  "fileGroup.animation": "Animatie",
+  "fileGroup.gcode": "GCode",
+  "fileGroup.other": "Anders",
+
+  "chat.uploadFormats": "Sleep een 3D model bestand hierheen",
+  "chat.uploadHint": "Ondersteunt STL, GLB, 3MF, STEP, OBJ, FBX en meer",
+  "chat.welcome": "Welkom bij Faicad",
+  "chat.welcomeMessage": "Laad een model of vraag me er een te maken",
+  "chat.inputPlaceholder": "Beschrijf wat je nodig hebt...",
+  "chat.send": "Verstuur"
+}

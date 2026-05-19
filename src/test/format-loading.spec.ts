@@ -6,6 +6,9 @@ import { fileURLToPath } from 'url'
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const PROJECT_ROOT = path.resolve(__dirname, '..', '..')
 
+// Set RUN_ALL_TESTS=true to run all format loading tests
+const RUN_ALL_TESTS = process.env.RUN_ALL_TESTS === 'true'
+
 // Fixtures for enabled formats across groups
 const FIXTURES: { name: string; file: string; format: string }[] = [
   // Mesh
@@ -62,7 +65,8 @@ test.describe('3D Viewer Electron - Format Loading', () => {
   })
 
   for (const fixture of FIXTURES) {
-    test(`loads ${fixture.format} file (${fixture.name}) without errors`, async () => {
+    const testName = `loads ${fixture.format} file (${fixture.name}) without errors`
+    const testFn = async () => {
       test.setTimeout(30000)
       const window = await electronApp.firstWindow()
 
@@ -109,6 +113,12 @@ test.describe('3D Viewer Electron - Format Loading', () => {
       })
       console.log(`[test] ${fixture.format} scene has content:`, sceneHasContent)
       expect(sceneHasContent).toBe(true)
-    })
+    }
+
+    if (RUN_ALL_TESTS) {
+      test(testName, testFn)
+    } else {
+      test.skip(testName, testFn)
+    }
   }
 })

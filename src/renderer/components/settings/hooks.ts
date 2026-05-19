@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import { useUIStore } from '@/stores/ui-store'
-import i18n from '@/i18n'
+import i18n, { SUPPORTED_LANGUAGES } from '@/i18n'
 
 function resolveTheme(theme: 'light' | 'dark' | 'system'): boolean {
   if (theme === 'system') {
@@ -46,7 +46,8 @@ export function useLanguageSync() {
       ? navigator.language.slice(0, 2)
       : language
 
-    const lang = targetLang === 'zh' || targetLang === 'en' ? targetLang : 'zh'
+    const supportedCodes = SUPPORTED_LANGUAGES.map(l => l.code)
+    const lang = supportedCodes.includes(targetLang as typeof supportedCodes[number]) ? targetLang : 'zh'
     i18n.changeLanguage(lang)
   }, [language])
 }

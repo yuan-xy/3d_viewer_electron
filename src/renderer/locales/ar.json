@@ -1,0 +1,83 @@
+{
+  "app.name": "Faicad",
+  "app.welcome": "مرحباً بك في Faicad عارض النماذج ثلاثية الأبعاد",
+  "app.welcomeHint": "قم بتحميل نموذج أو صِف ما تحتاجه",
+  "app.quickExample1": "إنشاء برغي M3",
+  "app.quickExample2": "صنع مكعب 20 ملم",
+  "app.emptySceneTree": "لا توجد نماذج بعد",
+  "app.noModel": "لا يوجد نموذج",
+
+  "toolbar.download": "تحميل النموذج",
+
+  "sceneTree.title": "المشهد",
+  "sceneTree.visible": "مرئي",
+  "sceneTree.hidden": "مخفي",
+
+  "status.vertices": "الرؤوس",
+  "status.faces": "الوجوه",
+  "status.material": "المادة",
+
+  "delete": "حذف",
+  "confirm": "تأكيد",
+  "cancel": "إلغاء",
+
+  "view.front": "أمام",
+  "view.back": "خلف",
+  "view.left": "يسار",
+  "view.right": "يمين",
+  "view.top": "أعلى",
+  "view.bottom": "أسفل",
+
+  "error.loadFailed": "فشل التحميل: {{message}}",
+  "error.unsupportedFormat": "صيغة غير مدعومة: {{format}}",
+  "error.retry": "إعادة المحاولة",
+  "error.connectionLost": "انقطع الاتصال، جاري إعادة الاتصال...",
+  "error.timeout": "انتهت المهلة، يرجى المحاولة مرة أخرى",
+  "error.webglLost": "خطأ في العرض ثلاثي الأبعاد، يرجى تحديث الصفحة",
+
+  "display.solid": "صلب",
+  "display.wireframe": "هيكل سلكي",
+  "display.solidWithWireframe": "صلب+هيكل سلكي",
+  "display.mesh": "شبكة",
+  "display.solidMesh": "صلب+شبكة",
+  "display.debug": "تصحيح",
+
+  "debug.selectFace": "-- تحديد الوجه --",
+  "debug.selectEdge": "-- تحديد الحافة --",
+
+  "selection": {
+    "object": "كائن",
+    "face": "وجه",
+    "edge": "حافة",
+    "point": "نقطة"
+  },
+
+  "fileList.title": "الملفات",
+  "fileList.empty": "قم بتحميل ملف لعرض النماذج في نفس المجلد",
+  "fileList.folder": "مجلد",
+  "fileList.sortByName": "ترتيب حسب الاسم",
+  "fileList.sortByType": "ترتيب حسب النوع",
+
+  "openFile.title": "فتح ملف",
+  "openFile.description": "اختر ملف نموذج ثلاثي الأبعاد لفتحه",
+  "openFile.dropHint": "انقر للتصفح أو اسحب وأفلت الملف",
+  "openFile.allFormats": "جميع التنسيقات المدعومة",
+  "openFile.filterByType": "تصفية حسب النوع",
+  "openFile.allTypes": "جميع الأنواع",
+
+  "fileGroup.mesh": "نماذج الشبكة",
+  "fileGroup.cad": "نماذج CAD",
+  "fileGroup.bim": "نماذج BIM",
+  "fileGroup.point": "سحب نقطية",
+  "fileGroup.volume": "بيانات حجمية",
+  "fileGroup.animation": "رسوم متحركة",
+  "fileGroup.gcode": "GCode",
+  "fileGroup.other": "أخرى",
+
+  "chat.uploadFormats": "اسحب وأفلت ملف النموذج ثلاثي الأبعاد هنا",
+  "chat.uploadHint": "يدعم STL وGLB و3MF وSTEP وOBJ وFBX والمزيد",
+  "chat.welcome": "مرحباً بك في Faicad",
+  "chat.welcomeMessage": "قم بتحميل نموذج أو اطلب مني إنشاء واحد",
+  "chat.inputPlaceholder": "صِف ما تحتاجه...",
+  "chat.send": "إرسال"
+}

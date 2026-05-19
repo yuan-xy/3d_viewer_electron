@@ -1,0 +1,83 @@
+{
+  "app.name": "Faicad",
+  "app.welcome": "Välkommen till Faicad 3D Viewer",
+  "app.welcomeHint": "Ladda upp en modell eller beskriv vad du behöver",
+  "app.quickExample1": "Skapa en M3-bult",
+  "app.quickExample2": "Gör en 20mm kub",
+  "app.emptySceneTree": "Inga modeller ännu",
+  "app.noModel": "Ingen modell",
+
+  "toolbar.download": "Ladda ner modell",
+
+  "sceneTree.title": "Scen",
+  "sceneTree.visible": "Synlig",
+  "sceneTree.hidden": "Dold",
+
+  "status.vertices": "Hörn",
+  "status.faces": "Ytor",
+  "status.material": "Material",
+
+  "delete": "Ta bort",
+  "confirm": "Bekräfta",
+  "cancel": "Avbryt",
+
+  "view.front": "Fram",
+  "view.back": "Bak",
+  "view.left": "Vänster",
+  "view.right": "Höger",
+  "view.top": "Upp",
+  "view.bottom": "Ner",
+
+  "error.loadFailed": "Laddning misslyckades: {{message}}",
+  "error.unsupportedFormat": "Formatet stöds inte: {{format}}",
+  "error.retry": "Försök igen",
+  "error.connectionLost": "Anslutningen förlorades, återansluter...",
+  "error.timeout": "Tidsgränsen nåddes, var god försök igen",
+  "error.webglLost": "3D-renderingsfel, var god uppdatera sidan",
+
+  "display.solid": "Solid",
+  "display.wireframe": "Trådmodell",
+  "display.solidWithWireframe": "Solid+Trådmodell",
+  "display.mesh": "Nät",
+  "display.solidMesh": "Solid+Nät",
+  "display.debug": "Debug",
+
+  "debug.selectFace": "-- Välj yta --",
+  "debug.selectEdge": "-- Välj kant --",
+
+  "selection": {
+    "object": "Objekt",
+    "face": "Yta",
+    "edge": "Kant",
+    "point": "Punkt"
+  },
+
+  "fileList.title": "Filer",
+  "fileList.empty": "Ladda en fil för att visa modeller i samma mapp",
+  "fileList.folder": "Mapp",
+  "fileList.sortByName": "Sortera efter namn",
+  "fileList.sortByType": "Sortera efter typ",
+
+  "openFile.title": "Öppna fil",
+  "openFile.description": "Välj en 3D-modellfil att öppna",
+  "openFile.dropHint": "Klicka för att bläddra eller dra och släpp",
+  "openFile.allFormats": "Alla format som stöds",
+  "openFile.filterByType": "Filtrera efter typ",
+  "openFile.allTypes": "Alla typer",
+
+  "fileGroup.mesh": "Nätmodeller",
+  "fileGroup.cad": "CAD-modeller",
+  "fileGroup.bim": "BIM-modeller",
+  "fileGroup.point": "Punktmoln",
+  "fileGroup.volume": "Volymdata",
+  "fileGroup.animation": "Animation",
+  "fileGroup.gcode": "GCode",
+  "fileGroup.other": "Övrigt",
+
+  "chat.uploadFormats": "Dra och släpp en 3D-modellfil här",
+  "chat.uploadHint": "Stöder STL, GLB, 3MF, STEP, OBJ, FBX och mer",
+  "chat.welcome": "Välkommen till Faicad",
+  "chat.welcomeMessage": "Ladda en modell eller be mig skapa en",
+  "chat.inputPlaceholder": "Beskriv vad du behöver...",
+  "chat.send": "Skicka"
+}

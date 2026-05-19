@@ -1,0 +1,83 @@
+{
+  "app.name": "Faicad",
+  "app.welcome": "Bienvenido a Faicad Visor 3D",
+  "app.welcomeHint": "Sube un modelo o describe lo que necesitas",
+  "app.quickExample1": "Generar un perno M3",
+  "app.quickExample2": "Hacer un cubo de 20mm",
+  "app.emptySceneTree": "Sin modelos todavía",
+  "app.noModel": "Sin modelo",
+
+  "toolbar.download": "Descargar modelo",
+
+  "sceneTree.title": "Escena",
+  "sceneTree.visible": "Visible",
+  "sceneTree.hidden": "Oculto",
+
+  "status.vertices": "Vértices",
+  "status.faces": "Caras",
+  "status.material": "Material",
+
+  "delete": "Eliminar",
+  "confirm": "Confirmar",
+  "cancel": "Cancelar",
+
+  "view.front": "Frente",
+  "view.back": "Atrás",
+  "view.left": "Izquierda",
+  "view.right": "Derecha",
+  "view.top": "Arriba",
+  "view.bottom": "Abajo",
+
+  "error.loadFailed": "Error al cargar: {{message}}",
+  "error.unsupportedFormat": "Formato no soportado: {{format}}",
+  "error.retry": "Reintentar",
+  "error.connectionLost": "Conexión perdida, reconectando...",
+  "error.timeout": "Tiempo de espera agotado, por favor reintente",
+  "error.webglLost": "Error de renderizado 3D, por favor actualice",
+
+  "display.solid": "Sólido",
+  "display.wireframe": "Estructura alambre",
+  "display.solidWithWireframe": "Sólido+Estructura",
+  "display.mesh": "Malla",
+  "display.solidMesh": "Sólido+Malla",
+  "display.debug": "Depurar",
+
+  "debug.selectFace": "-- Seleccionar cara --",
+  "debug.selectEdge": "-- Seleccionar borde --",
+
+  "selection": {
+    "object": "Objeto",
+    "face": "Cara",
+    "edge": "Borde",
+    "point": "Punto"
+  },
+
+  "fileList.title": "Archivos",
+  "fileList.empty": "Carga un archivo para ver modelos en la misma carpeta",
+  "fileList.folder": "Carpeta",
+  "fileList.sortByName": "Ordenar por nombre",
+  "fileList.sortByType": "Ordenar por tipo",
+
+  "openFile.title": "Abrir archivo",
+  "openFile.description": "Selecciona un archivo de modelo 3D para abrir",
+  "openFile.dropHint": "Clic para explorar o arrastra y suelta",
+  "openFile.allFormats": "Todos los formatos soportados",
+  "openFile.filterByType": "Filtrar por tipo",
+  "openFile.allTypes": "Todos los tipos",
+
+  "fileGroup.mesh": "Modelos de malla",
+  "fileGroup.cad": "Modelos CAD",
+  "fileGroup.bim": "Modelos BIM",
+  "fileGroup.point": "Nubes de puntos",
+  "fileGroup.volume": "Datos de volumen",
+  "fileGroup.animation": "Animación",
+  "fileGroup.gcode": "GCode",
+  "fileGroup.other": "Otros",
+
+  "chat.uploadFormats": "Arrastra y suelta un archivo de modelo 3D aquí",
+  "chat.uploadHint": "Soporta STL, GLB, 3MF, STEP, OBJ, FBX y más",
+  "chat.welcome": "Bienvenido a Faicad",
+  "chat.welcomeMessage": "Carga un modelo o pídeme que genere uno",
+  "chat.inputPlaceholder": "Describe lo que necesitas...",
+  "chat.send": "Enviar"
+}

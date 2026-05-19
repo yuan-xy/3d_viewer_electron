@@ -1,0 +1,83 @@
+{
+  "app.name": "Faicad",
+  "app.welcome": "Willkommen bei Faicad 3D-Viewer",
+  "app.welcomeHint": "Laden Sie ein Modell hoch oder beschreiben Sie, was Sie brauchen",
+  "app.quickExample1": "Eine M3-Schraube generieren",
+  "app.quickExample2": "Einen 20mm-Würfel erstellen",
+  "app.emptySceneTree": "Keine Modelle",
+  "app.noModel": "Kein Modell",
+
+  "toolbar.download": "Modell herunterladen",
+
+  "sceneTree.title": "Szene",
+  "sceneTree.visible": "Sichtbar",
+  "sceneTree.hidden": "Versteckt",
+
+  "status.vertices": "Eckpunkte",
+  "status.faces": "Flächen",
+  "status.material": "Material",
+
+  "delete": "Löschen",
+  "confirm": "Bestätigen",
+  "cancel": "Abbrechen",
+
+  "view.front": "Vorne",
+  "view.back": "Hinten",
+  "view.left": "Links",
+  "view.right": "Rechts",
+  "view.top": "Oben",
+  "view.bottom": "Unten",
+
+  "error.loadFailed": "Laden fehlgeschlagen: {{message}}",
+  "error.unsupportedFormat": "Nicht unterstütztes Format: {{format}}",
+  "error.retry": "Erneut versuchen",
+  "error.connectionLost": "Verbindung verloren, verbinde erneut...",
+  "error.timeout": "Zeitüberschreitung, bitte erneut versuchen",
+  "error.webglLost": "3D-Rendering-Fehler, bitte Seite aktualisieren",
+
+  "display.solid": "Massiv",
+  "display.wireframe": "Drahtgitter",
+  "display.solidWithWireframe": "Massiv+Drahtgitter",
+  "display.mesh": "Netz",
+  "display.solidMesh": "Massiv+Netz",
+  "display.debug": "Debug",
+
+  "debug.selectFace": "-- Fläche auswählen --",
+  "debug.selectEdge": "-- Kante auswählen --",
+
+  "selection": {
+    "object": "Objekt",
+    "face": "Fläche",
+    "edge": "Kante",
+    "point": "Punkt"
+  },
+
+  "fileList.title": "Dateien",
+  "fileList.empty": "Laden Sie eine Datei, um Modelle im gleichen Ordner anzuzeigen",
+  "fileList.folder": "Ordner",
+  "fileList.sortByName": "Nach Namen sortieren",
+  "fileList.sortByType": "Nach Typ sortieren",
+
+  "openFile.title": "Datei öffnen",
+  "openFile.description": "Wählen Sie eine 3D-Modelldatei zum Öffnen",
+  "openFile.dropHint": "Klicken zum Durchsuchen oder Datei hierher ziehen",
+  "openFile.allFormats": "Alle unterstützten Formate",
+  "openFile.filterByType": "Nach Typ filtern",
+  "openFile.allTypes": "Alle Typen",
+
+  "fileGroup.mesh": "Netzmodelle",
+  "fileGroup.cad": "CAD-Modelle",
+  "fileGroup.bim": "BIM-Modelle",
+  "fileGroup.point": "Punktwolken",
+  "fileGroup.volume": "Volumendaten",
+  "fileGroup.animation": "Animation",
+  "fileGroup.gcode": "GCode",
+  "fileGroup.other": "Andere",
+
+  "chat.uploadFormats": "3D-Modelldatei hierher ziehen",
+  "chat.uploadHint": "Unterstützt STL, GLB, 3MF, STEP, OBJ, FBX und mehr",
+  "chat.welcome": "Willkommen bei Faicad",
+  "chat.welcomeMessage": "Laden Sie ein Modell oder bitten Sie mich, eines zu generieren",
+  "chat.inputPlaceholder": "Beschreiben Sie, was Sie brauchen...",
+  "chat.send": "Senden"
+}

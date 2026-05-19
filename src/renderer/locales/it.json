@@ -1,0 +1,83 @@
+{
+  "app.name": "Faicad",
+  "app.welcome": "Benvenuto in Faicad Visualizzatore 3D",
+  "app.welcomeHint": "Carica un modello o descrivi cosa ti serve",
+  "app.quickExample1": "Genera una vite M3",
+  "app.quickExample2": "Crea un cubo da 20mm",
+  "app.emptySceneTree": "Nessun modello ancora",
+  "app.noModel": "Nessun modello",
+
+  "toolbar.download": "Scarica modello",
+
+  "sceneTree.title": "Scena",
+  "sceneTree.visible": "Visibile",
+  "sceneTree.hidden": "Nascosto",
+
+  "status.vertices": "Vertici",
+  "status.faces": "Facce",
+  "status.material": "Materiale",
+
+  "delete": "Elimina",
+  "confirm": "Conferma",
+  "cancel": "Annulla",
+
+  "view.front": "Davanti",
+  "view.back": "Dietro",
+  "view.left": "Sinistra",
+  "view.right": "Destra",
+  "view.top": "Sopra",
+  "view.bottom": "Sotto",
+
+  "error.loadFailed": "Caricamento fallito: {{message}}",
+  "error.unsupportedFormat": "Formato non supportato: {{format}}",
+  "error.retry": "Riprova",
+  "error.connectionLost": "Connessione persa, riconnessione...",
+  "error.timeout": "Timeout, per favore riprova",
+  "error.webglLost": "Errore di rendering 3D, per favore aggiorna la pagina",
+
+  "display.solid": "Solido",
+  "display.wireframe": "Wireframe",
+  "display.solidWithWireframe": "Solido+Wireframe",
+  "display.mesh": "Mesh",
+  "display.solidMesh": "Solido+Mesh",
+  "display.debug": "Debug",
+
+  "debug.selectFace": "-- Seleziona faccia --",
+  "debug.selectEdge": "-- Seleziona bordo --",
+
+  "selection": {
+    "object": "Oggetto",
+    "face": "Faccia",
+    "edge": "Bordo",
+    "point": "Punto"
+  },
+
+  "fileList.title": "File",
+  "fileList.empty": "Carica un file per visualizzare i modelli nella stessa cartella",
+  "fileList.folder": "Cartella",
+  "fileList.sortByName": "Ordina per nome",
+  "fileList.sortByType": "Ordina per tipo",
+
+  "openFile.title": "Apri file",
+  "openFile.description": "Seleziona un file di modello 3D da aprire",
+  "openFile.dropHint": "Clicca per sfogliare o trascina e rilascia",
+  "openFile.allFormats": "Tutti i formati supportati",
+  "openFile.filterByType": "Filtra per tipo",
+  "openFile.allTypes": "Tutti i tipi",
+
+  "fileGroup.mesh": "Modelli mesh",
+  "fileGroup.cad": "Modelli CAD",
+  "fileGroup.bim": "Modelli BIM",
+  "fileGroup.point": "Point cloud",
+  "fileGroup.volume": "Dati volumetrici",
+  "fileGroup.animation": "Animazione",
+  "fileGroup.gcode": "GCode",
+  "fileGroup.other": "Altro",
+
+  "chat.uploadFormats": "Trascina e rilascia un file di modello 3D qui",
+  "chat.uploadHint": "Supporta STL, GLB, 3MF, STEP, OBJ, FBX e altri",
+  "chat.welcome": "Benvenuto in Faicad",
+  "chat.welcomeMessage": "Carica un modello o chiedimi di generarne uno",
+  "chat.inputPlaceholder": "Descrivi cosa ti serve...",
+  "chat.send": "Invia"
+}

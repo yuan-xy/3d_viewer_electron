@@ -1,0 +1,83 @@
+{
+  "app.name": "Faicad",
+  "app.welcome": "Chào mừng đến với Faicad Trình xem 3D",
+  "app.welcomeHint": "Tải lên một mô hình hoặc mô tả những gì bạn cần",
+  "app.quickExample1": "Tạo bu lông M3",
+  "app.quickExample2": "Làm khối lập phương 20mm",
+  "app.emptySceneTree": "Chưa có mô hình",
+  "app.noModel": "Không có mô hình",
+
+  "toolbar.download": "Tải xuống mô hình",
+
+  "sceneTree.title": "Cảnh",
+  "sceneTree.visible": "Hiển thị",
+  "sceneTree.hidden": "Ẩn",
+
+  "status.vertices": "Đỉnh",
+  "status.faces": "Mặt",
+  "status.material": "Vật liệu",
+
+  "delete": "Xóa",
+  "confirm": "Xác nhận",
+  "cancel": "Hủy",
+
+  "view.front": "Trước",
+  "view.back": "Sau",
+  "view.left": "Trái",
+  "view.right": "Phải",
+  "view.top": "Trên",
+  "view.bottom": "Dưới",
+
+  "error.loadFailed": "Tải thất bại: {{message}}",
+  "error.unsupportedFormat": "Định dạng không được hỗ trợ: {{format}}",
+  "error.retry": "Thử lại",
+  "error.connectionLost": "Kết nối bị mất, đang kết nối lại...",
+  "error.timeout": "Hết thời gian, vui lòng thử lại",
+  "error.webglLost": "Lỗi kết xuất 3D, vui lòng làm mới trang",
+
+  "display.solid": "Đặc",
+  "display.wireframe": "Khung lưới",
+  "display.solidWithWireframe": "Đặc+Khung lưới",
+  "display.mesh": "Lưới",
+  "display.solidMesh": "Đặc+Lưới",
+  "display.debug": "Gỡ lỗi",
+
+  "debug.selectFace": "-- Chọn mặt --",
+  "debug.selectEdge": "-- Chọn cạnh --",
+
+  "selection": {
+    "object": "Đối tượng",
+    "face": "Mặt",
+    "edge": "Cạnh",
+    "point": "Điểm"
+  },
+
+  "fileList.title": "Tệp",
+  "fileList.empty": "Tải tệp để xem các mô hình trong cùng thư mục",
+  "fileList.folder": "Thư mục",
+  "fileList.sortByName": "Sắp xếp theo tên",
+  "fileList.sortByType": "Sắp xếp theo loại",
+
+  "openFile.title": "Mở tệp",
+  "openFile.description": "Chọn tệp mô hình 3D để mở",
+  "openFile.dropHint": "Nhấp để duyệt hoặc kéo và thả tệp",
+  "openFile.allFormats": "Tất cả các định dạng được hỗ trợ",
+  "openFile.filterByType": "Lọc theo loại",
+  "openFile.allTypes": "Tất cả các loại",
+
+  "fileGroup.mesh": "Mô hình lưới",
+  "fileGroup.cad": "Mô hình CAD",
+  "fileGroup.bim": "Mô hình BIM",
+  "fileGroup.point": "Đám mây điểm",
+  "fileGroup.volume": "Dữ liệu thể tích",
+  "fileGroup.animation": "Hoạt hình",
+  "fileGroup.gcode": "GCode",
+  "fileGroup.other": "Khác",
+
+  "chat.uploadFormats": "Kéo và thả tệp mô hình 3D vào đây",
+  "chat.uploadHint": "Hỗ trợ STL, GLB, 3MF, STEP, OBJ, FBX và các định dạng khác",
+  "chat.welcome": "Chào mừng đến với Faicad",
+  "chat.welcomeMessage": "Tải mô hình hoặc yêu cầu tôi tạo một mô hình",
+  "chat.inputPlaceholder": "Mô tả những gì bạn cần...",
+  "chat.send": "Gửi"
+}

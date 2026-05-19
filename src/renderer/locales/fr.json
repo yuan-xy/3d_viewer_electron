@@ -1,0 +1,83 @@
+{
+  "app.name": "Faicad",
+  "app.welcome": "Bienvenue sur Faicad Visionneuse 3D",
+  "app.welcomeHint": "Téléchargez un modèle ou décrivez ce dont vous avez besoin",
+  "app.quickExample1": "Générer un boulon M3",
+  "app.quickExample2": "Créer un cube de 20mm",
+  "app.emptySceneTree": "Aucun modèle",
+  "app.noModel": "Aucun modèle",
+
+  "toolbar.download": "Télécharger le modèle",
+
+  "sceneTree.title": "Scène",
+  "sceneTree.visible": "Visible",
+  "sceneTree.hidden": "Masqué",
+
+  "status.vertices": "Sommets",
+  "status.faces": "Faces",
+  "status.material": "Matériau",
+
+  "delete": "Supprimer",
+  "confirm": "Confirmer",
+  "cancel": "Annuler",
+
+  "view.front": "Devant",
+  "view.back": "Derrière",
+  "view.left": "Gauche",
+  "view.right": "Droite",
+  "view.top": "Haut",
+  "view.bottom": "Bas",
+
+  "error.loadFailed": "Échec du chargement: {{message}}",
+  "error.unsupportedFormat": "Format non pris en charge: {{format}}",
+  "error.retry": "Réessayer",
+  "error.connectionLost": "Connexion perdue, reconnexion...",
+  "error.timeout": "Délai dépassé, veuillez réessayer",
+  "error.webglLost": "Erreur de rendu 3D, veuillez actualiser la page",
+
+  "display.solid": "Solide",
+  "display.wireframe": "Fil de fer",
+  "display.solidWithWireframe": "Solide+Fil de fer",
+  "display.mesh": "Maillage",
+  "display.solidMesh": "Solide+Maillage",
+  "display.debug": "Débogage",
+
+  "debug.selectFace": "-- Sélectionner une face --",
+  "debug.selectEdge": "-- Sélectionner une arête --",
+
+  "selection": {
+    "object": "Objet",
+    "face": "Face",
+    "edge": "Arête",
+    "point": "Point"
+  },
+
+  "fileList.title": "Fichiers",
+  "fileList.empty": "Chargez un fichier pour parcourir les modèles du même dossier",
+  "fileList.folder": "Dossier",
+  "fileList.sortByName": "Trier par nom",
+  "fileList.sortByType": "Trier par type",
+
+  "openFile.title": "Ouvrir un fichier",
+  "openFile.description": "Sélectionnez un fichier de modèle 3D à ouvrir",
+  "openFile.dropHint": "Cliquez pour parcourir ou glissez-déposez",
+  "openFile.allFormats": "Tous les formats pris en charge",
+  "openFile.filterByType": "Filtrer par type",
+  "openFile.allTypes": "Tous les types",
+
+  "fileGroup.mesh": "Modèles maillés",
+  "fileGroup.cad": "Modèles CAO",
+  "fileGroup.bim": "Modèles BIM",
+  "fileGroup.point": "Nuages de points",
+  "fileGroup.volume": "Données volumiques",
+  "fileGroup.animation": "Animation",
+  "fileGroup.gcode": "GCode",
+  "fileGroup.other": "Autres",
+
+  "chat.uploadFormats": "Glissez-déposez un fichier de modèle 3D ici",
+  "chat.uploadHint": "Prend en charge STL, GLB, 3MF, STEP, OBJ, FBX et plus",
+  "chat.welcome": "Bienvenue sur Faicad",
+  "chat.welcomeMessage": "Chargez un modèle ou demandez-m'en de générer un",
+  "chat.inputPlaceholder": "Décrivez ce dont vous avez besoin...",
+  "chat.send": "Envoyer"
+}

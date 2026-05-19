@@ -1,0 +1,83 @@
+{
+  "app.name": "Faicad",
+  "app.welcome": "Selamat datang di Faicad Penampil 3D",
+  "app.welcomeHint": "Unggah model atau jelaskan apa yang Anda butuhkan",
+  "app.quickExample1": "Hasilkan baut M3",
+  "app.quickExample2": "Buat kubus 20mm",
+  "app.emptySceneTree": "Belum ada model",
+  "app.noModel": "Tidak ada model",
+
+  "toolbar.download": "Unduh model",
+
+  "sceneTree.title": "Scene",
+  "sceneTree.visible": "Tampil",
+  "sceneTree.hidden": "Sembunyi",
+
+  "status.vertices": "Vertices",
+  "status.faces": "Faces",
+  "status.material": "Material",
+
+  "delete": "Hapus",
+  "confirm": "Konfirmasi",
+  "cancel": "Batal",
+
+  "view.front": "Depan",
+  "view.back": "Belakang",
+  "view.left": "Kiri",
+  "view.right": "Kanan",
+  "view.top": "Atas",
+  "view.bottom": "Bawah",
+
+  "error.loadFailed": "Gagal memuat: {{message}}",
+  "error.unsupportedFormat": "Format tidak didukung: {{format}}",
+  "error.retry": "Coba lagi",
+  "error.connectionLost": "Koneksi terputus, menyambung kembali...",
+  "error.timeout": "Waktu habis, silakan coba lagi",
+  "error.webglLost": "Kesalahan rendering 3D, silakan segarkan halaman",
+
+  "display.solid": "Padat",
+  "display.wireframe": "Kawat",
+  "display.solidWithWireframe": "Padat+Kawat",
+  "display.mesh": "Mesh",
+  "display.solidMesh": "Padat+Mesh",
+  "display.debug": "Debug",
+
+  "debug.selectFace": "-- Pilih face --",
+  "debug.selectEdge": "-- Pilih edge --",
+
+  "selection": {
+    "object": "Objek",
+    "face": "Face",
+    "edge": "Edge",
+    "point": "Titik"
+  },
+
+  "fileList.title": "File",
+  "fileList.empty": "Muat file untuk melihat model di folder yang sama",
+  "fileList.folder": "Folder",
+  "fileList.sortByName": "Urutkan berdasarkan nama",
+  "fileList.sortByType": "Urutkan berdasarkan tipe",
+
+  "openFile.title": "Buka file",
+  "openFile.description": "Pilih file model 3D untuk dibuka",
+  "openFile.dropHint": "Klik untuk menjelajah atau seret dan letakkan",
+  "openFile.allFormats": "Semua format yang didukung",
+  "openFile.filterByType": "Filter berdasarkan tipe",
+  "openFile.allTypes": "Semua tipe",
+
+  "fileGroup.mesh": "Model Mesh",
+  "fileGroup.cad": "Model CAD",
+  "fileGroup.bim": "Model BIM",
+  "fileGroup.point": "Point Cloud",
+  "fileGroup.volume": "Data Volume",
+  "fileGroup.animation": "Animasi",
+  "fileGroup.gcode": "GCode",
+  "fileGroup.other": "Lainnya",
+
+  "chat.uploadFormats": "Seret dan letakkan file model 3D di sini",
+  "chat.uploadHint": "Mendukung STL, GLB, 3MF, STEP, OBJ, FBX dan lainnya",
+  "chat.welcome": "Selamat datang di Faicad",
+  "chat.welcomeMessage": "Muat model atau minta saya untuk membuatnya",
+  "chat.inputPlaceholder": "Jelaskan apa yang Anda butuhkan...",
+  "chat.send": "Kirim"
+}

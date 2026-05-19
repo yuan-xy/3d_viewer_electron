@@ -4,9 +4,28 @@ import {
 } from '@/components/ui/dialog'
 import { cn } from '@/lib/utils'
 import { Settings, Monitor, Moon, Sun } from 'lucide-react'
+import { SUPPORTED_LANGUAGES } from '@/i18n'
+
+function useUILanguage() {
+  const language = useUIStore((s) => s.language)
+  if (language === 'system') {
+    return navigator.language.startsWith('zh') ? 'zh' : 'en'
+  }
+  return language as 'zh' | 'en'
+}
 
 export function SettingsDialog({ children }: { children?: React.ReactNode }) {
-  const ui = useUIStore()
+  const isZh = useUILanguage()
+
+  const labels = {
+    settings: isZh ? '设置' : 'Settings',
+    theme: isZh ? '主题' : 'Theme',
+    light: isZh ? '浅色' : 'Light',
+    dark: isZh ? '深色' : 'Dark',
+    system: isZh ? '跟随系统' : 'System',
+    language: isZh ? '语言' : 'Language',
+    followSystem: isZh ? '跟随系统' : 'System',
+  }
 
   return (
     <Dialog>
@@ -17,23 +36,26 @@ export function SettingsDialog({ children }: { children?: React.ReactNode }) {
           </button>
         )}
       </DialogTrigger>
-      <DialogContent className="max-w-sm">
+      <DialogContent className="max-w-sm max-h-[80vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>{ui.language === 'zh' ? '设置' : 'Settings'}</DialogTitle>
+          <DialogTitle>{labels.settings}</DialogTitle>
         </DialogHeader>
         <div className="space-y-6">
-          <SettingSection title={ui.language === 'zh' ? '主题' : 'Theme'}>
+          <SettingSection title={labels.theme}>
             <div className="flex gap-2">
-              <ThemeOption value="light" label={ui.language === 'zh' ? '浅色' : 'Light'} icon={Sun} />
-              <ThemeOption value="dark" label={ui.language === 'zh' ? '深色' : 'Dark'} icon={Moon} />
-              <ThemeOption value="system" label={ui.language === 'zh' ? '跟随系统' : 'System'} icon={Monitor} />
+              <ThemeOption value="light" label={labels.light} icon={Sun} />
+              <ThemeOption value="dark" label={labels.dark} icon={Moon} />
+              <ThemeOption value="system" label={labels.system} icon={Monitor} />
             </div>
           </SettingSection>
 
-          <SettingSection title={ui.language === 'zh' ? '语言' : 'Language'}>
-            <LanguageOption value="zh" label="中文" />
-            <LanguageOption value="en" label="English" />
-            <LanguageOption value="system" label={ui.language === 'zh' ? '跟随系统' : 'System'} />
+          <SettingSection title={labels.language}>
+            <div className="grid grid-cols-2 gap-2">
+              <LanguageOption value="system" label={labels.followSystem} icon={Monitor} />
+              {SUPPORTED_LANGUAGES.map((lang) => (
+                <LanguageOption key={lang.code} value={lang.code} label={lang.name} />
+              ))}
+            </div>
           </SettingSection>
         </div>
       </DialogContent>
@@ -70,21 +92,24 @@ function ThemeOption({ value, label, icon: Icon }: {
   )
 }
 
-function LanguageOption({ value, label }: {
-  value: 'zh' | 'en' | 'system'; label: string
+function LanguageOption({ value, label, icon: Icon }: {
+  value: string; label: string; icon?: React.ComponentType<{ className?: string }>
 }) {
   const current = useUIStore((s) => s.language)
   const setLanguage = useUIStore((s) => s.setLanguage)
 
   return (
     <button
-      onClick={() => setLanguage(value)}
+      onClick={() => setLanguage(value as 'zh' | 'en' | 'system')}
       className={cn(
         'w-full text-left px-3 py-2 rounded-md border text-sm transition-colors',
         current === value ? 'border-primary bg-primary/10 text-primary' : 'border-border hover:bg-accent'
       )}
     >
-      {label}
+      <div className="flex items-center gap-2">
+        {Icon && <Icon className="h-4 w-4" />}
+        <span>{label}</span>
+      </div>
     </button>
   )
 }

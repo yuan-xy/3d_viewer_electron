@@ -1,5 +1,6 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
+import type { SupportedLanguage } from '@/i18n'
 
 const safeLocalStorage = {
   getItem: (key: string): string | null => {
@@ -18,14 +19,14 @@ interface UIStore {
   rightPanelOpen: boolean
   mobileDrawerOpen: boolean
   mobileChatOpen: boolean
-  language: 'zh' | 'en'
+  language: SupportedLanguage | 'system'
   theme: 'light' | 'dark' | 'system'
 
   toggleLeftPanel: () => void
   toggleRightPanel: () => void
   setMobileDrawerOpen: (open: boolean) => void
   setMobileChatOpen: (open: boolean) => void
-  setLanguage: (lang: 'zh' | 'en' | 'system') => void
+  setLanguage: (lang: SupportedLanguage | 'system') => void
   setTheme: (theme: 'light' | 'dark' | 'system') => void
 }
 
@@ -36,7 +37,7 @@ export const useUIStore = create<UIStore>()(
       rightPanelOpen: true,
       mobileDrawerOpen: false,
       mobileChatOpen: false,
-      language: (safeLocalStorage.getItem('lang') as 'zh' | 'en' | 'system') || 'zh',
+      language: (safeLocalStorage.getItem('lang') as SupportedLanguage | 'system') || 'zh',
       theme: 'system',
 
       toggleLeftPanel: () => set((s) => ({ leftPanelOpen: !s.leftPanelOpen })),
