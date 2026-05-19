@@ -225,6 +225,35 @@ describe('model-store', () => {
     expect(useModelStore.getState().sceneTree[0].visible).toBe(false)
   })
 
+  it('child can be independently toggled visible even when parent is hidden', () => {
+    useModelStore.getState().updateSceneTree(makeTree())
+    // 1. Toggle root off → all descendants become invisible
+    useModelStore.getState().toggleNodeVisible('root')
+    let tree = useModelStore.getState().sceneTree
+    expect(tree[0].visible).toBe(false)
+    expect(tree[0].children![0].visible).toBe(false)
+    // 2. Toggle child1 on — this child should be visible despite parent hidden
+    useModelStore.getState().toggleNodeVisible('child1')
+    tree = useModelStore.getState().sceneTree
+    expect(tree[0].children![0].visible).toBe(true)
+    // Parent remains hidden
+    expect(tree[0].visible).toBe(false)
+  })
+
+  it('parent toggle cascades to all children but individual child keeps its own state', () => {
+    useModelStore.getState().updateSceneTree(makeTree())
+    // Turn off parent
+    useModelStore.getState().toggleNodeVisible('root')
+    // Turn on one child
+    useModelStore.getState().toggleNodeVisible('child1')
+    // Turn parent back on
+    useModelStore.getState().toggleNodeVisible('root')
+    const tree = useModelStore.getState().sceneTree
+    expect(tree[0].visible).toBe(true)
+    expect(tree[0].children![0].visible).toBe(true)
+    expect(tree[0].children![1].visible).toBe(true)
+  })
+
   it('setGlbPartInfos', () => {
     const infos = [
       { partId: 'o0', meshIndex: 0, name: 'Part0', triangleCount: 100 },

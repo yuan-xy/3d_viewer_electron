@@ -4,6 +4,7 @@ import { mergeGeometries as mergeBufferGeometries } from 'three/examples/jsm/uti
 import { useModelStore, type GlbPartInfo, type SceneTreeNode } from '@/stores/model-store'
 import type { SelectorRuntime } from '@/lib/topology/types'
 import { buildGlbFaceIdsForPart } from '@/lib/topology/build-face-ids'
+import { flattenVisibility } from '@/lib/scene-tree-utils'
 import type { DisplayMode } from './DisplayModeDropdown'
 import { loadFormat } from '@/engine/formatLoaders'
 import type { FormatId } from '@/config/file-formats'
@@ -31,20 +32,6 @@ function mergeGeometries(meshes: THREE.Mesh[]): THREE.BufferGeometry {
   if (geoms.length === 0) return new THREE.BufferGeometry()
   if (geoms.length === 1) return geoms[0]
   return mergeBufferGeometries(geoms, false)
-}
-
-function flattenVisibility(tree: SceneTreeNode[], parentVisible: boolean): Map<string, boolean> {
-  const map = new Map<string, boolean>()
-  for (const node of tree) {
-    const vis = parentVisible && node.visible
-    map.set(node.id, vis)
-    if (node.children) {
-      for (const [childId, childVis] of flattenVisibility(node.children, vis)) {
-        map.set(childId, childVis)
-      }
-    }
-  }
-  return map
 }
 
 // ---- multi-mesh rendering constants ----
@@ -95,7 +82,7 @@ const ModelGroup = forwardRef<THREE.Group, ModelGroupProps>(function ModelGroup(
   const modelFilePath = useModelStore((s) => s.modelFilePath)
 
   const visibilityMap = useMemo(
-    () => flattenVisibility(sceneTree, true),
+    () => flattenVisibility(sceneTree),
     [sceneTree],
   )
 
