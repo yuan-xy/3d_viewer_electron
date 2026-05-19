@@ -8,6 +8,18 @@
   "app.noModel": "无模型",
 
   "toolbar.download": "下载模型",
+  "toolbar.cache": "缓存",
+  "cache.title": "缓存管理",
+  "cache.memory": "内存缓存",
+  "cache.disk": "磁盘缓存",
+  "cache.empty": "暂无缓存",
+  "cache.clearSelected": "清除选中",
+  "cache.clearAll": "清除全部",
+  "cache.size": "大小",
+  "cache.path": "路径",
+  "cache.modified": "修改时间",
+  "cache.selectAll": "全选",
+  "cache.refresh": "刷新",
 
   "sceneTree.title": "场景",
   "sceneTree.visible": "可见",

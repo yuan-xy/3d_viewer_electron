@@ -8,6 +8,18 @@
   "app.noModel": "No model",
 
   "toolbar.download": "Download Model",
+  "toolbar.cache": "Cache",
+  "cache.title": "Cache Manager",
+  "cache.memory": "Memory Cache",
+  "cache.disk": "Disk Cache",
+  "cache.empty": "No cached items",
+  "cache.clearSelected": "Clear Selected",
+  "cache.clearAll": "Clear All",
+  "cache.size": "Size",
+  "cache.path": "Path",
+  "cache.modified": "Modified",
+  "cache.selectAll": "Select All",
+  "cache.refresh": "Refresh",
 
   "sceneTree.title": "Scene",
   "sceneTree.visible": "Visible",

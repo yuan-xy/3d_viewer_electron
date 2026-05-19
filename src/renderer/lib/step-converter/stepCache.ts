@@ -2,6 +2,8 @@ const DB_NAME = 'step-glb-cache'
 const DB_VERSION = 1
 const STORE_NAME = 'buffers'
 
+export const memCache = new Map<string, ArrayBuffer>()
+
 let dbPromise: Promise<IDBDatabase> | null = null
 
 function openCache(): Promise<IDBDatabase> {
@@ -42,4 +44,21 @@ export async function putCached(key: string, buffer: ArrayBuffer): Promise<void>
     tx.onerror = () => reject(tx.error)
     tx.onabort = () => reject(tx.error)
   })
+}
+
+export async function clearStepCache(): Promise<void> {
+  try {
+    const db = await openCache()
+    await new Promise<void>((resolve, reject) => {
+      const tx = db.transaction(STORE_NAME, 'readwrite')
+      tx.objectStore(STORE_NAME).clear()
+      tx.oncomplete = () => resolve()
+      tx.onerror = () => reject(tx.error)
+      tx.onabort = () => reject(tx.error)
+    })
+  } catch (err) {
+    console.warn('[clearStepCache] IndexedDB clear failed:', err)
+  }
+  memCache.clear()
+  console.log('[clearStepCache] Done')
 }

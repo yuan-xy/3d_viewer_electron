@@ -19,6 +19,7 @@ import {
 import WorkspacePage from '@/pages/WorkspacePage'
 import FileListPanel from '@/components/FileListPanel'
 import { SettingsDialog } from '@/components/settings/SettingsDialog'
+import { CacheManager } from '@/components/CacheManager'
 
 function SceneTreeItem({ node, depth }: { node: SceneTreeNode; depth: number }) {
   const hasChildren = node.children && node.children.length > 0
@@ -204,6 +205,7 @@ export default function DesktopLayout() {
           {ui.rightPanelOpen ? <PanelRightClose className="h-4 w-4" /> : <PanelRightOpen className="h-4 w-4" />}
         </Button>
 
+        <CacheManager />
         <SettingsDialog />
       </header>
 
