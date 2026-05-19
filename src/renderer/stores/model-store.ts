@@ -82,13 +82,29 @@ function toggleNodeInTree(
 ): SceneTreeNode[] {
   return nodes.map((node) => {
     if (node.id === nodeId) {
-      return { ...node, [key]: !node[key] }
+      const newValue = !node[key]
+      if (key === 'visible' && node.children && node.children.length > 0) {
+        return {
+          ...node,
+          visible: newValue,
+          children: setAllVisible(node.children, newValue),
+        }
+      }
+      return { ...node, [key]: newValue }
     }
     if (node.children && node.children.length > 0) {
       return { ...node, children: toggleNodeInTree(node.children, nodeId, key) }
     }
     return node
   })
+}
+
+function setAllVisible(nodes: SceneTreeNode[], visible: boolean): SceneTreeNode[] {
+  return nodes.map((node) => ({
+    ...node,
+    visible,
+    ...(node.children && node.children.length > 0 ? { children: setAllVisible(node.children, visible) } : {}),
+  }))
 }
 
 export const useModelStore = create<ModelStore>()((set, get) => ({

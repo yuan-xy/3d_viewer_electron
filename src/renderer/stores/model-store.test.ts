@@ -14,13 +14,29 @@ function toggleNodeInTree(
 ): SceneTreeNode[] {
   return nodes.map((node) => {
     if (node.id === nodeId) {
-      return { ...node, [key]: !node[key] }
+      const newValue = !node[key]
+      if (key === 'visible' && node.children && node.children.length > 0) {
+        return {
+          ...node,
+          visible: newValue,
+          children: setAllVisible(node.children, newValue),
+        }
+      }
+      return { ...node, [key]: newValue }
     }
     if (node.children && node.children.length > 0) {
       return { ...node, children: toggleNodeInTree(node.children, nodeId, key) }
     }
     return node
   })
+}
+
+function setAllVisible(nodes: SceneTreeNode[], visible: boolean): SceneTreeNode[] {
+  return nodes.map((node) => ({
+    ...node,
+    visible,
+    ...(node.children && node.children.length > 0 ? { children: setAllVisible(node.children, visible) } : {}),
+  }))
 }
 
 function makeTree(): SceneTreeNode[] {
@@ -54,10 +70,37 @@ describe('toggleNodeInTree', () => {
     expect(result[0].children![0].expanded).toBe(false) // unchanged
   })
 
-  it('toggles visible on root node', () => {
+  it('toggles visible on root node and cascades to all children', () => {
     const tree = makeTree()
     const result = toggleNodeInTree(tree, 'root', 'visible')
     expect(result[0].visible).toBe(false)
+    // All descendants hidden
+    expect(result[0].children![0].visible).toBe(false)
+    expect(result[0].children![1].visible).toBe(false)
+    expect(result[0].children![1].children![0].visible).toBe(false)
+  })
+
+  it('toggles visible on child does not affect parent or sibling', () => {
+    const tree = makeTree()
+    const result = toggleNodeInTree(tree, 'child1', 'visible')
+    expect(result[0].visible).toBe(true) // parent unchanged
+    expect(result[0].children![0].visible).toBe(false) // toggled
+    expect(result[0].children![1].visible).toBe(true) // sibling unchanged
+  })
+
+  it('cascade double toggle returns all to original state', () => {
+    const tree = makeTree()
+    const once = toggleNodeInTree(tree, 'root', 'visible')
+    const twice = toggleNodeInTree(once, 'root', 'visible')
+    expect(twice).toEqual(tree)
+  })
+
+  it('toggling parent visible cascades to grandchildren', () => {
+    const tree = makeTree()
+    const result = toggleNodeInTree(tree, 'child2', 'visible')
+    expect(result[0].children![1].visible).toBe(false)
+    expect(result[0].children![1].children![0].visible).toBe(false) // grandchild cascaded
+    expect(result[0].children![0].visible).toBe(true) // sibling unaffected
   })
 
   it('toggles expanded on nested node', () => {
