@@ -1,10 +1,9 @@
 import { defineConfig } from 'vitest/config'
+import react from '@vitejs/plugin-react'
 import path from 'node:path'
 
 export default defineConfig({
-  oxc: {
-    jsx: 'automatic',
-  },
+  plugins: [react()],
   test: {
     environment: 'jsdom',
     include: ['src/**/__tests__/*.test.{ts,tsx}'],
