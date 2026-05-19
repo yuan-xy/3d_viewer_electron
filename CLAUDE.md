@@ -65,4 +65,4 @@ Zustand stores in `src/renderer/stores/`. No Redux or other state library.
 
 
 强调：任务完成前/代码提交到git前，必须跑scripts下面的ci脚本。windows环境，要跑scripts/ci.ps1, Linux跑scripts/ci.sh。
-
+一定要保证ci通过才能提交git，没有任何借口，绝对不存在已有的错误不管这回事。

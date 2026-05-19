@@ -143,7 +143,7 @@ test.describe('3D Viewer Electron - STEP Loading', () => {
     })
 
     // Find and click the test-model.step entry in the file list
-    const stepEntry = window.locator('div[data-index]').filter({ hasText: 'test-model.step' })
+    const stepEntry = window.locator('div[data-index]').filter({ hasText: /test-model\.step$/ })
     const entryCount = await stepEntry.count()
     console.log('[test] step file entries found:', entryCount)
     expect(entryCount).toBe(1)
@@ -214,7 +214,7 @@ test.describe('3D Viewer Electron - STEP Loading', () => {
     })
 
     // Click keycap_v6.step (not loaded by prior tests) → must be cache miss
-    const entry1 = window.locator('div[data-index]').filter({ hasText: 'keycap_v6.step' })
+    const entry1 = window.locator('div[data-index]').filter({ hasText: /keycap_v6\.step$/ })
     await entry1.click()
     await waitForLoadDone(window, 60000)
 
@@ -236,12 +236,12 @@ test.describe('3D Viewer Electron - STEP Loading', () => {
 
     // Switch to test-model.step, then back to keycap_v6 → second load should hit memory cache
     consoleMessages.length = 0
-    const entry2 = window.locator('div[data-index]').filter({ hasText: 'test-model.step' })
+    const entry2 = window.locator('div[data-index]').filter({ hasText: /test-model\.step$/ })
     await entry2.click()
     await waitForLoadDone(window, 60000)
 
     consoleMessages.length = 0
-    const entry3 = window.locator('div[data-index]').filter({ hasText: 'keycap_v6.step' })
+    const entry3 = window.locator('div[data-index]').filter({ hasText: /keycap_v6\.step$/ })
     await entry3.click()
     await waitForLoadDone(window)
 
