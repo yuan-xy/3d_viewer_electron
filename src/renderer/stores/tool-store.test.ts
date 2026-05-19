@@ -6,6 +6,7 @@ describe('tool-store', () => {
     const state = useToolStore.getState()
     expect(state.transformMode).toBe('translate')
     expect(state.selectionMode).toBe('object')
+    expect(state.activeToolMode).toBe('view')
   })
 
   it('setTransformMode', () => {
@@ -33,13 +34,23 @@ describe('tool-store', () => {
     expect(useToolStore.getState().selectionMode).toBe('object')
   })
 
-  it('transform and selection modes are independent', () => {
-    useToolStore.setState({ transformMode: 'rotate', selectionMode: 'face' })
+  it('setActiveToolMode switches between view and objectTransform', () => {
+    useToolStore.getState().setActiveToolMode('objectTransform')
+    expect(useToolStore.getState().activeToolMode).toBe('objectTransform')
+
+    useToolStore.getState().setActiveToolMode('view')
+    expect(useToolStore.getState().activeToolMode).toBe('view')
+  })
+
+  it('transform, selection, and activeTool are independent', () => {
+    useToolStore.setState({ transformMode: 'rotate', selectionMode: 'face', activeToolMode: 'objectTransform' })
     expect(useToolStore.getState().transformMode).toBe('rotate')
     expect(useToolStore.getState().selectionMode).toBe('face')
+    expect(useToolStore.getState().activeToolMode).toBe('objectTransform')
 
     useToolStore.getState().setTransformMode('translate')
     expect(useToolStore.getState().transformMode).toBe('translate')
     expect(useToolStore.getState().selectionMode).toBe('face')
+    expect(useToolStore.getState().activeToolMode).toBe('objectTransform')
   })
 })
