@@ -11,7 +11,7 @@ interface TopologyPickerProps {
   selectorRuntime: SelectorRuntime | null
   modelGroupRef: RefObject<THREE.Group | null>
   onHover: (referenceId: string | null) => void
-  onClick: (referenceId: string, shiftKey?: boolean) => void
+  onClick: (referenceId: string | null, shiftKey?: boolean) => void
   onClickWorldPoint?: (point: THREE.Vector3 | null) => void
   onSnap?: (candidate: SnapCandidate | null) => void
 }

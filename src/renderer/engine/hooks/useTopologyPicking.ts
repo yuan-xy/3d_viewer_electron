@@ -27,8 +27,8 @@ interface UseTopologyPickingOptions {
   modelGroupRef: React.RefObject<THREE.Group | null>
   /** Called on hover with the reference id (or null when hovering nothing) */
   onHover: (referenceId: string | null) => void
-  /** Called on click with the reference id and whether shift was held */
-  onClick: (referenceId: string, shiftKey?: boolean) => void
+  /** Called on click with the reference id (null = empty space) and whether shift was held */
+  onClick: (referenceId: string | null, shiftKey?: boolean) => void
   /** Called with the world-space intersection point on face click */
   onClickWorldPoint?: (point: THREE.Vector3 | null) => void
   /** Called when a snap candidate is found in point mode (null = no snap) */
@@ -345,6 +345,9 @@ export function useTopologyPicking({
         if (selectionModeRef.current === 'face') {
           onClickPointRef.current?.(lastHitPointRef.current)
         }
+      } else if (selectionModeRef.current === 'object' && !event.shiftKey) {
+        // Clicking empty space in object mode deselects
+        onClickRef.current(null)
       }
     }
 
