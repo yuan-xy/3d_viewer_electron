@@ -64,5 +64,5 @@ Zustand stores in `src/renderer/stores/`. No Redux or other state library.
 - electron-builder (packaging)
 
 
-强调：任务完成前/代码提交到git前，必须跑scripts下面的ci脚本。
+强调：任务完成前/代码提交到git前，必须跑scripts下面的ci脚本。windows环境，要跑scripts/ci.ps1, Linux跑scripts/ci.sh。
 

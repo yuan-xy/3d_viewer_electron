@@ -74,8 +74,14 @@ function createWindow(): void {
     return { action: 'deny' }
   })
 
-  mainWindow.loadURL('faicad-viewer://local/out/renderer/index.html')
-  console.log('[Main] loading: faicad-viewer://local/out/renderer/index.html')
+  if (import.meta.env.DEV) {
+    const devURL = process.env.ELECTRON_RENDERER_URL as string
+    mainWindow.loadURL(devURL)
+    console.log('[Main] loading (dev):', devURL)
+  } else {
+    mainWindow.loadURL('faicad-viewer://local/out/renderer/index.html')
+    console.log('[Main] loading (prod): faicad-viewer://local/out/renderer/index.html')
+  }
 
   mainWindow.on('closed', () => {
     mainWindow = null
