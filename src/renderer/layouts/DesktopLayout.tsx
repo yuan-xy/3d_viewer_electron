@@ -90,6 +90,23 @@ function SceneTreeItem({ node, depth }: { node: SceneTreeNode; depth: number }) 
   )
 }
 
+const MIN_PANEL_PCT = 8
+const MAX_PANEL_PCT = 40
+
+function ResizeHandle({
+  onMouseDown,
+}: {
+  onMouseDown: (e: React.MouseEvent) => void
+}) {
+  return (
+    <div
+      className="shrink-0 cursor-col-resize hover:bg-primary/20 active:bg-primary/30 transition-colors"
+      style={{ width: 4 }}
+      onMouseDown={onMouseDown}
+    />
+  )
+}
+
 export default function DesktopLayout() {
   const { projectId } = useParams<{ projectId?: string }>()
   const { t } = useTranslation()
@@ -97,6 +114,30 @@ export default function DesktopLayout() {
   const model = useModelStore()
 
   const activeTool = useModelStore.getState().glbUrl
+
+  const [leftPanelPct, setLeftPanelPct] = useState(15)
+  const [rightPanelPct, setRightPanelPct] = useState(15)
+  const [resizing, setResizing] = useState<'left' | 'right' | null>(null)
+
+  useEffect(() => {
+    if (!resizing) return
+    const handleMouseMove = (e: MouseEvent) => {
+      const totalWidth = window.innerWidth
+      const pct = (e.clientX / totalWidth) * 100
+      if (resizing === 'left') {
+        setLeftPanelPct(Math.max(MIN_PANEL_PCT, Math.min(MAX_PANEL_PCT, pct)))
+      } else {
+        setRightPanelPct(Math.max(MIN_PANEL_PCT, Math.min(MAX_PANEL_PCT, 100 - pct)))
+      }
+    }
+    const handleMouseUp = () => setResizing(null)
+    window.addEventListener('mousemove', handleMouseMove)
+    window.addEventListener('mouseup', handleMouseUp)
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove)
+      window.removeEventListener('mouseup', handleMouseUp)
+    }
+  }, [resizing])
 
   // Reactive compact mode: auto-open/close left panel at 1024px breakpoint
   const isCompactViewport = useMediaQuery('(max-width: 1023px)')
@@ -373,24 +414,27 @@ export default function DesktopLayout() {
       </header>
 
       {/* Main Content */}
-      <div className="flex-1 flex overflow-hidden">
+      <div className="flex-1 flex overflow-hidden" style={resizing ? { userSelect: 'none' } : undefined}>
         {/* Left Sidebar */}
         {ui.leftPanelOpen && (
-          <aside style={{ width: '15%' } as React.CSSProperties} className="border-r flex flex-col shrink-0">
-            <div className="p-2 text-xs font-semibold text-muted-foreground">{t('sceneTree.title')}</div>
-            <ScrollArea className="flex-1">
-              {model.sceneTree.length === 0 ? (
-                <p className="text-xs text-muted-foreground p-4">{t('app.emptySceneTree')}</p>
-              ) : (
-                <div className="p-2 min-w-max">
-                  {model.sceneTree.map((node) => (
-                    <SceneTreeItem key={node.id} node={node} depth={0} />
-                  ))}
-                </div>
-              )}
-              <ScrollBar orientation="horizontal" />
-            </ScrollArea>
-          </aside>
+          <>
+            <aside style={{ width: `${leftPanelPct}%` } as React.CSSProperties} className="border-r flex flex-col shrink-0">
+              <div className="p-2 text-xs font-semibold text-muted-foreground">{t('sceneTree.title')}</div>
+              <ScrollArea className="flex-1">
+                {model.sceneTree.length === 0 ? (
+                  <p className="text-xs text-muted-foreground p-4">{t('app.emptySceneTree')}</p>
+                ) : (
+                  <div className="p-2 min-w-max">
+                    {model.sceneTree.map((node) => (
+                      <SceneTreeItem key={node.id} node={node} depth={0} />
+                    ))}
+                  </div>
+                )}
+                <ScrollBar orientation="horizontal" />
+              </ScrollArea>
+            </aside>
+            <ResizeHandle onMouseDown={() => setResizing('left')} />
+          </>
         )}
 
         {/* Center: Viewport */}
@@ -400,9 +444,12 @@ export default function DesktopLayout() {
 
         {/* Right Panel */}
         {(ui.rightPanelOpen || ui.modelInfoOpen) && (
-          <aside style={{ width: '15%' } as React.CSSProperties} className="border-l flex flex-col shrink-0">
-            {ui.modelInfoOpen ? <ModelInfoPanel /> : <FileListPanel />}
-          </aside>
+          <>
+            <ResizeHandle onMouseDown={() => setResizing('right')} />
+            <aside style={{ width: `${rightPanelPct}%` } as React.CSSProperties} className="border-l flex flex-col shrink-0">
+              {ui.modelInfoOpen ? <ModelInfoPanel /> : <FileListPanel />}
+            </aside>
+          </>
         )}
       </div>
     </div>
