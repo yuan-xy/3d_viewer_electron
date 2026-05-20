@@ -155,32 +155,10 @@ describe('STEP → GLB production pipeline', () => {
   it('has STEP_T extension with required fields', () => {
     const ext = (gltf.extensions as Record<string, unknown>)?.STEP_T as Record<string, unknown> | undefined
     expect(ext).toBeDefined()
-    expect(ext!.schemaVersion).toBe(1)
+    expect(ext!.schemaVersion).toBe(2)
     expect(ext!.entryKind).toBe('part')
     expect(ext!.encoding).toBe('utf-8')
-    expect(typeof ext!.indexView).toBe('number')
     expect(typeof ext!.selectorView).toBe('number')
-  })
-
-  // ── Index manifest ──
-
-  it('has valid index manifest', () => {
-    const ext = (gltf.extensions as Record<string, unknown>).STEP_T as Record<string, unknown>
-    const indexBytes = readBufferView(ext.indexView as number)
-    const indexManifest = JSON.parse(new TextDecoder().decode(indexBytes))
-
-    expect(indexManifest.schemaVersion).toBe(1)
-    expect(indexManifest.entryKind).toBe('part')
-    expect(Array.isArray(indexManifest.meshes)).toBe(true)
-    expect(indexManifest.meshes.length).toBeGreaterThan(0)
-    expect(indexManifest.meshes[0].faceCount).toBeGreaterThan(0)
-
-    // Mesh metadata
-    const firstMesh = indexManifest.meshes[0]
-    expect(typeof firstMesh.index).toBe('number')
-    expect(typeof firstMesh.name).toBe('string')
-    expect(typeof firstMesh.vertexCount).toBe('number')
-    expect(typeof firstMesh.triangleCount).toBe('number')
   })
 
   // ── Selector manifest ──
@@ -190,7 +168,7 @@ describe('STEP → GLB production pipeline', () => {
     const selBytes = readBufferView(ext.selectorView as number)
     const sel = JSON.parse(new TextDecoder().decode(selBytes))
 
-    expect(sel.schemaVersion).toBe(1)
+    expect(sel.schemaVersion).toBe(2)
     expect(sel.profile).toBe('selector')
 
     // Occurrences, faces

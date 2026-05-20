@@ -155,7 +155,7 @@ export function stepTopologyExtension(glb: GlbContainer): Record<string, unknown
   const extensions = gltfJson?.extensions as Record<string, unknown> | undefined
   const extension = extensions?.[STEP_TOPOLOGY_EXTENSION]
 
-  if (!isObject(extension) || Number(extension.schemaVersion) !== 1) {
+  if (!isObject(extension) || Number(extension.schemaVersion) !== 2) {
     throw new Error(`GLB is missing ${STEP_TOPOLOGY_EXTENSION}`)
   }
 

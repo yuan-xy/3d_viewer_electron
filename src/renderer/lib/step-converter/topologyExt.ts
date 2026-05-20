@@ -129,12 +129,7 @@ export function addStepTopology(
     cadPath,
   }: AddStepTopologyOptions = {},
 ): void {
-  // 1. index manifest
-  const indexManifest = buildIndexManifest(importResult, { entryKind, stepHash, cadPath });
-  const indexPayload = new TextEncoder().encode(JSON.stringify(indexManifest));
-  const indexView = builder.addBufferView(indexPayload);
-
-  // 2. selector manifest (with proxy geometry)
+  // selector manifest (with proxy geometry)
   let selectorView: number | null = null;
   if (includeSelectorTopology && importResult.meshes.length > 0) {
     const { manifest, buffers } = buildSelectorManifest(builder, importResult, { entryKind, stepHash, cadPath });
@@ -177,44 +172,10 @@ export function addStepTopology(
   }
 
   (builder.json.extensions as Record<string, unknown>).STEP_T = {
-    schemaVersion: 1,
+    schemaVersion: 2,
     entryKind,
-    indexView,
     encoding: 'utf-8',
     ...(selectorView !== null ? { selectorView } : {}),
-  };
-}
-
-function buildIndexManifest(
-  importResult: OcctImportResult,
-  { entryKind, stepHash, cadPath }: { entryKind?: string; stepHash?: string; cadPath?: string },
-): Record<string, unknown> {
-  const meshesMeta = importResult.meshes.map((m, i) => ({
-    index: i,
-    name: m.name,
-    vertexCount: m.attributes.position.array.length / 3,
-    triangleCount: m.index.array.length / 3,
-    faceCount: m.brep_faces ? m.brep_faces.length : 0,
-  }));
-
-  const rootNodeMeta = describeNode(importResult.root);
-
-  const manifest: Record<string, unknown> = {
-    schemaVersion: 1,
-    entryKind,
-    meshes: meshesMeta,
-    root: rootNodeMeta,
-  };
-  if (stepHash) manifest.stepHash = stepHash;
-  if (cadPath) manifest.cadPath = cadPath;
-  return manifest;
-}
-
-function describeNode(node: OcctNode): Record<string, unknown> {
-  return {
-    name: node.name,
-    meshCount: (node.meshes || []).length,
-    children: (node.children || []).map((c) => describeNode(c)),
   };
 }
 
@@ -340,7 +301,7 @@ function buildSelectorManifest(
   // Until the WASM module is rebuilt with edge support, edge tables and proxy
   // geometry buffers are left empty.
   const manifest: Record<string, unknown> = {
-    schemaVersion: 1,
+    schemaVersion: 2,
     profile: 'selector',
     cadRef: cadPath,
     stepPath: cadPath ? `${cadPath}.step` : undefined,
