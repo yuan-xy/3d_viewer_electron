@@ -82,6 +82,8 @@
   "fileList.folder": "文件夹",
   "fileList.sortByName": "按名称排序",
   "fileList.sortByType": "按类型排序",
+  "fileList.sortAsc": "升序",
+  "fileList.sortDesc": "降序",
 
   "openFile.title": "打开文件",
   "openFile.description": "选择一个3D模型文件打开",

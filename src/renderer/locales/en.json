@@ -82,6 +82,8 @@
   "fileList.folder": "Folder",
   "fileList.sortByName": "Sort by name",
   "fileList.sortByType": "Sort by type",
+  "fileList.sortAsc": "Ascending",
+  "fileList.sortDesc": "Descending",
 
   "openFile.title": "Open File",
   "openFile.description": "Select a 3D model file to open",

@@ -19,6 +19,7 @@ export interface GlbPartInfo {
 }
 
 export type FileSortMode = 'name' | 'type+name'
+export type SortOrder = 'asc' | 'desc'
 
 export type LoadingPhase = 'idle' | 'loading' | 'done' | 'error'
 
@@ -60,9 +61,11 @@ interface ModelStore {
   folderFiles: { name: string; path: string; mtimeMs: number }[]
   selectedFileIndex: number
   fileSortMode: FileSortMode
+  sortOrder: SortOrder
   setFolderFiles: (folderPath: string | null, files: { name: string; path: string; mtimeMs: number }[]) => void
   setSelectedFileIndex: (index: number) => void
   setFileSortMode: (mode: FileSortMode) => void
+  setSortOrder: (order: SortOrder) => void
 
   setGLBUrl: (url: string) => void
   setModelVersion: (v: number) => void
@@ -125,6 +128,7 @@ export const useModelStore = create<ModelStore>()((set, get) => ({
   folderFiles: [],
   selectedFileIndex: -1,
   fileSortMode: 'name',
+  sortOrder: 'asc',
 
   setIsConverting: (v) => set({ isConverting: v }),
   setLoadingPhase: (phase) => set({ __loadingPhase: phase }),
@@ -135,6 +139,7 @@ export const useModelStore = create<ModelStore>()((set, get) => ({
   setFolderFiles: (folderPath, files) => set({ currentFolderPath: folderPath, folderFiles: files, selectedFileIndex: -1 }),
   setSelectedFileIndex: (index) => set({ selectedFileIndex: index }),
   setFileSortMode: (mode) => set({ fileSortMode: mode }),
+  setSortOrder: (order) => set({ sortOrder: order }),
 
   setGLBUrl: (url) => {
     if (get().glbUrl) URL.revokeObjectURL(get().glbUrl!)
@@ -170,6 +175,6 @@ export const useModelStore = create<ModelStore>()((set, get) => ({
   reset: () => {
     const url = get().glbUrl
     if (url && url !== 'loaded') URL.revokeObjectURL(url)
-    set({ glbUrl: null, sceneTree: [], modelVersion: 0, modelBuffer: null, modelFormat: null, modelFilePath: null, __loadingPhase: 'idle', glbPartInfos: [], modelCenteringOffset: null, isConverting: false, fileSortMode: 'name', activeUpAxis: 'z' })
+    set({ glbUrl: null, sceneTree: [], modelVersion: 0, modelBuffer: null, modelFormat: null, modelFilePath: null, __loadingPhase: 'idle', glbPartInfos: [], modelCenteringOffset: null, isConverting: false, fileSortMode: 'name', sortOrder: 'asc', activeUpAxis: 'z' })
   },
 }))

@@ -162,6 +162,7 @@ describe('model-store', () => {
     expect(s.folderFiles).toEqual([])
     expect(s.selectedFileIndex).toBe(-1)
     expect(s.fileSortMode).toBe('name')
+    expect(s.sortOrder).toBe('asc')
   })
 
   it('setGLBUrl stores url', () => {
@@ -207,6 +208,13 @@ describe('model-store', () => {
   it('setFileSortMode', () => {
     useModelStore.getState().setFileSortMode('type+name')
     expect(useModelStore.getState().fileSortMode).toBe('type+name')
+  })
+
+  it('setSortOrder', () => {
+    useModelStore.getState().setSortOrder('desc')
+    expect(useModelStore.getState().sortOrder).toBe('desc')
+    useModelStore.getState().setSortOrder('asc')
+    expect(useModelStore.getState().sortOrder).toBe('asc')
   })
 
   it('updateSceneTree and toggleNodeExpanded', () => {
@@ -296,5 +304,6 @@ describe('model-store', () => {
     expect(s.glbPartInfos).toEqual([])
     // reset preserves folderFiles & selectedFileIndex (file list persists across model changes)
     expect(s.fileSortMode).toBe('name')
+    expect(s.sortOrder).toBe('asc')
   })
 })

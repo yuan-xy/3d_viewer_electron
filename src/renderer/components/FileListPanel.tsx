@@ -7,7 +7,7 @@ import { toast } from 'sonner'
 import { stepToGlbCached, startPreCache } from '@/lib/step-converter'
 import { EXT_COLORS, detectFormat } from '@/config/file-formats'
 import { Button } from '@/components/ui/button'
-import { ArrowUpDown } from 'lucide-react'
+import { ArrowDownUp, ArrowUpAZ, ArrowDownZA } from 'lucide-react'
 
 function getExt(name: string): string {
   const i = name.lastIndexOf('.')
@@ -21,8 +21,10 @@ export default function FileListPanel() {
     folderFiles,
     selectedFileIndex,
     fileSortMode,
+    sortOrder,
     setSelectedFileIndex,
     setFileSortMode,
+    setSortOrder,
     glbUrl,
   } = useModelStore()
   const listRef = useRef<HTMLDivElement>(null)
@@ -45,21 +47,26 @@ export default function FileListPanel() {
 
   const sortedFiles = useMemo(() => {
     const files = [...folderFiles]
-    if (fileSortMode === 'type+name') {
-      files.sort((a, b) => {
+    const cmp = (a: { name: string }, b: { name: string }) => {
+      if (fileSortMode === 'type+name') {
         const extA = getExt(a.name)
         const extB = getExt(b.name)
         if (extA !== extB) return extA.localeCompare(extB)
-        return a.name.localeCompare(b.name)
-      })
+      }
+      return a.name.localeCompare(b.name)
     }
-    // 'name' — keep original order
+    files.sort(cmp)
+    if (sortOrder === 'desc') files.reverse()
     return files
-  }, [folderFiles, fileSortMode])
+  }, [folderFiles, fileSortMode, sortOrder])
 
   function cycleSortMode() {
     const next: FileSortMode = fileSortMode === 'name' ? 'type+name' : 'name'
     setFileSortMode(next)
+  }
+
+  function toggleSortOrder() {
+    setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')
   }
 
   if (folderFiles.length === 0) {
@@ -79,15 +86,30 @@ export default function FileListPanel() {
     <div className="flex flex-col h-full">
       <div className="p-2 text-xs font-semibold text-muted-foreground border-b flex items-center justify-between">
         <span>{t('fileList.title')}</span>
-        <Button
-          variant="ghost"
-          size="icon"
-          className="h-5 w-5"
-          onClick={cycleSortMode}
-          title={fileSortMode === 'name' ? t('fileList.sortByName') : t('fileList.sortByType')}
-        >
-          <ArrowUpDown className={cn('h-3 w-3', fileSortMode === 'type+name' && 'text-primary')} />
-        </Button>
+        <div className="flex items-center gap-0.5">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-5 w-5"
+            onClick={cycleSortMode}
+            title={fileSortMode === 'name' ? t('fileList.sortByName') : t('fileList.sortByType')}
+          >
+            <ArrowDownUp className={cn('h-3 w-3', fileSortMode === 'type+name' && 'text-primary')} />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-5 w-5"
+            onClick={toggleSortOrder}
+            title={sortOrder === 'asc' ? t('fileList.sortAsc') : t('fileList.sortDesc')}
+          >
+            {sortOrder === 'asc' ? (
+              <ArrowUpAZ className="h-3 w-3" />
+            ) : (
+              <ArrowDownZA className="h-3 w-3" />
+            )}
+          </Button>
+        </div>
       </div>
       {currentFolderPath && (
         <div className="px-3 py-1.5 text-xs text-muted-foreground border-b overflow-x-auto whitespace-nowrap">
