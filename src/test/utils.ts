@@ -10,7 +10,8 @@ export function getElectronPath(): string {
     return path.join(PROJECT_ROOT, 'dist', 'win-unpacked', '3D_Viewer.exe')
   }
   if (platform === 'darwin') {
-    return path.join(PROJECT_ROOT, 'dist', 'mac', '3D_Viewer.app')
+    const macDir = process.arch === 'arm64' ? 'dist/mac-arm64' : 'dist/mac'
+    return path.join(PROJECT_ROOT, macDir, '3D Model Viewer.app')
   }
   if (platform === 'linux') {
     return path.join(PROJECT_ROOT, 'dist', 'linux-unpacked', '3d_viewer_electron')
