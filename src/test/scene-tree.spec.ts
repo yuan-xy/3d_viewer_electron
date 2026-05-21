@@ -55,17 +55,19 @@ test.describe.serial('Multi-level scene tree', () => {
 
     const leftPanel = window.locator('aside').first()
     const treeNodes = leftPanel.locator('.whitespace-nowrap')
-    const nodeCount = await treeNodes.count()
 
-    expect(nodeCount).toBeGreaterThan(1)
+    // Use auto-retrying assertions instead of bare count() — locator.count()
+    // does not wait, and on Windows the React DOM may not have committed yet.
+    await expect.poll(async () => await treeNodes.count(), { timeout: 15000 }).toBeGreaterThan(1)
+    const nodeCount = await treeNodes.count()
 
     const rootNode = treeNodes.first()
     await expect(rootNode).toBeVisible()
 
     // Chevron buttons exist for nodes with children
     const chevronButtons = leftPanel.locator('button[aria-label="collapse"], button[aria-label="expand"]')
+    await expect.poll(async () => await chevronButtons.count(), { timeout: 10000 }).toBeGreaterThan(0)
     const chevronCount = await chevronButtons.count()
-    expect(chevronCount).toBeGreaterThan(0)
 
     console.log(`[test] tree nodes: ${nodeCount}, chevron buttons: ${chevronCount}`)
   })
