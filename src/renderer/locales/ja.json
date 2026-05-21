@@ -41,7 +41,6 @@
   "display.wireframe": "ワイヤーフレーム",
   "display.solidWithWireframe": "ソリッド+ワイヤーフレーム",
   "display.mesh": "メッシュ",
-  "display.solidMesh": "ソリッド+メッシュ",
   "display.debug": "デバッグ",
   "debug.selectFace": "-- 面を選択 --",
   "debug.selectEdge": "-- エッジを選択 --",

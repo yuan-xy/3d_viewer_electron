@@ -41,7 +41,6 @@
   "display.wireframe": "โครงลวด",
   "display.solidWithWireframe": "ของแข็ง+โครงลวด",
   "display.mesh": "เมช",
-  "display.solidMesh": "ของแข็ง+เมช",
   "display.debug": "ดีบัก",
   "debug.selectFace": "-- เลือกใบหน้า --",
   "debug.selectEdge": "-- เลือกขอบ --",

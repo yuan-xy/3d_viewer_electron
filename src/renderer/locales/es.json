@@ -41,7 +41,6 @@
   "display.wireframe": "Estructura alambre",
   "display.solidWithWireframe": "Sólido+Estructura",
   "display.mesh": "Malla",
-  "display.solidMesh": "Sólido+Malla",
   "display.debug": "Depurar",
   "debug.selectFace": "-- Seleccionar cara --",
   "debug.selectEdge": "-- Seleccionar borde --",

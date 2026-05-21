@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next'
 import { useThemeColors } from '@/components/settings/useThemeColors'
 
-export type DisplayMode = 'solid' | 'mesh' | 'solidWithMesh' | 'wireframe' | 'debug'
+export type DisplayMode = 'solid' | 'mesh' | 'wireframe' | 'debug'
 
 interface DisplayModeDropdownProps {
   displayMode: DisplayMode
@@ -41,7 +41,6 @@ export default function DisplayModeDropdown({ displayMode, onChange, hasTopology
         {hasEdges && <option value="wireframe">{t('display.wireframe')}</option>}
         {hasEdges && <option value="solidWithWireframe">{t('display.solidWithWireframe')}</option>}
         <option value="mesh">{t('display.mesh')}</option>
-        <option value="solidWithMesh">{t('display.solidMesh')}</option>
         {hasEdges && <option value="debug">{t('display.debug')}</option>}
       </select>
     </div>

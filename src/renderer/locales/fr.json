@@ -41,7 +41,6 @@
   "display.wireframe": "Fil de fer",
   "display.solidWithWireframe": "Solide+Fil de fer",
   "display.mesh": "Maillage",
-  "display.solidMesh": "Solide+Maillage",
   "display.debug": "Débogage",
   "debug.selectFace": "-- Sélectionner une face --",
   "debug.selectEdge": "-- Sélectionner une arête --",

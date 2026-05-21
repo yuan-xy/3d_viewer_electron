@@ -41,7 +41,6 @@
   "display.wireframe": "Tel çerçeve",
   "display.solidWithWireframe": "Katı+Tel çerçeve",
   "display.mesh": "Ağ",
-  "display.solidMesh": "Katı+Ağ",
   "display.debug": "Hata ayıklama",
   "debug.selectFace": "-- Yüzey seçin --",
   "debug.selectEdge": "-- Kenar seçin --",

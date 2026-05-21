@@ -41,7 +41,6 @@
   "display.wireframe": "Drahtgitter",
   "display.solidWithWireframe": "Massiv+Drahtgitter",
   "display.mesh": "Netz",
-  "display.solidMesh": "Massiv+Netz",
   "display.debug": "Debug",
   "debug.selectFace": "-- Fläche auswählen --",
   "debug.selectEdge": "-- Kante auswählen --",

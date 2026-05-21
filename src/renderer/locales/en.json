@@ -64,7 +64,6 @@
   "display.wireframe": "Wireframe",
   "display.solidWithWireframe": "Solid+Wireframe",
   "display.mesh": "Mesh",
-  "display.solidMesh": "Solid+Mesh",
   "display.debug": "Debug",
 
   "debug.selectFace": "-- Select Face --",

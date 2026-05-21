@@ -41,7 +41,6 @@
   "display.wireframe": "Khung lưới",
   "display.solidWithWireframe": "Đặc+Khung lưới",
   "display.mesh": "Lưới",
-  "display.solidMesh": "Đặc+Lưới",
   "display.debug": "Gỡ lỗi",
   "debug.selectFace": "-- Chọn mặt --",
   "debug.selectEdge": "-- Chọn cạnh --",

@@ -64,7 +64,6 @@
   "display.wireframe": "线框",
   "display.solidWithWireframe": "实体+线框",
   "display.mesh": "网格",
-  "display.solidMesh": "实体+网格",
   "display.debug": "调试",
 
   "debug.selectFace": "-- 选择面 --",

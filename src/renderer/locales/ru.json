@@ -41,7 +41,6 @@
   "display.wireframe": "Каркас",
   "display.solidWithWireframe": "Твердый+Каркас",
   "display.mesh": "Сетка",
-  "display.solidMesh": "Твердый+Сетка",
   "display.debug": "Отладка",
   "debug.selectFace": "-- Выбрать грань --",
   "debug.selectEdge": "-- Выбрать ребро --",

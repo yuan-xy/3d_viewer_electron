@@ -351,7 +351,6 @@ export default function ViewportContainer() {
   }, [activeUpAxis])
 
   const handleModelLoaded = useCallback((box: THREE.Box3) => {
-    useEngineStore.getState().setModelGroup(modelGroupRef.current)
     const controls = controlsRef.current
     if (!controls) {
       pendingBoxRef.current = box.clone()
@@ -449,7 +448,7 @@ export default function ViewportContainer() {
         />
         <ToolOverlay modelRef={modelGroupRef} />
         {hasTopology && <TopologyOverlay selectorRuntime={selectorRuntime} />}
-        {(resolvedDisplayMode === 'wireframe' && hasEdges || resolvedDisplayMode === 'solidWithMesh' && hasTopology || resolvedDisplayMode === 'debug' && hasEdges) && (
+        {(resolvedDisplayMode === 'wireframe' && hasEdges || resolvedDisplayMode === 'debug' && hasEdges) && (
           <DebugTopologyOverlay selectorRuntime={selectorRuntime!} centeringOffset={centeringOffset} showVertices={displayMode === 'debug'} />
         )}
         <TopologyPicker

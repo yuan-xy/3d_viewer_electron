@@ -41,7 +41,6 @@
   "display.wireframe": "Wireframe",
   "display.solidWithWireframe": "Solido+Wireframe",
   "display.mesh": "Mesh",
-  "display.solidMesh": "Solido+Mesh",
   "display.debug": "Debug",
   "debug.selectFace": "-- Seleziona faccia --",
   "debug.selectEdge": "-- Seleziona bordo --",

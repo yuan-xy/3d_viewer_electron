@@ -41,7 +41,6 @@
   "display.wireframe": "Trådmodell",
   "display.solidWithWireframe": "Solid+Trådmodell",
   "display.mesh": "Nät",
-  "display.solidMesh": "Solid+Nät",
   "display.debug": "Debug",
   "debug.selectFace": "-- Välj yta --",
   "debug.selectEdge": "-- Välj kant --",

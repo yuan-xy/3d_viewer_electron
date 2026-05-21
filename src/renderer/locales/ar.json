@@ -41,7 +41,6 @@
   "display.wireframe": "هيكل سلكي",
   "display.solidWithWireframe": "صلب+هيكل سلكي",
   "display.mesh": "شبكة",
-  "display.solidMesh": "صلب+شبكة",
   "display.debug": "تصحيح",
   "debug.selectFace": "-- تحديد الوجه --",
   "debug.selectEdge": "-- تحديد الحافة --",

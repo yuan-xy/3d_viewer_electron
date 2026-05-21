@@ -145,7 +145,7 @@ export function useTopologyPicking({
       if (mode === 'face') {
         // PRIMARY PATH: hit visible display meshes (ModelGroup output).
         // These carry per-part faceIds built by buildGlbFaceIdsForPart().
-        // Used in normal display modes (solid, mesh, solidWithMesh, debug).
+        // Used in normal display modes (solid, mesh, debug).
         if (displayMeshes.length) {
           const hits = raycaster.intersectObjects(displayMeshes, false)
           if (hits.length) {

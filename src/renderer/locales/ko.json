@@ -41,7 +41,6 @@
   "display.wireframe": "와이어프레임",
   "display.solidWithWireframe": "솔리드+와이어프레임",
   "display.mesh": "메쉬",
-  "display.solidMesh": "솔리드+메쉬",
   "display.debug": "디버그",
   "debug.selectFace": "-- 면 선택 --",
   "debug.selectEdge": "-- 모서리 선택 --",

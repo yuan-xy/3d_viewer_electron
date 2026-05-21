@@ -41,7 +41,6 @@
   "display.wireframe": "Aramado",
   "display.solidWithWireframe": "Sólido+Aramado",
   "display.mesh": "Malha",
-  "display.solidMesh": "Sólido+Malha",
   "display.debug": "Depurar",
   "debug.selectFace": "-- Selecionar face --",
   "debug.selectEdge": "-- Selecionar aresta --",

@@ -41,7 +41,6 @@
   "display.wireframe": "Kawat",
   "display.solidWithWireframe": "Padat+Kawat",
   "display.mesh": "Mesh",
-  "display.solidMesh": "Padat+Mesh",
   "display.debug": "Debug",
   "debug.selectFace": "-- Pilih face --",
   "debug.selectEdge": "-- Pilih edge --",

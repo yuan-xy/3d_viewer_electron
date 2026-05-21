@@ -41,7 +41,6 @@
   "display.wireframe": "Каркас",
   "display.solidWithWireframe": "Суцільний+Каркас",
   "display.mesh": "Сітка",
-  "display.solidMesh": "Суцільний+Сітка",
   "display.debug": "Зневадження",
   "debug.selectFace": "-- Вибрати грань --",
   "debug.selectEdge": "-- Вибрати ребро --",

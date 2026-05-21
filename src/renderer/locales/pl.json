@@ -41,7 +41,6 @@
   "display.wireframe": "Szkielet",
   "display.solidWithWireframe": "Pełny+Szkielet",
   "display.mesh": "Siatka",
-  "display.solidMesh": "Pełny+Siatka",
   "display.debug": "Debug",
   "debug.selectFace": "-- Wybierz ścianę --",
   "debug.selectEdge": "-- Wybierz krawędź --",

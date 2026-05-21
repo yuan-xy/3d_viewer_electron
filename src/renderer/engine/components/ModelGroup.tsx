@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, useMemo, forwardRef } from 'react'
 import * as THREE from 'three'
 import { mergeGeometries as mergeBufferGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js'
 import { useModelStore, type GlbPartInfo, type SceneTreeNode } from '@/stores/model-store'
+import { useEngineStore } from '@/stores/engine-store'
 import type { SelectorRuntime } from '@/lib/topology/types'
 import { buildGlbFaceIdsForPart } from '@/lib/topology/build-face-ids'
 import { flattenVisibility } from '@/lib/scene-tree-utils'
@@ -256,6 +257,15 @@ const ModelGroup = forwardRef<THREE.Group, ModelGroupProps>(function ModelGroup(
     return () => { cancelled = true }
   }, [buffer, format, modelFilePath, setGlbPartInfos, setModelCenteringOffset, setLoadingPhase, updateSceneTree])
 
+  // Sync group ref to engine store after render so ModelInfoPanel can read it
+  useEffect(() => {
+    const groupRef = ref as React.RefObject<THREE.Group | null> | null
+    useEngineStore.getState().setModelGroup(groupRef?.current ?? null)
+    return () => {
+      useEngineStore.getState().setModelGroup(null)
+    }
+  }, [glbMeshes, mergedGeometry, objects])
+
   if (error) {
     return null
   }
@@ -298,7 +308,6 @@ const ModelGroup = forwardRef<THREE.Group, ModelGroupProps>(function ModelGroup(
     }
 
     const isMeshOnly = displayMode === 'mesh' || displayMode === 'debug'
-    const isSolidMesh = displayMode === 'solidWithMesh'
 
     if (displayMode === 'wireframe') {
       return (
@@ -354,28 +363,6 @@ const ModelGroup = forwardRef<THREE.Group, ModelGroupProps>(function ModelGroup(
                 roughness={0.4}
                 metalness={0.1}
                 wireframe={isMeshOnly}
-                polygonOffset={isSolidMesh}
-                polygonOffsetFactor={isSolidMesh ? 1 : 0}
-                polygonOffsetUnits={isSolidMesh ? 1 : 0}
-              />
-            </mesh>
-          )
-        })}
-        {isSolidMesh && glbMeshes.map((mesh, i) => {
-          const partId = glbPartInfos[i]?.partId || `part-${i}`
-          const vis = visibilityMap.get(partId) ?? true
-          return (
-            <mesh
-              key={`wf-${i}`}
-              visible={vis}
-              geometry={mesh.geometry}
-              position={mesh.position}
-            >
-              <meshBasicMaterial
-                color="#222222"
-                wireframe
-                depthTest
-                depthWrite={false}
               />
             </mesh>
           )
@@ -388,7 +375,6 @@ const ModelGroup = forwardRef<THREE.Group, ModelGroupProps>(function ModelGroup(
   if (!mergedGeometry) return null
 
   const isMeshOnly = displayMode === 'mesh' || displayMode === 'debug'
-  const isSolidMesh = displayMode === 'solidWithMesh'
 
   if (displayMode === 'wireframe') {
     return (
@@ -414,21 +400,8 @@ const ModelGroup = forwardRef<THREE.Group, ModelGroupProps>(function ModelGroup(
           roughness={0.4}
           metalness={0.1}
           wireframe={isMeshOnly}
-          polygonOffset={isSolidMesh}
-          polygonOffsetFactor={isSolidMesh ? 1 : 0}
-          polygonOffsetUnits={isSolidMesh ? 1 : 0}
         />
       </mesh>
-      {isSolidMesh && (
-        <mesh geometry={mergedGeometry}>
-          <meshBasicMaterial
-            color="#222222"
-            wireframe
-            depthTest
-            depthWrite={false}
-          />
-        </mesh>
-      )}
     </group>
   )
 })

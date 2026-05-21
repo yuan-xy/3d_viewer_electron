@@ -41,7 +41,6 @@
   "display.wireframe": "वायरफ्रेम",
   "display.solidWithWireframe": "ठोस+वायरफ्रेम",
   "display.mesh": "मेश",
-  "display.solidMesh": "ठोस+मेश",
   "display.debug": "डिबग",
   "debug.selectFace": "-- फेस चुनें --",
   "debug.selectEdge": "-- एज चुनें --",

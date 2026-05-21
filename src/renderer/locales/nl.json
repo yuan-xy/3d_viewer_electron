@@ -41,7 +41,6 @@
   "display.wireframe": "Draadmodel",
   "display.solidWithWireframe": "Solide+Draadmodel",
   "display.mesh": "Mesh",
-  "display.solidMesh": "Solide+Mesh",
   "display.debug": "Debug",
   "debug.selectFace": "-- Selecteer face --",
   "debug.selectEdge": "-- Selecteer edge --",
