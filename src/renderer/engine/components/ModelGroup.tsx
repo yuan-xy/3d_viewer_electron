@@ -223,7 +223,6 @@ const ModelGroup = forwardRef<THREE.Group, ModelGroupProps>(function ModelGroup(
                 expanded: true,
                 meshIndex: info.meshIndex,
               }))
-          console.log('[ModelGroup] sceneTree built, nodes:', sceneTree.length, 'meshes:', processed.length, 'partInfos:', partInfos.length, 'sceneRoot:', !!result.sceneRoot)
           updateSceneTree(sceneTree)
 
           const finalBox = new THREE.Box3()
