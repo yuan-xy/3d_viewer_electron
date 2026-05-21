@@ -8,7 +8,7 @@ import { toast } from 'sonner'
 import { stepToGlbCached, startPreCache } from '@/lib/step-converter'
 import { EXT_COLORS, detectFormat } from '@/config/file-formats'
 import { Button } from '@/components/ui/button'
-import { ArrowDownUp, ArrowUpAZ, ArrowDownZA, AlertCircle } from 'lucide-react'
+import { List, ArrowUpAZ, ArrowDownZA, AlertCircle } from 'lucide-react'
 import {
   startThumbnailQueue,
   stopThumbnailQueue,
@@ -200,7 +200,7 @@ export default function FileListPanel() {
             onClick={cycleSortMode}
             title={fileSortMode === 'name' ? t('fileList.sortByName') : t('fileList.sortByType')}
           >
-            <ArrowDownUp className={cn('h-3 w-3', fileSortMode === 'type+name' && 'text-primary')} />
+            <List className={cn('h-3 w-3', fileSortMode === 'type+name' && 'text-primary')} />
           </Button>
           <Button
             variant="ghost"

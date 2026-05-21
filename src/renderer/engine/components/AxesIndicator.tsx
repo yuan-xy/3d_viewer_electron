@@ -90,7 +90,7 @@ export default function AxesIndicator({ mainCamera }: AxesIndicatorOverlayProps)
     <div
       style={{
         position: 'absolute',
-        left: 1,
+        right: 1,
         bottom: 1,
         width: 120,
         height: 120,

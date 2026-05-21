@@ -49,7 +49,7 @@ export const useUIStore = create<UIStore>()(
       language: (safeLocalStorage.getItem('lang') as SupportedLanguage | 'system') || 'zh',
       theme: 'system',
       cameraMode: 'perspective',
-      enablePreview: false,
+      enablePreview: true,
 
       toggleLeftPanel: () => set((s) => ({ leftPanelOpen: !s.leftPanelOpen })),
       toggleRightPanel: () => set((s) => ({ rightPanelOpen: !s.rightPanelOpen })),
