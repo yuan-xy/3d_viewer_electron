@@ -173,6 +173,20 @@ ipcMain.handle('fs:readDirectory', async (_event, dirPath: string) => {
   }
 })
 
+ipcMain.handle('fs:readFile', async (_event, filePath: string) => {
+  try {
+    const buffer = await fs.promises.readFile(filePath)
+    // Return a clean ArrayBuffer (no byteOffset/larger backing buffer)
+    return {
+      success: true,
+      data: buffer.buffer.slice(buffer.byteOffset, buffer.byteOffset + buffer.byteLength),
+    }
+  } catch (e) {
+    const err = e as Error
+    return { success: false, error: err.message }
+  }
+})
+
 ipcMain.handle('fs:readFileAsBase64', async (_event, filePath: string) => {
   try {
     const buffer = await fs.promises.readFile(filePath)

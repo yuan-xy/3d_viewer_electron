@@ -65,7 +65,7 @@ export async function startPreCache(
     }
 
     try {
-      const result = await window.electronAPI.readFileAsBase64(file.path)
+      const result = await window.electronAPI.readFile(file.path)
       if (!result.success || !result.data) {
         console.warn('[preCache] failed to read file:', file.name, result.error)
         continue
@@ -73,12 +73,8 @@ export async function startPreCache(
 
       if (preCacheAbort) break
 
-      const binaryString = atob(result.data)
-      const bytes = new Uint8Array(binaryString.length)
-      for (let i = 0; i < binaryString.length; i++) bytes[i] = binaryString.charCodeAt(i)
-
       console.log('[preCache] converting:', file.name)
-      const importResult = await convertInWorker(key, bytes.buffer, OCCT_PARAMS, 'precache')
+      const importResult = await convertInWorker(key, result.data, OCCT_PARAMS, 'precache')
 
       const glbBuffer = buildGlbFromResult(importResult, {
         wasmPath,

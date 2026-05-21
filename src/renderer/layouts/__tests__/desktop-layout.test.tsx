@@ -113,6 +113,7 @@ describe('DesktopLayout toolbar', () => {
     vi.clearAllMocks()
     ;(window as any).electronAPI = {
       openFileDialog: vi.fn().mockResolvedValue({ success: true, filePaths: [] }),
+      readFile: vi.fn().mockResolvedValue({ success: false, error: 'no file' }),
       readFileAsBase64: vi.fn().mockResolvedValue({ success: false, error: 'no file' }),
       readDirectory: vi.fn().mockResolvedValue({ success: true, files: [] }),
       getFilePath: vi.fn(),

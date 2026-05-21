@@ -5,6 +5,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
   getPlatform: () => process.platform,
   openExternal: (url: string) => ipcRenderer.invoke('electron:openExternal', url),
   readDirectory: (dirPath: string) => ipcRenderer.invoke('fs:readDirectory', dirPath),
+  readFile: (filePath: string) => ipcRenderer.invoke('fs:readFile', filePath),
   readFileAsBase64: (filePath: string) => ipcRenderer.invoke('fs:readFileAsBase64', filePath),
   getFilePath: (file: File) => webUtils.getPathForFile(file),
   openFileDialog: () => ipcRenderer.invoke('dialog:openFile'),

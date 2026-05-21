@@ -12,6 +12,11 @@ declare global {
         files?: { name: string; path: string; mtimeMs: number }[]
         error?: string
       }>
+      readFile: (filePath: string) => Promise<{
+        success: boolean
+        data?: ArrayBuffer
+        error?: string
+      }>
       readFileAsBase64: (filePath: string) => Promise<{
         success: boolean
         data?: string

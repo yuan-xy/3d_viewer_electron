@@ -8,7 +8,7 @@ import { toast } from 'sonner'
 import { stepToGlbCached, startPreCache } from '@/lib/step-converter'
 import { EXT_COLORS, detectFormat } from '@/config/file-formats'
 import { Button } from '@/components/ui/button'
-import { List, ArrowUpAZ, ArrowDownZA, AlertCircle, Eye, EyeOff } from 'lucide-react'
+import { List, ArrowUpAZ, ArrowDownZA, AlertCircle, Eye, EyeOff, Loader2 } from 'lucide-react'
 import {
   startThumbnailQueue,
   stopThumbnailQueue,
@@ -63,8 +63,20 @@ export default function FileListPanel() {
     return () => clearTimeout(timer)
   }, [folderFiles])
 
+  const [processingPath, setProcessingPath] = useState<string | null>(null)
+
   // Thumbnail queue lifecycle
   const handleThumbReady = useCallback((filePath: string, objectURL: string) => {
+    setProcessingPath(null)
+    // Empty URL means thumbnail generation failed — mark as failed
+    if (!objectURL) {
+      setThumbState((prev) => {
+        const failed = new Set(prev.failed)
+        failed.add(filePath)
+        return { ...prev, failed }
+      })
+      return
+    }
     setThumbState((prev) => {
       const urls = new Map(prev.urls)
       const old = urls.get(filePath)
@@ -75,6 +87,10 @@ export default function FileListPanel() {
       return { urls, failed }
     })
   }, [])
+
+  const handleThumbProgress = useCallback((filePath: string) => {
+    setProcessingPath(filePath)
+  }, [setProcessingPath])
 
   useEffect(() => {
     if (!enablePreview || folderFiles.length === 0) {
@@ -95,7 +111,7 @@ export default function FileListPanel() {
       return { urls: new Map(), failed: new Set() }
     })
 
-    startThumbnailQueue(files, handleThumbReady)
+    startThumbnailQueue(files, handleThumbReady, handleThumbProgress)
 
     return () => {
       stopThumbnailQueue()
@@ -277,7 +293,7 @@ export default function FileListPanel() {
                         onLoad={(e) => { (e.target as HTMLImageElement).style.opacity = '1' }}
                       />
                     ) : (
-                      <PlaceholderCard file={file} failed={failed} />
+                      <PlaceholderCard file={file} failed={failed} loading={processingPath === file.path} />
                     )}
 
                     <div className="absolute bottom-0 left-0 right-0 bg-black/50 px-1.5 py-0.5">
@@ -337,7 +353,7 @@ export default function FileListPanel() {
   )
 }
 
-function PlaceholderCard({ file, failed }: { file: { name: string }; failed: boolean }) {
+function PlaceholderCard({ file, failed, loading }: { file: { name: string }; failed: boolean; loading?: boolean }) {
   const ext = getExt(file.name)
   const extLabel = ext ? ext.toUpperCase().slice(1) : '?'
 
@@ -362,7 +378,10 @@ function PlaceholderCard({ file, failed }: { file: { name: string }; failed: boo
       >
         {extLabel}
       </span>
-      {failed && (
+      {loading && (
+        <Loader2 className="relative z-10 h-4 w-4 animate-spin text-muted-foreground/60" />
+      )}
+      {!loading && failed && (
         <AlertCircle className="relative z-10 h-4 w-4 text-muted-foreground/50" />
       )}
     </div>
@@ -374,18 +393,13 @@ async function handleFileClick(file: { name: string; path: string; mtimeMs: numb
   setSelectedFileIndex(index)
 
   try {
-    const result = await window.electronAPI.readFileAsBase64(file.path)
+    const result = await window.electronAPI.readFile(file.path)
     if (!result.success || !result.data) {
-      console.error('[handleFileClick] readFileAsBase64 failed:', result.error || 'unknown error')
+      console.error('[handleFileClick] readFile failed:', result.error || 'unknown error')
       toast.error('Load failed: ' + (result.error || 'unknown error'))
       return
     }
-    const binaryString = atob(result.data)
-    const bytes = new Uint8Array(binaryString.length)
-    for (let i = 0; i < binaryString.length; i++) {
-      bytes[i] = binaryString.charCodeAt(i)
-    }
-    const buffer = bytes.buffer
+    const buffer = result.data
     const format = detectFormat(file.name)
 
     if (format === 'step') {

@@ -6,6 +6,7 @@ if (typeof window !== 'undefined') {
   // Mock electronAPI
   ;(window as Record<string, unknown>).electronAPI = {
     readDirectory: async () => [],
+    readFile: async () => ({ success: true, data: new ArrayBuffer(0) }),
     readFileAsBase64: async () => '',
     getFilePath: (file: File) => (file as unknown as { path?: string }).path ?? '',
     getAppVersion: async () => '1.0.0',

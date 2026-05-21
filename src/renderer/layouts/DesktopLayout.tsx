@@ -179,14 +179,9 @@ export default function DesktopLayout() {
         const idx = selectedFileIndex === -1 ? 0 : selectedFileIndex
         const file = folderFiles[idx]
         if (file) {
-          window.electronAPI.readFileAsBase64(file.path).then(async (result) => {
+          window.electronAPI.readFile(file.path).then(async (result) => {
             if (result.success && result.data) {
-              const binaryString = atob(result.data)
-              const bytes = new Uint8Array(binaryString.length)
-              for (let i = 0; i < binaryString.length; i++) {
-                bytes[i] = binaryString.charCodeAt(i)
-              }
-              const buffer = bytes.buffer
+              const buffer = result.data
               const ext = file.name.split('.').pop()?.toLowerCase()
               const isStep = ext === 'step' || ext === 'stp'
               if (isStep) {
@@ -243,17 +238,12 @@ export default function DesktopLayout() {
     const dirPath = filePath.slice(0, filePath.lastIndexOf(filePath.includes('\\') ? '\\' : '/'))
 
     try {
-      const fileResult = await window.electronAPI.readFileAsBase64(filePath)
+      const fileResult = await window.electronAPI.readFile(filePath)
       if (!fileResult.success || !fileResult.data) {
         toast.error('Load failed: ' + (fileResult.error || 'unknown error'))
         return
       }
-      const binaryString = atob(fileResult.data)
-      const bytes = new Uint8Array(binaryString.length)
-      for (let i = 0; i < binaryString.length; i++) {
-        bytes[i] = binaryString.charCodeAt(i)
-      }
-      const buffer = bytes.buffer
+      const buffer = fileResult.data
       const format = detectFormat(fileName)
 
       if (format === 'step') {
