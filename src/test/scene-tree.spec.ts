@@ -15,6 +15,22 @@ async function waitForLoadDone(page: Page, timeout = 30000) {
   )
 }
 
+/**
+ * Set up console and error listeners on a page for diagnostics.
+ * Returns a function that logs collected messages, call after the test completes.
+ */
+function setupConsoleCapture(page: Page) {
+  const errors: string[] = []
+  page.on('pageerror', (err) => errors.push(`[pageerror] ${err.message}`))
+  page.on('console', (msg) => {
+    if (msg.type() === 'error') errors.push(`[console.error] ${msg.text()}`)
+  })
+  return () => {
+    if (errors.length > 0) console.log('[test] renderer errors:', JSON.stringify(errors))
+    return errors
+  }
+}
+
 test.describe.serial('Multi-level scene tree', () => {
   let electronApp: ElectronApplication
 
@@ -45,13 +61,21 @@ test.describe.serial('Multi-level scene tree', () => {
     const window = await electronApp.firstWindow()
     await window.locator('canvas').first().waitFor({ state: 'attached', timeout: 20000 })
 
-    await window.locator('input[type="file"]').setInputFiles({
-      name: 'RobotExpressive.glb',
-      mimeType: 'model/gltf-binary',
-      buffer: ROBOT_GLB,
-    })
+    const getErrors = setupConsoleCapture(window)
+
+    // Load GLB directly through store to avoid cross-platform
+    // differences in file input change event handling
+    const base64 = ROBOT_GLB.toString('base64')
+    await window.evaluate((b64) => {
+      const binary = atob(b64)
+      const bytes = new Uint8Array(binary.length)
+      for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i)
+      window.__modelStore!.getState().setModelBuffer(bytes.buffer, 'glb')
+      window.__modelStore!.getState().setGLBUrl('RobotExpressive.glb')
+    }, base64)
 
     await waitForLoadDone(window)
+    getErrors()
 
     // Wait for at least one tree node to appear (handles cross-platform DOM timing)
     const leftPanel = window.locator('aside').first()
