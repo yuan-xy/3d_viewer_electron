@@ -91,12 +91,12 @@ export class GlbBuilder {
     return (this.json.accessors as Array<Record<string, unknown>>).length - 1;
   }
 
-  addMaterial(color: number[]): number {
+  addMaterial(color: number[], metallicFactor = 0.0, roughnessFactor = 0.55): number {
     (this.json.materials as Array<Record<string, unknown>>).push({
       pbrMetallicRoughness: {
         baseColorFactor: [color[0], color[1], color[2], color[3]],
-        metallicFactor: 0.0,
-        roughnessFactor: 0.55,
+        metallicFactor,
+        roughnessFactor,
       },
       doubleSided: true,
     });

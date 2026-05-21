@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next'
 import { useThemeColors } from '@/components/settings/useThemeColors'
 
-export type DisplayMode = 'solid' | 'mesh' | 'wireframe' | 'debug'
+export type DisplayMode = 'solid' | 'solidWithWireframe' | 'mesh' | 'wireframe' | 'debug'
 
 interface DisplayModeDropdownProps {
   displayMode: DisplayMode

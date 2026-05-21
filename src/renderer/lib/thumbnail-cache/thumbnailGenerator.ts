@@ -111,15 +111,18 @@ export async function generateThumbnail(
   const scene = new THREE.Scene()
   // Transparent background — CSS bg-muted shows through the PNG alpha channel
 
-  // Lighting
-  const ambient = new THREE.AmbientLight(0xffffff, 0.6)
+  // Lighting (synced with SceneSetup.tsx)
+  const ambient = new THREE.AmbientLight(0xD4E1E8, 0.5)
   scene.add(ambient)
-  const dir1 = new THREE.DirectionalLight(0xffffff, 1.0)
+  const dir1 = new THREE.DirectionalLight(0xFFF5EE, 1.2)
   dir1.position.set(1, 1, 1)
   scene.add(dir1)
-  const dir2 = new THREE.DirectionalLight(0x8888ff, 1.0)
+  const dir2 = new THREE.DirectionalLight(0xC0D4E8, 0.6)
   dir2.position.set(-0.5, -0.3, -1)
   scene.add(dir2)
+  const dir3 = new THREE.DirectionalLight(0x8FD6D6, 0.3)
+  dir3.position.set(0, 0.5, -0.5)
+  scene.add(dir3)
 
   const camera = new THREE.PerspectiveCamera(45, WIDTH / HEIGHT)
 

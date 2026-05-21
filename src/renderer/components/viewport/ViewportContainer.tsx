@@ -209,7 +209,7 @@ export default function ViewportContainer() {
     const isDark = theme === 'system'
       ? window.matchMedia('(prefers-color-scheme: dark)').matches
       : theme === 'dark'
-    return isDark ? '#1a1a2e' : '#f8f8f8'
+    return isDark ? '#1a1a2e' : '#EEF3F5'
   }, [theme])
 
   const [animTarget, setAnimTarget] = useState<THREE.Vector3 | null>(null)
@@ -419,7 +419,7 @@ export default function ViewportContainer() {
         style={{ width: '100%', height: '100%', background: canvasBackground }}
         scene={{ up: [0, 0, 1] as unknown as THREE.Vector3 }}
         camera={{ fov: 50, near: 0.001, far: 10000, position: [5, -5, 3], up: [0, 0, 1] as [number, number, number] }}
-        gl={{ antialias: true, alpha: true, preserveDrawingBuffer: true }}
+        gl={{ antialias: true, alpha: true, preserveDrawingBuffer: true, outputColorSpace: THREE.SRGBColorSpace, toneMapping: THREE.ACESFilmicToneMapping, toneMappingExposure: 1.0 }}
         onCreated={({ camera, scene, gl }) => {
           useEngineStore.getState().setEngineObjects({ camera, scene, gl })
           window.__r3f_dev = { camera, scene, gl }
@@ -448,7 +448,7 @@ export default function ViewportContainer() {
         />
         <ToolOverlay modelRef={modelGroupRef} />
         {hasTopology && <TopologyOverlay selectorRuntime={selectorRuntime} />}
-        {(resolvedDisplayMode === 'wireframe' && hasEdges || resolvedDisplayMode === 'debug' && hasEdges) && (
+        {((resolvedDisplayMode === 'wireframe' || resolvedDisplayMode === 'solidWithWireframe') && hasEdges || resolvedDisplayMode === 'debug' && hasEdges) && (
           <DebugTopologyOverlay selectorRuntime={selectorRuntime!} centeringOffset={centeringOffset} showVertices={displayMode === 'debug'} />
         )}
         <TopologyPicker

@@ -3,22 +3,35 @@ import * as THREE from 'three'
 /**
  * Clone a mesh's geometry for use in a new Mesh.
  *
- * R3F creates a fresh THREE.Mesh (no geometry in constructor) then sets geometry
- * as a plain property, which does NOT call updateMorphTargets().  If the
- * geometry has morphAttributes the mesh will have undefined
- * morphTargetInfluences, and Three.js crashes in WebGLMorphtargets.update with
- * "Cannot read properties of undefined (reading 'length')".
- *
- * We clear morphAttributes since we don't animate morph targets.
+ * Morph attributes are preserved. The caller MUST call {@link initMorphTargets}
+ * on the resulting Mesh to prevent Three.js from crashing in
+ * WebGLMorphtargets.update — R3F assigns geometry as a plain property, which
+ * does NOT call updateMorphTargets(), leaving morphTargetInfluences undefined.
  */
 export function cloneMeshGeometry(src: THREE.Mesh): THREE.BufferGeometry {
-  const geo = src.geometry.clone()
-  // R3F assigns geometry as a plain property (not via constructor), which
-  // does NOT call updateMorphTargets().  Clear morph attributes so Three.js
-  // skips morph processing — otherwise WebGLMorphtargets.update crashes on
-  // undefined morphTargetInfluences every render frame.
+  return src.geometry.clone()
+}
+
+/**
+ * Initialize morphTargetInfluences on a mesh whose geometry has morphAttributes.
+ *
+ * R3F creates a fresh THREE.Mesh (no geometry in constructor) and later assigns
+ * geometry as a plain property, which does NOT call updateMorphTargets(). If
+ * geometry.morphAttributes is non-empty while morphTargetInfluences is
+ * undefined, Three.js crashes every render frame.
+ *
+ * Call this after creating a mesh with a cloned geometry that may carry morph
+ * attributes (e.g. from GLTFLoader output).
+ */
+export function initMorphTargets(mesh: THREE.Mesh): void {
+  const geo = mesh.geometry
   if (geo.morphAttributes) {
-    geo.morphAttributes = {}
+    const keys = Object.keys(geo.morphAttributes)
+    if (keys.length > 0) {
+      const firstAttr = geo.morphAttributes[keys[0]]
+      if (firstAttr && firstAttr.length > 0) {
+        mesh.morphTargetInfluences = new Array(firstAttr.length).fill(0)
+      }
+    }
   }
-  return geo
 }

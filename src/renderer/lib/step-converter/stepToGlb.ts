@@ -3,7 +3,7 @@ import { GlbBuilder } from './GlbBuilder';
 import { addStepTopology } from './topologyExt';
 
 const CAD_TO_GLB_SCALE = 0.001;
-const DEFAULT_MATERIAL = [0.72, 0.72, 0.72, 1.0];
+const DEFAULT_MATERIAL = [0.608, 0.651, 0.682, 1.0]; // #9BA6AE — matches createDefaultMaterial()
 
 export interface StepToGlbOptions {
   linearDeflection?: number;

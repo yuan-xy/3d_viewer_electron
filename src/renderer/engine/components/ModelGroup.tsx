@@ -10,7 +10,8 @@ import type { DisplayMode } from './DisplayModeDropdown'
 import { loadFormat } from '@/engine/formatLoaders'
 import type { FormatId } from '@/config/file-formats'
 import { FORMAT_MAP } from '@/config/file-formats'
-import { cloneMeshGeometry } from './cloneMeshGeometry'
+import { cloneMeshGeometry, initMorphTargets } from './cloneMeshGeometry'
+import { cloneAndConvertMaterial, disposeMaterial, getMaterialColor } from './cloneMaterial'
 
 // ---- types ----
 
@@ -34,6 +35,22 @@ function mergeGeometries(meshes: THREE.Mesh[]): THREE.BufferGeometry {
   if (geoms.length === 0) return new THREE.BufferGeometry()
   if (geoms.length === 1) return geoms[0]
   return mergeBufferGeometries(geoms, false)
+}
+
+/** Recursively set skinning=true on a material or array of materials. */
+function setSkinningFlag(
+  mat: THREE.Material | THREE.Material[] | null,
+  value: boolean,
+): void {
+  if (mat == null) return
+  if (Array.isArray(mat)) {
+    for (const m of mat) setSkinningFlag(m, value)
+    return
+  }
+  if ('skinning' in mat) {
+    ;(mat as THREE.MeshStandardMaterial).skinning = value
+    mat.needsUpdate = true
+  }
 }
 
 // ---- multi-mesh rendering constants ----
@@ -72,6 +89,7 @@ const ModelGroup = forwardRef<THREE.Group, ModelGroupProps>(function ModelGroup(
   ref,
 ) {
   const [glbMeshes, setGlbMeshes] = useState<THREE.Mesh[]>([])
+  const [meshMaterials, setMeshMaterials] = useState<(THREE.Material | THREE.Material[] | null)[]>([])
   const [mergedGeometry, setMergedGeometry] = useState<THREE.BufferGeometry | null>(null)
   const [objects, setObjects] = useState<THREE.Object3D[]>([])
   const [error, setError] = useState<string | null>(null)
@@ -88,14 +106,32 @@ const ModelGroup = forwardRef<THREE.Group, ModelGroupProps>(function ModelGroup(
     [sceneTree],
   )
 
+  // Pre-compute morph target influence arrays for R3F meshes.
+  // R3F creates fresh THREE.Mesh from JSX and assigns geometry as a plain
+  // property — updateMorphTargets() is NOT called, so we must pass
+  // morphTargetInfluences explicitly to prevent WebGLMorphtargets crashes.
+  const morphInfluenceArrays = useMemo(() => {
+    return glbMeshes.map((m) => {
+      const ma = m.geometry.morphAttributes
+      if (!ma) return undefined
+      const keys = Object.keys(ma)
+      if (keys.length === 0) return undefined
+      const count = ma[keys[0]]?.length ?? 0
+      if (count === 0) return undefined
+      return new Array(count).fill(0)
+    })
+  }, [glbMeshes])
+
   const onLoadedRef = useRef(onLoaded)
   onLoadedRef.current = onLoaded
   const onErrorRef = useRef(onError)
   onErrorRef.current = onError
+  const materialsRef = useRef<(THREE.Material | THREE.Material[] | null)[]>([])
 
   useEffect(() => {
     if (!buffer || !format) {
       setGlbMeshes([])
+      setMeshMaterials([])
       setMergedGeometry(null)
       setObjects([])
       setError(null)
@@ -130,6 +166,7 @@ const ModelGroup = forwardRef<THREE.Group, ModelGroupProps>(function ModelGroup(
         if (result.objects.length > 0 && result.meshes.length === 0) {
           setObjects(result.objects)
           setGlbMeshes([])
+          setMeshMaterials([])
           setMergedGeometry(null)
           setGlbPartInfos([])
           updateSceneTree([{ id: `${format}-objects`, name: format.toUpperCase(), visible: true, expanded: true }])
@@ -166,6 +203,7 @@ const ModelGroup = forwardRef<THREE.Group, ModelGroupProps>(function ModelGroup(
           // Multi-mesh path (GLB-like): keep individual meshes for face picking
           const overallBox = new THREE.Box3()
           const processed: THREE.Mesh[] = []
+          const materials: (THREE.Material | THREE.Material[] | null)[] = []
           const partInfos: GlbPartInfo[] = []
 
           for (let i = 0; i < meshes.length; i++) {
@@ -174,13 +212,10 @@ const ModelGroup = forwardRef<THREE.Group, ModelGroupProps>(function ModelGroup(
             src.updateWorldMatrix(true, false)
             geo.applyMatrix4(src.matrixWorld)
 
-            // Strip skinning attributes — we don't evaluate skeletal animation,
-            // and these attributes can cause shader compilation errors in Three.js
-            // because MeshStandardMaterial doesn't define them.
-            geo.deleteAttribute('skinIndex')
-            geo.deleteAttribute('skinWeight')
-            geo.deleteAttribute('joints_0')
-            geo.deleteAttribute('weights_0')
+            // Preserve skinning data: set skinning=true on material when
+            // geometry has skinIndex / skinWeight attributes, so
+            // MeshStandardMaterial compiles the correct shader variant.
+            const hasSkinning = geo.getAttribute('skinIndex') !== undefined
 
             geo.computeVertexNormals()
             geo.computeBoundingBox()
@@ -189,8 +224,17 @@ const ModelGroup = forwardRef<THREE.Group, ModelGroupProps>(function ModelGroup(
               overallBox.expandByObject(new THREE.Mesh(geo))
             }
 
+            // Clone and convert material from source mesh
+            const mat = cloneAndConvertMaterial(src.material)
+            if (hasSkinning && mat) {
+              setSkinningFlag(mat, true)
+            }
+            materials.push(mat)
+
             const partId = src.userData?.partId || src.name || `part-${i}`
-            processed.push(new THREE.Mesh(geo))
+            const mesh = new THREE.Mesh(geo)
+            initMorphTargets(mesh)
+            processed.push(mesh)
             partInfos.push({
               partId: String(partId),
               meshIndex: i,
@@ -212,6 +256,8 @@ const ModelGroup = forwardRef<THREE.Group, ModelGroupProps>(function ModelGroup(
           setMergedGeometry(null)
           setObjects([])
           setGlbMeshes(processed)
+          setMeshMaterials(materials)
+          materialsRef.current = materials
           setGlbPartInfos(partInfos)
 
           const sceneTree = result.sceneRoot
@@ -259,7 +305,14 @@ const ModelGroup = forwardRef<THREE.Group, ModelGroupProps>(function ModelGroup(
     }
 
     load()
-    return () => { cancelled = true }
+    return () => {
+      cancelled = true
+      // Dispose materials tracked via ref to avoid stale-closure races
+      for (const mat of materialsRef.current) {
+        disposeMaterial(mat)
+      }
+      materialsRef.current = []
+    }
   }, [buffer, format, modelFilePath, setGlbPartInfos, setModelCenteringOffset, setLoadingPhase, updateSceneTree])
 
   // Sync group ref to engine store after render so ModelInfoPanel can read it
@@ -326,6 +379,8 @@ const ModelGroup = forwardRef<THREE.Group, ModelGroupProps>(function ModelGroup(
                 visible={vis}
                 geometry={mesh.geometry}
                 position={mesh.position}
+                material={meshMaterials[i] ?? undefined}
+                morphTargetInfluences={morphInfluenceArrays[i]}
                 userData={{
                   partId,
                   meshIndex: i,
@@ -336,7 +391,7 @@ const ModelGroup = forwardRef<THREE.Group, ModelGroupProps>(function ModelGroup(
                   color="#cccccc"
                   transparent
                   opacity={0}
-                  depthWrite={false}
+                  depthWrite={true}
                   colorWrite={false}
                 />
               </mesh>
@@ -351,24 +406,39 @@ const ModelGroup = forwardRef<THREE.Group, ModelGroupProps>(function ModelGroup(
         {glbMeshes.map((mesh, i) => {
           const partId = glbPartInfos[i]?.partId || `part-${i}`
           const vis = visibilityMap.get(partId) ?? true
+          const mat = meshMaterials[i]
+          const matColor = isMeshOnly
+            ? (getMaterialColor(mat) ?? '#cccccc')
+            : undefined
           return (
             <mesh
               key={i}
               visible={vis}
               geometry={mesh.geometry}
               position={mesh.position}
+              material={mat ?? undefined}
+              morphTargetInfluences={morphInfluenceArrays[i]}
               userData={{
                 partId,
                 meshIndex: i,
                 faceIds: meshFaceIds[i] || undefined,
               }}
             >
-              <meshStandardMaterial
-                color="#cccccc"
-                roughness={0.4}
-                metalness={0.1}
-                wireframe={isMeshOnly}
-              />
+              {mat == null && !isMeshOnly && (
+                <meshStandardMaterial
+                  color="#9BA6AE"
+                  roughness={0.35}
+                  metalness={0.1}
+                />
+              )}
+              {isMeshOnly && (
+                <meshStandardMaterial
+                  color={matColor}
+                  roughness={0.4}
+                  metalness={0.1}
+                  wireframe={true}
+                />
+              )}
             </mesh>
           )
         })}
@@ -389,7 +459,7 @@ const ModelGroup = forwardRef<THREE.Group, ModelGroupProps>(function ModelGroup(
             color={'#cccccc'}
             transparent
             opacity={0}
-            depthWrite={false}
+            depthWrite={true}
             colorWrite={false}
           />
         </mesh>
@@ -401,8 +471,8 @@ const ModelGroup = forwardRef<THREE.Group, ModelGroupProps>(function ModelGroup(
     <group ref={ref as unknown as React.Ref<THREE.Group>}>
       <mesh geometry={mergedGeometry}>
         <meshStandardMaterial
-          color={'#cccccc'}
-          roughness={0.4}
+          color={'#9BA6AE'}
+          roughness={0.35}
           metalness={0.1}
           wireframe={isMeshOnly}
         />

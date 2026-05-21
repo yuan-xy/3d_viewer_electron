@@ -35,6 +35,8 @@ export interface LoaderResult {
   sceneRoot?: THREE.Object3D
   /** Unit system detected or defaulted for this file format. If undefined, caller should use format's defaultUnit. */
   sourceUnit?: UnitSystem
+  /** Materials extracted from the scene (may differ from meshes[].material after processing) */
+  materials?: (THREE.Material | THREE.Material[])[]
 }
 
 function bufferToText(buffer: ArrayBuffer): string {
