@@ -50,6 +50,8 @@
     "edge": "Kante",
     "point": "Punkt"
   },
+  "settings.enablePreview": "Enable Preview",
+
   "fileList.title": "Dateien",
   "fileList.empty": "Laden Sie eine Datei, um Modelle im gleichen Ordner anzuzeigen",
   "fileList.folder": "Ordner",

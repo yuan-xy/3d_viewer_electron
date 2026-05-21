@@ -50,6 +50,8 @@
     "edge": "エッジ",
     "point": "点"
   },
+  "settings.enablePreview": "Enable Preview",
+
   "fileList.title": "ファイル",
   "fileList.empty": "ファイルを読み込むと同一フォルダのモデルが表示されます",
   "fileList.folder": "フォルダ",

@@ -50,6 +50,8 @@
     "edge": "Ребро",
     "point": "Точка"
   },
+  "settings.enablePreview": "Enable Preview",
+
   "fileList.title": "Файлы",
   "fileList.empty": "Загрузите файл для просмотра моделей в той же папке",
   "fileList.folder": "Папка",

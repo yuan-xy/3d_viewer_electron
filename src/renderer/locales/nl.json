@@ -50,6 +50,8 @@
     "edge": "Edge",
     "point": "Punt"
   },
+  "settings.enablePreview": "Enable Preview",
+
   "fileList.title": "Bestanden",
   "fileList.empty": "Laad een bestand om modellen in dezelfde map te bekijken",
   "fileList.folder": "Map",

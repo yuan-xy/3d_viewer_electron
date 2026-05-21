@@ -50,6 +50,8 @@
     "edge": "Arête",
     "point": "Point"
   },
+  "settings.enablePreview": "Enable Preview",
+
   "fileList.title": "Fichiers",
   "fileList.empty": "Chargez un fichier pour parcourir les modèles du même dossier",
   "fileList.folder": "Dossier",

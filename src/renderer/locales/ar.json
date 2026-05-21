@@ -50,6 +50,8 @@
     "edge": "حافة",
     "point": "نقطة"
   },
+  "settings.enablePreview": "Enable Preview",
+
   "fileList.title": "الملفات",
   "fileList.empty": "قم بتحميل ملف لعرض النماذج في نفس المجلد",
   "fileList.folder": "مجلد",

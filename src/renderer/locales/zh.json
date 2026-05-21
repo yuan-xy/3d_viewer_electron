@@ -76,6 +76,8 @@
     "point": "点"
   },
 
+  "settings.enablePreview": "启用预览",
+
   "fileList.title": "文件列表",
   "fileList.empty": "加载文件后显示同目录模型",
   "fileList.folder": "文件夹",

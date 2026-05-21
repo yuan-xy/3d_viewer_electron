@@ -23,6 +23,7 @@ export function SettingsDialog({ children }: { children?: React.ReactNode }) {
     light: isZh ? '浅色' : 'Light',
     dark: isZh ? '深色' : 'Dark',
     system: isZh ? '跟随系统' : 'System',
+    enablePreview: isZh ? '启用预览' : 'Enable Preview',
     language: isZh ? '语言' : 'Language',
     followSystem: isZh ? '跟随系统' : 'System',
   }
@@ -47,6 +48,10 @@ export function SettingsDialog({ children }: { children?: React.ReactNode }) {
               <ThemeOption value="dark" label={labels.dark} icon={Moon} />
               <ThemeOption value="system" label={labels.system} icon={Monitor} />
             </div>
+          </SettingSection>
+
+          <SettingSection title={labels.enablePreview}>
+            <PreviewOption />
           </SettingSection>
 
           <SettingSection title={labels.language}>
@@ -110,6 +115,28 @@ function LanguageOption({ value, label, icon: Icon }: {
         {Icon && <Icon className="h-4 w-4" />}
         <span>{label}</span>
       </div>
+    </button>
+  )
+}
+
+function PreviewOption() {
+  const enablePreview = useUIStore((s) => s.enablePreview)
+  const setEnablePreview = useUIStore((s) => s.setEnablePreview)
+
+  return (
+    <button
+      onClick={() => setEnablePreview(!enablePreview)}
+      className={cn(
+        'relative inline-flex h-6 w-11 items-center rounded-full transition-colors',
+        enablePreview ? 'bg-primary' : 'bg-muted-foreground/30'
+      )}
+    >
+      <span
+        className={cn(
+          'inline-block h-4 w-4 transform rounded-full bg-white shadow-sm transition-transform',
+          enablePreview ? 'translate-x-6' : 'translate-x-1'
+        )}
+      />
     </button>
   )
 }

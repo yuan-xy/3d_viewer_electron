@@ -50,6 +50,8 @@
     "edge": "Kenar",
     "point": "Nokta"
   },
+  "settings.enablePreview": "Enable Preview",
+
   "fileList.title": "Dosyalar",
   "fileList.empty": "Aynı klasördeki modelleri görmek için bir dosya yükleyin",
   "fileList.folder": "Klasör",

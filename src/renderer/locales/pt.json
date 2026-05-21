@@ -50,6 +50,8 @@
     "edge": "Aresta",
     "point": "Ponto"
   },
+  "settings.enablePreview": "Enable Preview",
+
   "fileList.title": "Ficheiros",
   "fileList.empty": "Carregue um ficheiro para ver modelos na mesma pasta",
   "fileList.folder": "Pasta",

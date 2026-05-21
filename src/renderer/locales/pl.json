@@ -50,6 +50,8 @@
     "edge": "Krawędź",
     "point": "Punkt"
   },
+  "settings.enablePreview": "Enable Preview",
+
   "fileList.title": "Pliki",
   "fileList.empty": "Załaduj plik, aby przeglądać modele w tym samym folderze",
   "fileList.folder": "Folder",

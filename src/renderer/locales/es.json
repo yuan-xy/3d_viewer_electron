@@ -50,6 +50,8 @@
     "edge": "Borde",
     "point": "Punto"
   },
+  "settings.enablePreview": "Enable Preview",
+
   "fileList.title": "Archivos",
   "fileList.empty": "Carga un archivo para ver modelos en la misma carpeta",
   "fileList.folder": "Carpeta",

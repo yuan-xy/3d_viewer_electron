@@ -50,6 +50,8 @@
     "edge": "Edge",
     "point": "Titik"
   },
+  "settings.enablePreview": "Enable Preview",
+
   "fileList.title": "File",
   "fileList.empty": "Muat file untuk melihat model di folder yang sama",
   "fileList.folder": "Folder",

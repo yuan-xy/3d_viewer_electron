@@ -50,6 +50,8 @@
     "edge": "ขอบ",
     "point": "จุด"
   },
+  "settings.enablePreview": "Enable Preview",
+
   "fileList.title": "ไฟล์",
   "fileList.empty": "โหลดไฟล์เพื่อดูโมเดลในโฟลเดอร์เดียวกัน",
   "fileList.folder": "โฟลเดอร์",

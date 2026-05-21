@@ -50,6 +50,8 @@
     "edge": "Cạnh",
     "point": "Điểm"
   },
+  "settings.enablePreview": "Enable Preview",
+
   "fileList.title": "Tệp",
   "fileList.empty": "Tải tệp để xem các mô hình trong cùng thư mục",
   "fileList.folder": "Thư mục",

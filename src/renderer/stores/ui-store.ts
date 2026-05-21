@@ -25,6 +25,7 @@ interface UIStore {
   language: SupportedLanguage | 'system'
   theme: 'light' | 'dark' | 'system'
   cameraMode: CameraMode
+  enablePreview: boolean
 
   toggleLeftPanel: () => void
   toggleRightPanel: () => void
@@ -34,6 +35,7 @@ interface UIStore {
   setLanguage: (lang: SupportedLanguage | 'system') => void
   setTheme: (theme: 'light' | 'dark' | 'system') => void
   setCameraMode: (mode: CameraMode) => void
+  setEnablePreview: (v: boolean) => void
 }
 
 export const useUIStore = create<UIStore>()(
@@ -47,6 +49,7 @@ export const useUIStore = create<UIStore>()(
       language: (safeLocalStorage.getItem('lang') as SupportedLanguage | 'system') || 'zh',
       theme: 'system',
       cameraMode: 'perspective',
+      enablePreview: false,
 
       toggleLeftPanel: () => set((s) => ({ leftPanelOpen: !s.leftPanelOpen })),
       toggleRightPanel: () => set((s) => ({ rightPanelOpen: !s.rightPanelOpen })),
@@ -59,10 +62,11 @@ export const useUIStore = create<UIStore>()(
       },
       setTheme: (theme) => set({ theme }),
       setCameraMode: (cameraMode) => set({ cameraMode }),
+      setEnablePreview: (enablePreview) => set({ enablePreview }),
     }),
     {
       name: 'faicad-ui',
-      partialize: (s) => ({ language: s.language, theme: s.theme }),
+      partialize: (s) => ({ language: s.language, theme: s.theme, enablePreview: s.enablePreview }),
       storage: {
         getItem: safeLocalStorage.getItem,
         setItem: safeLocalStorage.setItem,

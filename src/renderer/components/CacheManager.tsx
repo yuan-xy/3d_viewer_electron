@@ -2,15 +2,22 @@ import { useState, useEffect } from 'react'
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger
 } from '@/components/ui/dialog'
-import { Trash2, HardDrive, RefreshCw, Database, Check } from 'lucide-react'
+import { Trash2, HardDrive, RefreshCw, Database, Check, Image } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { clearStepCache, memCache } from '@/lib/step-converter/stepCache'
+import {
+  clearThumbnailCache,
+  memCache as thumbMemCache,
+} from '@/lib/thumbnail-cache/thumbnailCache'
 import { useThemeColors } from '@/components/settings/useThemeColors'
+
+type CacheKind = 'step' | 'thumbnail'
 
 interface CacheEntry {
   key: string
   size: number
   type: 'memory' | 'indexeddb'
+  kind: CacheKind
 }
 
 function formatBytes(bytes: number): string {
@@ -27,16 +34,33 @@ function parseKey(key: string): { path: string; mtime: string } {
   }
 }
 
-const DB_NAME = 'step-glb-cache'
-const DB_VERSION = 1
-const STORE_NAME = 'buffers'
+const STEP_DB_NAME = 'step-glb-cache'
+const STEP_DB_VERSION = 1
+const STEP_STORE_NAME = 'buffers'
 
-function openIDB(): Promise<IDBDatabase> {
+function openStepIDB(): Promise<IDBDatabase> {
   return new Promise((resolve, reject) => {
-    const request = indexedDB.open(DB_NAME, DB_VERSION)
+    const request = indexedDB.open(STEP_DB_NAME, STEP_DB_VERSION)
     request.onupgradeneeded = () => {
-      if (!request.result.objectStoreNames.contains(STORE_NAME)) {
-        request.result.createObjectStore(STORE_NAME)
+      if (!request.result.objectStoreNames.contains(STEP_STORE_NAME)) {
+        request.result.createObjectStore(STEP_STORE_NAME)
+      }
+    }
+    request.onsuccess = () => resolve(request.result)
+    request.onerror = () => reject(request.error)
+  })
+}
+
+const THUMB_DB_NAME = 'thumbnail-cache'
+const THUMB_DB_VERSION = 1
+const THUMB_STORE_NAME = 'thumbnails'
+
+function openThumbIDB(): Promise<IDBDatabase> {
+  return new Promise((resolve, reject) => {
+    const request = indexedDB.open(THUMB_DB_NAME, THUMB_DB_VERSION)
+    request.onupgradeneeded = () => {
+      if (!request.result.objectStoreNames.contains(THUMB_STORE_NAME)) {
+        request.result.createObjectStore(THUMB_STORE_NAME)
       }
     }
     request.onsuccess = () => resolve(request.result)
@@ -60,24 +84,32 @@ export function CacheManager({ children }: CacheManagerProps) {
     setLoading(true)
     const items: CacheEntry[] = []
 
-    // Memory cache entries
+    // STEP memory cache
     memCache.forEach((buffer, key) => {
-      items.push({ key, size: buffer.byteLength, type: 'memory' })
+      items.push({ key, size: buffer.byteLength, type: 'memory', kind: 'step' })
     })
 
-    // IndexedDB entries
+    // Thumbnail memory cache
+    thumbMemCache.forEach((blob, key) => {
+      items.push({ key, size: blob.size, type: 'memory', kind: 'thumbnail' })
+    })
+
+    // STEP IndexedDB
     try {
-      const db = await openIDB()
-      const tx = db.transaction(STORE_NAME, 'readonly')
-      const store = tx.objectStore(STORE_NAME)
+      const db = await openStepIDB()
+      const tx = db.transaction(STEP_STORE_NAME, 'readonly')
+      const store = tx.objectStore(STEP_STORE_NAME)
       const request = store.openCursor()
 
       await new Promise<void>((resolve) => {
         request.onsuccess = () => {
           const cursor = request.result
           if (cursor) {
-            if (!items.find(e => e.key === cursor.key)) {
-              items.push({ key: cursor.key as string, size: cursor.value?.byteLength || 0, type: 'indexeddb' })
+            if (!items.find(e => e.key === cursor.key && e.kind === 'step')) {
+              const size = cursor.value instanceof ArrayBuffer
+                ? cursor.value.byteLength
+                : cursor.value?.byteLength || 0
+              items.push({ key: cursor.key as string, size, type: 'indexeddb', kind: 'step' })
             }
             cursor.continue()
           } else {
@@ -87,7 +119,35 @@ export function CacheManager({ children }: CacheManagerProps) {
         request.onerror = () => resolve()
       })
     } catch (e) {
-      console.warn('[CacheManager] IndexedDB read failed:', e)
+      console.warn('[CacheManager] STEP IndexedDB read failed:', e)
+    }
+
+    // Thumbnail IndexedDB
+    try {
+      const db = await openThumbIDB()
+      const tx = db.transaction(THUMB_STORE_NAME, 'readonly')
+      const store = tx.objectStore(THUMB_STORE_NAME)
+      const request = store.openCursor()
+
+      await new Promise<void>((resolve) => {
+        request.onsuccess = () => {
+          const cursor = request.result
+          if (cursor) {
+            if (!items.find(e => e.key === cursor.key && e.kind === 'thumbnail')) {
+              const size = cursor.value instanceof Blob
+                ? cursor.value.size
+                : 0
+              items.push({ key: cursor.key as string, size, type: 'indexeddb', kind: 'thumbnail' })
+            }
+            cursor.continue()
+          } else {
+            resolve()
+          }
+        }
+        request.onerror = () => resolve()
+      })
+    } catch (e) {
+      console.warn('[CacheManager] Thumbnail IndexedDB read failed:', e)
     }
 
     setEntries(items)
@@ -116,32 +176,70 @@ export function CacheManager({ children }: CacheManagerProps) {
     if (selectedKeys.size === entries.length) {
       setSelectedKeys(new Set())
     } else {
-      setSelectedKeys(new Set(entries.map(e => e.key)))
+      setSelectedKeys(new Set(entries.map(e => `${e.kind}:${e.key}`)))
     }
+  }
+
+  function entryId(entry: CacheEntry): string {
+    return `${entry.kind}:${entry.key}`
   }
 
   const handleClearSelected = async () => {
     if (selectedKeys.size === 0) return
     setLoading(true)
 
-    try {
-      const db = await openIDB()
-      const tx = db.transaction(STORE_NAME, 'readwrite')
-      const store = tx.objectStore(STORE_NAME)
-      for (const key of selectedKeys) {
-        store.delete(key)
+    const stepKeys: string[] = []
+    const thumbKeys: string[] = []
+
+    for (const id of selectedKeys) {
+      const [kind, ...keyParts] = id.split(':')
+      const key = keyParts.join(':')
+      if (kind === 'step') stepKeys.push(key)
+      else thumbKeys.push(key)
+    }
+
+    // Clear STEP entries
+    if (stepKeys.length > 0) {
+      try {
+        const db = await openStepIDB()
+        const tx = db.transaction(STEP_STORE_NAME, 'readwrite')
+        const store = tx.objectStore(STEP_STORE_NAME)
+        for (const key of stepKeys) {
+          store.delete(key)
+        }
+        await new Promise<void>((resolve, reject) => {
+          tx.oncomplete = () => resolve()
+          tx.onerror = () => reject(tx.error)
+          tx.onabort = () => reject(tx.error)
+        })
+        for (const key of stepKeys) {
+          memCache.delete(key)
+        }
+      } catch (e) {
+        console.warn('[CacheManager] STEP delete failed:', e)
       }
-      await new Promise<void>((resolve, reject) => {
-        tx.oncomplete = () => resolve()
-        tx.onerror = () => reject(tx.error)
-        tx.onabort = () => reject(tx.error)
-      })
-      // Only clear memCache after IDB transaction succeeds
-      for (const key of selectedKeys) {
-        memCache.delete(key)
+    }
+
+    // Clear thumbnail entries
+    if (thumbKeys.length > 0) {
+      try {
+        const db = await openThumbIDB()
+        const tx = db.transaction(THUMB_STORE_NAME, 'readwrite')
+        const store = tx.objectStore(THUMB_STORE_NAME)
+        for (const key of thumbKeys) {
+          store.delete(key)
+        }
+        await new Promise<void>((resolve, reject) => {
+          tx.oncomplete = () => resolve()
+          tx.onerror = () => reject(tx.error)
+          tx.onabort = () => reject(tx.error)
+        })
+        for (const key of thumbKeys) {
+          thumbMemCache.delete(key)
+        }
+      } catch (e) {
+        console.warn('[CacheManager] Thumbnail delete failed:', e)
       }
-    } catch (e) {
-      console.warn('[CacheManager] IndexedDB delete failed:', e)
     }
 
     await loadEntries()
@@ -150,11 +248,15 @@ export function CacheManager({ children }: CacheManagerProps) {
   const handleClearAll = async () => {
     setLoading(true)
     await clearStepCache()
+    await clearThumbnailCache()
     await loadEntries()
   }
 
-  const memoryEntries = entries.filter(e => e.type === 'memory')
-  const diskEntries = entries.filter(e => e.type === 'indexeddb')
+  // Group entries
+  const stepMemory = entries.filter(e => e.kind === 'step' && e.type === 'memory')
+  const stepDisk = entries.filter(e => e.kind === 'step' && e.type === 'indexeddb')
+  const thumbMemory = entries.filter(e => e.kind === 'thumbnail' && e.type === 'memory')
+  const thumbDisk = entries.filter(e => e.kind === 'thumbnail' && e.type === 'indexeddb')
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -276,71 +378,98 @@ export function CacheManager({ children }: CacheManagerProps) {
             </div>
           ) : (
             <div className="space-y-1">
-              {memoryEntries.length > 0 && (
-                <div className="mb-3">
-                  <div className="flex items-center gap-1 mb-1 text-xs text-muted-foreground font-medium">
-                    <HardDrive size={11} />
-                    {t('cache.memory')} ({memoryEntries.length})
-                  </div>
-                  {memoryEntries.map(entry => {
-                    const { path, mtime } = parseKey(entry.key)
-                    return (
-                      <div
-                        key={entry.key}
-                        onClick={() => handleSelect(entry.key)}
-                        className="flex items-center gap-2 px-2 py-1.5 rounded cursor-pointer hover:bg-accent text-xs"
-                      >
-                        <input
-                          type="checkbox"
-                          checked={selectedKeys.has(entry.key)}
-                          onChange={() => {}}
-                          className="accent-primary"
-                        />
-                        <div className="flex-1 min-w-0">
-                          <div className="truncate text-foreground" title={path}>{path}</div>
-                          <div className="text-muted-foreground text-[10px]">{mtime}</div>
-                        </div>
-                        <div className="text-muted-foreground shrink-0">{formatBytes(entry.size)}</div>
-                      </div>
-                    )
-                  })}
-                </div>
+              {stepMemory.length > 0 && (
+                <CacheSection
+                  icon={HardDrive}
+                  label={`${t('cache.memory')} (STEP)`}
+                  entries={stepMemory}
+                  selectedKeys={selectedKeys}
+                  onSelect={handleSelect}
+                  entryId={entryId}
+                />
               )}
-
-              {diskEntries.length > 0 && (
-                <div className="mb-3">
-                  <div className="flex items-center gap-1 mb-1 text-xs text-muted-foreground font-medium">
-                    <Database size={11} />
-                    {t('cache.disk')} ({diskEntries.length})
-                  </div>
-                  {diskEntries.map(entry => {
-                    const { path, mtime } = parseKey(entry.key)
-                    return (
-                      <div
-                        key={entry.key}
-                        onClick={() => handleSelect(entry.key)}
-                        className="flex items-center gap-2 px-2 py-1.5 rounded cursor-pointer hover:bg-accent text-xs"
-                      >
-                        <input
-                          type="checkbox"
-                          checked={selectedKeys.has(entry.key)}
-                          onChange={() => {}}
-                          className="accent-primary"
-                        />
-                        <div className="flex-1 min-w-0">
-                          <div className="truncate text-foreground" title={path}>{path}</div>
-                          <div className="text-muted-foreground text-[10px]">{mtime}</div>
-                        </div>
-                        <div className="text-muted-foreground shrink-0">{formatBytes(entry.size)}</div>
-                      </div>
-                    )
-                  })}
-                </div>
+              {stepDisk.length > 0 && (
+                <CacheSection
+                  icon={Database}
+                  label={`${t('cache.disk')} (STEP)`}
+                  entries={stepDisk}
+                  selectedKeys={selectedKeys}
+                  onSelect={handleSelect}
+                  entryId={entryId}
+                />
+              )}
+              {thumbMemory.length > 0 && (
+                <CacheSection
+                  icon={Image}
+                  label={`${t('cache.memory')} (Thumbnail)`}
+                  entries={thumbMemory}
+                  selectedKeys={selectedKeys}
+                  onSelect={handleSelect}
+                  entryId={entryId}
+                />
+              )}
+              {thumbDisk.length > 0 && (
+                <CacheSection
+                  icon={Image}
+                  label={`${t('cache.disk')} (Thumbnail)`}
+                  entries={thumbDisk}
+                  selectedKeys={selectedKeys}
+                  onSelect={handleSelect}
+                  entryId={entryId}
+                />
               )}
             </div>
           )}
         </div>
       </DialogContent>
     </Dialog>
+  )
+}
+
+function CacheSection({
+  icon: Icon,
+  label,
+  entries,
+  selectedKeys,
+  onSelect,
+  entryId,
+}: {
+  icon: React.ComponentType<{ size?: number }>
+  label: string
+  entries: CacheEntry[]
+  selectedKeys: Set<string>
+  onSelect: (id: string) => void
+  entryId: (entry: CacheEntry) => string
+}) {
+  return (
+    <div className="mb-3">
+      <div className="flex items-center gap-1 mb-1 text-xs text-muted-foreground font-medium">
+        <Icon size={11} />
+        {label} ({entries.length})
+      </div>
+      {entries.map(entry => {
+        const { path, mtime } = parseKey(entry.key)
+        const id = entryId(entry)
+        return (
+          <div
+            key={id}
+            onClick={() => onSelect(id)}
+            className="flex items-center gap-2 px-2 py-1.5 rounded cursor-pointer hover:bg-accent text-xs"
+          >
+            <input
+              type="checkbox"
+              checked={selectedKeys.has(id)}
+              onChange={() => {}}
+              className="accent-primary"
+            />
+            <div className="flex-1 min-w-0">
+              <div className="truncate text-foreground" title={path}>{path}</div>
+              <div className="text-muted-foreground text-[10px]">{mtime}</div>
+            </div>
+            <div className="text-muted-foreground shrink-0">{formatBytes(entry.size)}</div>
+          </div>
+        )
+      })}
+    </div>
   )
 }

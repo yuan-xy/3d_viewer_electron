@@ -76,6 +76,8 @@
     "point": "Point"
   },
 
+  "settings.enablePreview": "Enable Preview",
+
   "fileList.title": "Files",
   "fileList.empty": "Load a file to browse models in the same folder",
   "fileList.folder": "Folder",

@@ -50,6 +50,8 @@
     "edge": "모서리",
     "point": "점"
   },
+  "settings.enablePreview": "Enable Preview",
+
   "fileList.title": "파일",
   "fileList.empty": "파일을 불러오면 같은 폴더의 모델이 표시됩니다",
   "fileList.folder": "폴더",

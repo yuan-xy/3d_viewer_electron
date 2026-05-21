@@ -50,6 +50,8 @@
     "edge": "Kant",
     "point": "Punkt"
   },
+  "settings.enablePreview": "Enable Preview",
+
   "fileList.title": "Filer",
   "fileList.empty": "Ladda en fil för att visa modeller i samma mapp",
   "fileList.folder": "Mapp",
