@@ -22,7 +22,8 @@ test.describe('3D Viewer Electron - File List Panel', () => {
   test.beforeAll(async () => {
     electronApp = await _electron.launch({
       executablePath: getElectronPath(),
-      env: { E2E: '1' },
+      args: ['--no-sandbox', '--ozone-platform-hint=x11'],
+      env: { ...process.env, E2E: '1' },
     })
   })
 
