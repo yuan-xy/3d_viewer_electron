@@ -79,16 +79,35 @@ export function getMaterialColor(
 // ---------------------------------------------------------------------------
 
 function convertSingle(src: THREE.Material): THREE.Material {
-  if (src instanceof THREE.MeshPhysicalMaterial) return src.clone()
-  if (src instanceof THREE.MeshStandardMaterial) return src.clone()
-  if (src instanceof THREE.MeshPhongMaterial) return phongToStandard(src)
-  if (src instanceof THREE.MeshLambertMaterial) return lambertToStandard(src)
-  if (src instanceof THREE.MeshBasicMaterial) return basicToStandard(src)
-  if (src instanceof THREE.MeshToonMaterial) return toonToStandard(src)
-  if (src instanceof THREE.MeshNormalMaterial) return src.clone()
-  if (src instanceof THREE.MeshMatcapMaterial) return matcapToStandard(src)
-  // Fallback for unknown / base Material types
-  return fallbackToStandard(src)
+  let dst: THREE.Material
+  if (src instanceof THREE.MeshPhysicalMaterial) {
+    dst = src.clone()
+  } else if (src instanceof THREE.MeshStandardMaterial) {
+    dst = src.clone()
+  } else if (src instanceof THREE.MeshPhongMaterial) {
+    dst = phongToStandard(src)
+  } else if (src instanceof THREE.MeshLambertMaterial) {
+    dst = lambertToStandard(src)
+  } else if (src instanceof THREE.MeshBasicMaterial) {
+    dst = basicToStandard(src)
+  } else if (src instanceof THREE.MeshToonMaterial) {
+    dst = toonToStandard(src)
+  } else if (src instanceof THREE.MeshNormalMaterial) {
+    dst = src.clone()
+  } else if (src instanceof THREE.MeshMatcapMaterial) {
+    dst = matcapToStandard(src)
+  } else {
+    dst = fallbackToStandard(src)
+  }
+
+  // Apply polygon offset to prevent z-fighting between adjacent/overlapping surfaces
+  if (dst instanceof THREE.MeshStandardMaterial || dst instanceof THREE.MeshPhysicalMaterial) {
+    dst.polygonOffset = true
+    dst.polygonOffsetFactor = -1
+    dst.polygonOffsetUnits = -1
+  }
+
+  return dst
 }
 
 // ---------------------------------------------------------------------------

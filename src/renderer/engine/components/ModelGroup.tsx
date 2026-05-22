@@ -483,6 +483,9 @@ const ModelGroup = forwardRef<THREE.Group, ModelGroupProps>(function ModelGroup(
                   color="#9BA6AE"
                   roughness={0.35}
                   metalness={0.1}
+                  polygonOffset
+                  polygonOffsetFactor={-1}
+                  polygonOffsetUnits={-1}
                 />
               )}
               {isMeshOnly && (
@@ -491,6 +494,9 @@ const ModelGroup = forwardRef<THREE.Group, ModelGroupProps>(function ModelGroup(
                   roughness={0.4}
                   metalness={0.1}
                   wireframe={true}
+                  polygonOffset
+                  polygonOffsetFactor={-1}
+                  polygonOffsetUnits={-1}
                 />
               )}
             </mesh>
@@ -529,6 +535,9 @@ const ModelGroup = forwardRef<THREE.Group, ModelGroupProps>(function ModelGroup(
           roughness={0.35}
           metalness={0.1}
           wireframe={isMeshOnly}
+          polygonOffset
+          polygonOffsetFactor={-1}
+          polygonOffsetUnits={-1}
         />
       </mesh>
     </group>
