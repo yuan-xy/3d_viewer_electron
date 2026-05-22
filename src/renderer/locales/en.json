@@ -12,7 +12,6 @@
   "toolbar.perspective": "Perspective View",
   "toolbar.orthographic": "Orthographic View",
   "toolbar.fullscreen": "Fullscreen",
-  "toolbar.download": "Download Model",
   "toolbar.modelInfo": "Model Info",
   "toolbar.cache": "Cache",
   "cache.title": "Cache Manager",

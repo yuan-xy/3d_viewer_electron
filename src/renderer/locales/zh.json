@@ -12,7 +12,6 @@
   "toolbar.perspective": "透视视图",
   "toolbar.orthographic": "正交视图",
   "toolbar.fullscreen": "全屏",
-  "toolbar.download": "下载模型",
   "toolbar.modelInfo": "模型信息",
   "toolbar.cache": "缓存",
   "cache.title": "缓存管理",

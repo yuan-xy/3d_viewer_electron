@@ -5,7 +5,6 @@
   "app.quickExample1": "M3ボルトを生成",
   "app.quickExample2": "20mmキューブを作成",
   "app.emptySceneTree": "モデルがありません",
-  "toolbar.download": "モデルをダウンロード",
   "toolbar.modelInfo": "Model Info",
   "toolbar.openFile": "ファイルを開く",
   "toolbar.fullscreen": "フルスクリーン",

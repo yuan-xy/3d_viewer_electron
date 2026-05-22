@@ -14,7 +14,7 @@ import { Separator } from '@/components/ui/separator'
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
 import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip'
 import {
-  PanelLeftClose, PanelLeftOpen, PanelRightClose, PanelRightOpen, Download, FolderOpen,
+  PanelLeftClose, PanelLeftOpen, PanelRightClose, PanelRightOpen, FolderOpen,
   Maximize, Minimize, Info,
   ChevronRight, ChevronDown, Eye, EyeOff,
   Cuboid, Grid3x3,
@@ -213,23 +213,6 @@ export default function DesktopLayout() {
     return () => window.removeEventListener('keydown', handleKeyDown)
   }, [ui.rightPanelOpen, model.folderFiles.length, model.selectedFileIndex])
 
-  const handleDownload = useCallback(() => {
-    const buffer = useModelStore.getState().modelBuffer
-    const format = useModelStore.getState().modelFormat
-    if (!buffer) return
-    const ext = format === 'stl' ? 'stl' : 'glb'
-    const mime = format === 'stl' ? 'application/sla' : 'model/gltf-binary'
-    const blob = new Blob([buffer], { type: mime })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = `model.${ext}`
-    document.body.appendChild(a)
-    a.click()
-    document.body.removeChild(a)
-    URL.revokeObjectURL(url)
-  }, [])
-
   const handleOpenFile = useCallback(async () => {
     const result = await window.electronAPI.openFileDialog()
     if (!result.success || !result.filePaths?.length) return
@@ -363,16 +346,6 @@ export default function DesktopLayout() {
             </Button>
           </TooltipTrigger>
           <TooltipContent>{t('toolbar.fullscreen')}</TooltipContent>
-        </Tooltip>
-
-        {/* Download */}
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button variant="ghost" size="icon" disabled={!activeTool} onClick={handleDownload}>
-              <Download className="h-4 w-4" />
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent>{t('toolbar.download')}</TooltipContent>
         </Tooltip>
 
         {/* Model Info */}
