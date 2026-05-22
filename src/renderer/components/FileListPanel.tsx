@@ -407,10 +407,10 @@ async function handleFileClick(file: { name: string; path: string; mtimeMs: numb
   const store = useModelStore.getState()
   store.setSelectedFileIndex(index)
 
-  // If already loaded, just switch active file
+  // If already loaded, remove it (toggle off); next click loads it again
   const existing = store.loadedFiles.find(f => f.filePath === file.path)
   if (existing) {
-    store.setActiveFile(existing.id)
+    store.removeLoadedFile(existing.id)
     return
   }
 

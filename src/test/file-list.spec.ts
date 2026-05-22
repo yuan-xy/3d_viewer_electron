@@ -117,4 +117,86 @@ test.describe('3D Viewer Electron - File List Panel', () => {
     expect(result.success).toBe(true)
     expect(result.files!.length).toBeGreaterThan(3) // box_boss, test-box, vise, etc.
   })
+
+  test('click file in list toggles load/unload', async () => {
+    test.setTimeout(60000)
+    const window = await electronApp.firstWindow()
+    await window.locator('canvas').first().waitFor({ state: 'attached', timeout: 20000 })
+    await window.setViewportSize({ width: 1280, height: 800 })
+
+    // Ensure clean state
+    await window.evaluate(() => window.__modelStore?.getState().reset())
+
+    // Populate file list from real fixture directory (so readFile IPC works)
+    const hasFiles = await window.evaluate(async (fixturesPath: string) => {
+      const result = await window.electronAPI.readDirectory(fixturesPath)
+      if (!result.success || !result.files) return false
+      window.__modelStore.getState().setFolderFiles(fixturesPath, result.files)
+      return true
+    }, TEST_FIXTURES)
+    expect(hasFiles).toBe(true)
+
+    // Read back the actual file path (uses OS-native separators)
+    const testBoxPath = await window.evaluate(() => {
+      const files = window.__modelStore!.getState().folderFiles
+      const found = files.find((f: any) => f.name === 'test-box.glb')
+      return found?.path ?? null
+    })
+    expect(testBoxPath).toBeTruthy()
+
+    // Wait for the test-box.glb card to appear in the right panel grid
+    const firstCard = window.locator('.grid > div').filter({ hasText: 'test-box.glb' }).first()
+    await firstCard.waitFor({ state: 'attached', timeout: 10000 })
+
+    // First click: load the file
+    await firstCard.click()
+    await window.waitForFunction(
+      (p: string) => window.__modelStore?.getState().loadedFiles.some(
+        (f: any) => f.filePath === p,
+      ),
+      testBoxPath!,
+      { timeout: 30000 },
+    )
+    let loaded = await window.evaluate((p: string) =>
+      window.__modelStore!.getState().loadedFiles.some(
+        (f: any) => f.filePath === p,
+      ),
+      testBoxPath!,
+    )
+    expect(loaded).toBe(true)
+
+    // Second click: unload the file (toggle off)
+    await firstCard.click()
+    await window.waitForFunction(
+      (p: string) => !window.__modelStore?.getState().loadedFiles.some(
+        (f: any) => f.filePath === p,
+      ),
+      testBoxPath!,
+      { timeout: 5000 },
+    )
+    loaded = await window.evaluate((p: string) =>
+      window.__modelStore!.getState().loadedFiles.some(
+        (f: any) => f.filePath === p,
+      ),
+      testBoxPath!,
+    )
+    expect(loaded).toBe(false)
+
+    // Third click: load again (toggle on)
+    await firstCard.click()
+    await window.waitForFunction(
+      (p: string) => window.__modelStore?.getState().loadedFiles.some(
+        (f: any) => f.filePath === p,
+      ),
+      testBoxPath!,
+      { timeout: 30000 },
+    )
+    loaded = await window.evaluate((p: string) =>
+      window.__modelStore!.getState().loadedFiles.some(
+        (f: any) => f.filePath === p,
+      ),
+      testBoxPath!,
+    )
+    expect(loaded).toBe(true)
+  })
 })

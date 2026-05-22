@@ -183,6 +183,16 @@ function setAllVisible(nodes: SceneTreeNode[], visible: boolean): SceneTreeNode[
   }))
 }
 
+/** Copy expanded/visible state from the combined tree back to each file's internal scene tree.
+ *  This ensures ModelGroup (which receives file.sceneTree) stays in sync with the UI tree. */
+function syncCombinedToFiles(combined: SceneTreeNode[], files: LoadedFileModel[]): LoadedFileModel[] {
+  return files.map((file) => {
+    const fileNode = combined.find((n) => n.id === `file:${file.id}`)
+    if (!fileNode?.children) return file
+    return { ...file, sceneTree: fileNode.children }
+  })
+}
+
 function syncActiveFileFields(
   file: LoadedFileModel | undefined,
   allFiles: LoadedFileModel[],
@@ -268,18 +278,15 @@ export const useModelStore = create<ModelStore>()((set, get) => ({
 
   toggleNodeExpanded: (nodeId) => {
     set((state) => {
-      // Handle file-level nodes: delegate to the file's internal tree
-      if (nodeId.startsWith('file:')) {
-        return { sceneTree: toggleNodeInTree(state.sceneTree, nodeId, 'expanded') }
-      }
-      // Internal node: toggle in the combined tree (which contains all files' trees)
-      return { sceneTree: toggleNodeInTree(state.sceneTree, nodeId, 'expanded') }
+      const newTree = toggleNodeInTree(state.sceneTree, nodeId, 'expanded')
+      return { sceneTree: newTree, loadedFiles: syncCombinedToFiles(newTree, state.loadedFiles) }
     })
   },
 
   toggleNodeVisible: (nodeId) => {
     set((state) => {
-      return { sceneTree: toggleNodeInTree(state.sceneTree, nodeId, 'visible') }
+      const newTree = toggleNodeInTree(state.sceneTree, nodeId, 'visible')
+      return { sceneTree: newTree, loadedFiles: syncCombinedToFiles(newTree, state.loadedFiles) }
     })
   },
 
@@ -368,10 +375,12 @@ export const useModelStore = create<ModelStore>()((set, get) => ({
       const newFiles = state.loadedFiles.map((f) =>
         f.id === fileId ? { ...f, sceneTree: tree } : f,
       )
+      const newTree = buildCombinedTree(newFiles, state.sceneTree)
+      const syncedFiles = syncCombinedToFiles(newTree, newFiles)
       const synced = state.activeFileId === fileId
-        ? { sceneTree: buildCombinedTree(newFiles, state.sceneTree) }
+        ? { sceneTree: newTree }
         : {}
-      return { loadedFiles: newFiles, ...synced }
+      return { loadedFiles: syncedFiles, ...synced }
     }),
 
   updateFilePartInfos: (fileId, infos) =>

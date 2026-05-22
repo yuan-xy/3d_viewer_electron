@@ -225,6 +225,17 @@ export default function ViewportContainer() {
   const [animTargetUp, setAnimTargetUp] = useState<THREE.Vector3 | null>(null)
   const [animActive, setAnimActive] = useState(false)
   const pendingBoxRef = useRef<THREE.Box3 | null>(null)
+  // Track largest bounding box across all loaded models for multi-file camera fit
+  const largestBoxRef = useRef<THREE.Box3 | null>(null)
+  const prevFileCountRef = useRef(0)
+
+  // Reset largest-box tracker when files are cleared (new file dialog selection)
+  useEffect(() => {
+    if (loadedFiles.length === 0 && prevFileCountRef.current > 0) {
+      largestBoxRef.current = null
+    }
+    prevFileCountRef.current = loadedFiles.length
+  }, [loadedFiles])
 
   // Topology selection state — only available for GLB (not glTF, which
   // doesn't support embedded STEP_T extensions)
@@ -372,13 +383,24 @@ export default function ViewportContainer() {
   }, [activeUpAxis])
 
   const handleModelLoaded = useCallback((box: THREE.Box3) => {
+    const size = box.getSize(new THREE.Vector3())
+    const maxDim = Math.max(size.x, size.y, size.z)
+    const current = largestBoxRef.current
+    if (!current) {
+      largestBoxRef.current = box.clone()
+    } else {
+      const curSize = current.getSize(new THREE.Vector3())
+      if (maxDim > Math.max(curSize.x, curSize.y, curSize.z)) {
+        largestBoxRef.current = box.clone()
+      }
+    }
     const controls = controlsRef.current
     if (!controls) {
-      pendingBoxRef.current = box.clone()
+      pendingBoxRef.current = largestBoxRef.current.clone()
       return
     }
     pendingBoxRef.current = null
-    applyCameraFit(box, controls)
+    applyCameraFit(largestBoxRef.current, controls)
   }, [applyCameraFit])
 
   // Apply pending camera fit once OrbitControls ref is available
@@ -459,10 +481,10 @@ export default function ViewportContainer() {
         <SceneSetup />
         <ModelTransformTracker modelRef={modelGroupRef} />
         {loadedFiles.length > 0 ? (
-          loadedFiles.map((file, i) => (
-            <group key={file.id} position={[i * 10, 0, 0]}>
+          loadedFiles.map((file) => (
+            <group key={file.id}>
               <ModelGroup
-                ref={i === 0 ? modelGroupRef : undefined}
+                ref={modelGroupRef}
                 buffer={file.buffer}
                 format={file.format}
                 fileId={file.id}
@@ -475,7 +497,7 @@ export default function ViewportContainer() {
                 onCenteringOffsetChange={(offset) => updateFileCenteringOffset(file.id, offset)}
                 onLoadingPhaseChange={(phase) => updateFileLoadingPhase(file.id, phase)}
                 onParsed={makeHandleParsed(file.id)}
-                onLoaded={i === 0 ? handleModelLoaded : undefined}
+                onLoaded={handleModelLoaded}
                 onError={handleModelError}
                 selectorRuntime={file.id === activeFileId ? selectorRuntime : null}
                 displayMode={resolvedDisplayMode}

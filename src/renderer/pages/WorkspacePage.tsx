@@ -38,6 +38,9 @@ export default function WorkspacePage({ projectId }: WorkspacePageProps) {
     const result = await window.electronAPI.openFileDialog()
     if (!result.success || !result.filePaths?.length) return
 
+    // Clear all currently loaded content before loading new files
+    useModelStore.getState().reset()
+
     let firstDirPath: string | null = null
 
     for (const filePath of result.filePaths) {
